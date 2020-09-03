@@ -40,17 +40,16 @@ namespace In {
 		while (!text.eof()) {
 			text.getline(buff, IN_MAX_LEN_LINE);
 			info.lines++;
-			for (int i = 0; i <= strlen(buff); i++) {
+			for (int i = 0, spaceControl = 0; i <= strlen(buff); i++) {
 				info.fullsize++;
 				// debug check
 				std::cout << buff[i] << " " << i << " code: " << getAscii(buff[i]) << std::endl;
 
 				// check spaces
-				if (getAscii(buff[i]) == 32 && getAscii(buff[i + 1] == 32)) {
-					i--;
+				if ((getAscii(buff[i]) == 32 || getAscii(buff[i]) == 9) && i == spaceControl) {
+					spaceControl++;
 					continue;
-				} else if ((getAscii(buff[i]) == 32 && i == 0))
-					continue;
+				}
 
 				if (IN_CODE_TABLE[getAscii(buff[i])] == T) {
 					info.text[info.size] = buff[i];
