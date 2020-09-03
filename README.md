@@ -1,6 +1,6 @@
 # CEA-2020 Course project
 Programming Languages Compiler
 
-After building project you should run CEA-2020.exe via console:
+### After building project you should run CEA-2020.exe via console:
 
-```$ CEA-2020.exe -in:[CODE FILE DIRECTION] -log:[LOG FILE DIR] -out:[OUT FILE DIR]```
+```$ CEA-2020.exe -in:[SOURCE CODE FILE DIR] -log:[LOG FILE DIR] -out:[OUT FILE DIR]```
