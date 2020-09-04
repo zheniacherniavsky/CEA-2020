@@ -45,11 +45,24 @@ namespace In {
 				// debug check
 				std::cout << buff[i] << " " << i << " code: " << getAscii(buff[i]) << std::endl;
 
-				// check spaces
+				// ---- SEPARATORS ----
+				// delete { and } 
+				if (getAscii(buff[i]) == 123 || getAscii(buff[i]) == 125) {
+					break;
+				}
+
+				// delete excess lines
+				if(getAscii(buff[i] == 0 && i == 0)) continue;
+
+				// check spaces like a trim() function
 				if ((getAscii(buff[i]) == 32 || getAscii(buff[i]) == 9) && i == spaceControl) {
 					spaceControl++;
 					continue;
 				}
+				else if (getAscii(buff[i]) == 32 && getAscii(buff[i + 1]) == 32) {
+					continue;
+				}
+				// ---------------------
 
 				if (IN_CODE_TABLE[getAscii(buff[i])] == T) {
 					info.text[info.size] = buff[i];
