@@ -6,7 +6,9 @@
 //		in -in you get only handled program text
 // true:
 //		you enable regular express handler
-#define REGULAR_HANDLER false 
+#define REGULAR_HANDLER true 
+
+#define MAX_LEXEMS_LENGTH 100
 
 #include "In.h"
 #include "Error.h"
@@ -23,6 +25,32 @@ namespace In {
 		for (int i = 0; i < 256; i++)
 			if ((char)i == a) return i;
 		throw ERROR_THROW(0);
+	}
+
+	char* lexems(char* s) {
+		// from this function we get a lexems which are used in FST
+		char* str = new char[strlen(s)];
+		for (int i = 0; i < strlen(s); i++)
+			str[i] = s[i];
+		const char* separators = " ,()";
+		bool pass = false;
+		for (int i = 0; i < strlen(str); i++, pass = false) {
+			for (int j = 0; j < strlen(separators); j++) {
+				if (str[i] == separators[j])
+					pass = true;
+			}
+			if (pass) str[i] = '\n';
+		}
+		for (int i = 0; i < strlen(str); i++) {
+			if (str[i] == '\n' && str[i + 1] == '\n') {
+				for (int j = i + 1; j < strlen(str); j++) {
+					str[j] = str[j + 1];
+				}
+				str[strlen(str)] = '\0';
+			}
+		}
+		str[strlen(str) - 4] = '\0'; // fix size lol i dont wanna find bug
+		return str;
 	}
 
 	_IN_ getin(char* dir, char* outdir) {
@@ -43,23 +71,29 @@ namespace In {
 			for (int i = 0, spaceControl = 0; i <= strlen(buff); i++) {
 				info.fullsize++;
 				// debug check
-				std::cout << buff[i] << " " << i << " code: " << getAscii(buff[i]) << std::endl;
+				// std::cout << buff[i] << " " << i << " code: " << getAscii(buff[i]) << std::endl;
 
-				// ---- SEPARATORS ----
+				// ----- SEPARATORS -----
 				// delete { and } 
 				if (getAscii(buff[i]) == 123 || getAscii(buff[i]) == 125) {
+					info.ignored++;
 					break;
 				}
 
 				// delete excess lines
-				if(getAscii(buff[i] == 0 && i == 0)) continue;
+				if (getAscii(buff[i] == 0 && i == 0)) {
+					info.ignored++;
+					continue;
+				}
 
 				// check spaces like a trim() function
 				if ((getAscii(buff[i]) == 32 || getAscii(buff[i]) == 9) && i == spaceControl) {
+					info.ignored++;
 					spaceControl++;
 					continue;
 				}
 				else if (getAscii(buff[i]) == 32 && getAscii(buff[i + 1]) == 32) {
+					info.ignored++;
 					continue;
 				}
 				// ---------------------
@@ -87,8 +121,11 @@ namespace In {
 		}
 
 		info.text[info.size] = '\0';
-		cout << info.text << endl;
-		text.close();
+		
+		char* lexemsList = lexems(info.text);
+		cout << lexemsList << endl << info.text << endl;
+
+		
 
 		// OUT
 
@@ -104,8 +141,8 @@ namespace In {
 
 		if (REGULAR_HANDLER) {
 			ofstream out(outdir);
-			char* regular = strtok(info.text, "\n");
-
+			char* regular = strtok(lexemsList, "\n");
+			
 			while (regular != NULL) {
 				FST::FST fst1(
 					regular,
@@ -146,6 +183,7 @@ namespace In {
 					out << "(-) Цепочка не распознана:\t\t" << regular << "\n";
 				}
 				regular = strtok(NULL, "\n");
+				
 			}
 			out.close();
 		}
@@ -154,7 +192,6 @@ namespace In {
 			out << info.text;
 			out.close();
 		}
-
 		return info;
 	}
 }
