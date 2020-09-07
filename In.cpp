@@ -6,7 +6,7 @@
 //		in -in you get only handled program text
 // true:
 //		you enable regular express handler
-#define REGULAR_HANDLER true 
+#define REGULAR_HANDLER true
 
 #define MAX_LEXEMS_LENGTH 100
 
@@ -14,9 +14,11 @@
 #include "Error.h"
 #include "Log.h"
 #include "FST/FST.h"
-#include <fstream>
+
 #include <cstring>
 #include <iostream>
+#include <string>
+#include <fstream>
 using namespace std;
 
 namespace In {
@@ -27,30 +29,44 @@ namespace In {
 		throw ERROR_THROW(0);
 	}
 
-	char* lexems(char* s) {
-		// from this function we get a lexems which are used in FST
-		char* str = new char[strlen(s)];
-		for (int i = 0; i < strlen(s); i++)
-			str[i] = s[i];
-		const char* separators = " ,()";
-		bool pass = false;
-		for (int i = 0; i < strlen(str); i++, pass = false) {
-			for (int j = 0; j < strlen(separators); j++) {
-				if (str[i] == separators[j])
-					pass = true;
+	string lexems(char* s) {
+		string lex = "";
+		bool separator = false;
+		
+		for (int i = 0; i < strlen(s); i++) {
+
+			switch (s[i])
+			{
+			case(' '):
+				separator = true;
+				break;
+			case(','):
+				separator = true;
+				break;
+			case('\n'):
+				separator = true;
+				break;
+			case('('):
+				lex += "\n(";
+				separator = true;
+				break;
+			case(')'):
+				lex += "\n)";
+				separator = true;
+				break;
 			}
-			if (pass) str[i] = '\n';
-		}
-		for (int i = 0; i < strlen(str); i++) {
-			if (str[i] == '\n' && str[i + 1] == '\n') {
-				for (int j = i + 1; j < strlen(str); j++) {
-					str[j] = str[j + 1];
-				}
-				str[strlen(str)] = '\0';
+
+			if (!separator) lex += s[i];
+			else {
+				lex += '\n';
+				separator = false;
+			}
+
+			for (int i = 0, j = 0; i < lex.length(); i++, j++) {
+				if (lex[i] == '\n' && lex[i + 1] == '\n') lex[i] = ' ';
 			}
 		}
-		str[strlen(str) - 4] = '\0'; // fix size lol i dont wanna find bug
-		return str;
+		return lex;
 	}
 
 	_IN_ getin(char* dir, char* outdir) {
@@ -74,11 +90,6 @@ namespace In {
 				// std::cout << buff[i] << " " << i << " code: " << getAscii(buff[i]) << std::endl;
 
 				// ----- SEPARATORS -----
-				// delete { and } 
-				if (getAscii(buff[i]) == 123 || getAscii(buff[i]) == 125) {
-					info.ignored++;
-					break;
-				}
 
 				// delete excess lines
 				if (getAscii(buff[i] == 0 && i == 0)) {
@@ -87,7 +98,7 @@ namespace In {
 				}
 
 				// check spaces like a trim() function
-				if ((getAscii(buff[i]) == 32 || getAscii(buff[i]) == 9) && i == spaceControl) {
+				if ((getAscii(buff[i]) == 32) && i == spaceControl) {
 					info.ignored++;
 					spaceControl++;
 					continue;
@@ -121,12 +132,13 @@ namespace In {
 		}
 
 		info.text[info.size] = '\0';
-		
-		char* lexemsList = lexems(info.text);
-		cout << lexemsList << endl << info.text << endl;
 
+		string lex = lexems(info.text);
+		char* lexemsList = new char[lex.length()];
+		for (int i = 0; i < strlen(lexemsList); i++)
+			lexemsList[i] = lex[i];
 		
-
+	
 		// OUT
 
 		// a(g)⁺((b+c+d)e(g)⁺)*g⁺fe - regular expression
@@ -141,6 +153,7 @@ namespace In {
 
 		if (REGULAR_HANDLER) {
 			ofstream out(outdir);
+
 			char* regular = strtok(lexemsList, "\n");
 			
 			while (regular != NULL) {

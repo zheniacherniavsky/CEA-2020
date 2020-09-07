@@ -19,7 +19,7 @@ namespace In {
 	//		если 0 <= значение < 256 - то вводится данное значение
 	const unsigned short IN_CODE_TABLE[256] = {
 	// 0     1      2      3      4      5      6      7      8      9     10     11     12     13     14      15
-	'\n',  In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, // 1
+	'\n',  In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::I, In::T, In::T, In::T, In::T, In::T, In::T, // 1
 	// 16
 	In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, // 2
 	// 32
