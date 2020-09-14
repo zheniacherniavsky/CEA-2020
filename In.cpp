@@ -29,7 +29,7 @@ namespace In {
 		throw ERROR_THROW(0);
 	}
 
-	string lexems(char* s) {
+	string lexems(char* s, int line, string& lexems) {
 		string lex = "";
 		bool separator = false;
 		
@@ -134,7 +134,7 @@ namespace In {
 		info.text[info.size] = '\0';
 
 		string lex = lexems(info.text);
-		char* lexemsList = new char[lex.length()];
+		char* lexemsList = new char[lex.length()]; // таблица лексем и идентификаторов
 		for (int i = 0; i < strlen(lexemsList); i++)
 			lexemsList[i] = lex[i];
 		
