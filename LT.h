@@ -16,18 +16,22 @@
 #define LEX_BRACELET '}'
 #define LEX_LEFTHESIS '('
 #define LEX_RIGHTHESIS ')'
-#define LEX_PLUS 'v' // +
-#define LEX_MINUS 'v' // - 
-#define LEX_STAR 'v' // *
-#define LEX_DIRSLASH 'v' // /
+#define LEX_PLUS '+' // +
+#define LEX_MINUS '-' // - 
+#define LEX_STAR '*' // *
+#define LEX_DIRSLASH '/' // /
+
 
 namespace LT // таблица лексем
 {
+
 	struct Entry
 	{
 		char lexema[LEXEMA_FIXSIZE]; // лексема
 		int sn; // номер строки в исходном тексте
 		int idxTI; // индекс в таблице идентификаторов или NULL
+
+		Entry* next = nullptr;
 	};
 
 	struct LexTable
@@ -35,8 +39,7 @@ namespace LT // таблица лексем
 		int maxsize = LT_MAXSIZE; // емкость таблицы лексем < LT_MAXSIZE
 		int size; // текущий размер таблицы лексем
 		Entry* table; // массив строк таблицы лексем
-		Entry* next; // следующий элемент таблицы
-		Entry* head; // голова
+		Entry* head;
 	};
 
 	LexTable Create( // создать таблицу лексем
@@ -54,5 +57,7 @@ namespace LT // таблица лексем
 	);
 
 	void Delete(LexTable& lextable);
+
+	char compareLexems(char* lexem);
 }
 
