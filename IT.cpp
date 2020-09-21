@@ -1,32 +1,32 @@
-#include "IT.h"
+п»ї#include "IT.h"
 #include "Error.h"
 #include <iostream>
 
 namespace IT
 {
-	IdTable Create(int size) // создание таблицы идентификаторов
+	IdTable Create(int size) // СЃРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ
 	{
-		IdTable newTable; // выделяю память под таблицу
+		IdTable newTable; // РІС‹РґРµР»СЏСЋ РїР°РјСЏС‚СЊ РїРѕРґ С‚Р°Р±Р»РёС†Сѓ
 		
 		if (size < IT_MAXSIZE) newTable.maxsize = size;
 		else throw ERROR_THROW(200)
 
-		newTable.size = 0; // текущий размер таблицы
-		newTable.table = new Entry; // выделяю память под элемент
-		newTable.head = newTable.table; // запоминаю начало списка
+		newTable.size = 0; // С‚РµРєСѓС‰РёР№ СЂР°Р·РјРµСЂ С‚Р°Р±Р»РёС†С‹
+		newTable.table = new Entry; // РІС‹РґРµР»СЏСЋ РїР°РјСЏС‚СЊ РїРѕРґ СЌР»РµРјРµРЅС‚
+		newTable.head = newTable.table; // Р·Р°РїРѕРјРёРЅР°СЋ РЅР°С‡Р°Р»Рѕ СЃРїРёСЃРєР°
 
 		return newTable;
 	}
 
-	void Add(IdTable& idtable, Entry entry) // добавление элемента в таблицу
+	void Add(IdTable& idtable, Entry entry) // РґРѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РІ С‚Р°Р±Р»РёС†Сѓ
 	{
 		if (idtable.table != nullptr)
 		{
-			for (int i = 0; i < ID_MAXSIZE; i++) // идентификатор
+			for (int i = 0; i < ID_MAXSIZE; i++) // РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
 				idtable.table->id[i] = entry.id[i];
 
 			if (idtable.size < idtable.maxsize) idtable.size++;
-			// else throw "ЖЕКА НЕ ЗАБУДЬ ОШИБКУ ДОПИСАТЬ"
+			// else throw "Р–Р•РљРђ РќР• Р—РђР‘РЈР”Р¬ РћРЁРР‘РљРЈ Р”РћРџРРЎРђРўР¬"
 
 			idtable.table->iddatatype = entry.iddatatype;
 
@@ -34,8 +34,8 @@ namespace IT
 
 			idtable.table->idxfirstLE = entry.idxfirstLE;
 
-			idtable.table->value.vint = entry.value.vint; // копирование значения int
-			for(int i = 0; i < entry.value.vstr->len; i++) // копирование значения char
+			idtable.table->value.vint = entry.value.vint; // РєРѕРїРёСЂРѕРІР°РЅРёРµ Р·РЅР°С‡РµРЅРёСЏ int
+			for(int i = 0; i < entry.value.vstr->len; i++) // РєРѕРїРёСЂРѕРІР°РЅРёРµ Р·РЅР°С‡РµРЅРёСЏ char
 				idtable.table->value.vstr->str[i] = entry.value.vstr->str[i];
 			
 			idtable.table->next = new Entry;
@@ -45,10 +45,10 @@ namespace IT
 		else throw ERROR_THROW(201);
 	}
 
-	Entry GetEntry(IdTable& idtable, int n) // получить элемент таблицы идентификаторов по номеру строки
+	Entry GetEntry(IdTable& idtable, int n) // РїРѕР»СѓС‡РёС‚СЊ СЌР»РµРјРµРЅС‚ С‚Р°Р±Р»РёС†С‹ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ РїРѕ РЅРѕРјРµСЂСѓ СЃС‚СЂРѕРєРё
 	{
 		Entry* value = idtable.head;
-		int pos = 0; // первая строка
+		int pos = 0; // РїРµСЂРІР°СЏ СЃС‚СЂРѕРєР°
 		while (value)
 		{
 			if (pos == n)
@@ -61,10 +61,10 @@ namespace IT
 				pos++;
 			}
 		}
-		throw ERROR_THROW(202) // Не обнаружена лексема в данной строке
+		throw ERROR_THROW(202) // РќРµ РѕР±РЅР°СЂСѓР¶РµРЅР° Р»РµРєСЃРµРјР° РІ РґР°РЅРЅРѕР№ СЃС‚СЂРѕРєРµ
 	}
 
-	int IsId(IdTable& idtable, char id[ID_MAXSIZE]) // возврат номера строки (если есть) и TI_NULLIDX (если нет)
+	int IsId(IdTable& idtable, char id[ID_MAXSIZE]) // РІРѕР·РІСЂР°С‚ РЅРѕРјРµСЂР° СЃС‚СЂРѕРєРё (РµСЃР»Рё РµСЃС‚СЊ) Рё TI_NULLIDX (РµСЃР»Рё РЅРµС‚)
 	{
 		Entry* value = idtable.head;
 		while (value)
