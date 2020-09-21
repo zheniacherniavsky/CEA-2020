@@ -8,7 +8,7 @@
 //		you enable regular express handler
 #define REGULAR_HANDLER true
 
-#define MAX_LEXEMS_LENGTH 100
+#define MAX_LEXEMS_LENGTH 1000
 
 #include "In.h"
 #include "Error.h"
@@ -24,15 +24,15 @@ using namespace std;
 
 namespace In {
 
-	int getAscii(char a) {
+	int getAscii(char a) { // фция получения аски кода символа
 		for (int i = 0; i < 256; i++)
 			if ((char)i == a) return i;
 		throw ERROR_THROW(0);
 	}
 
-	bool checkSeparators(string &code, char symbol)
+	bool checkSeparators(string &code, char symbol) // функция проверки на лексемы отдельных символов
 	{
-		const char* separators = ";,()+-*/{}";
+		const char* separators = ";,()+-*/{}=";
 		for (int i = 0; i < strlen(separators); i++) {
 			if (separators[i] == symbol) 
 			{
@@ -43,7 +43,7 @@ namespace In {
 		return false;
 	}
 
-	int* getLineNums(string code)
+	int* getLineNums(string code) // функция вычисления номера строки исходного кода для его лексем
 	{
 		int* array = new int[MAX_LEXEMS_LENGTH];
 		int size = 0;
@@ -69,6 +69,8 @@ namespace In {
 		}
 		return array;
 	}
+
+	void makeOutWithLT(LT::LexTable& table);
 
 	_IN_ getin(char* dir, char* outdir) {
 		_IN_ info;
@@ -106,6 +108,9 @@ namespace In {
 			for (int i = 0, spaceControl = 0; i <= line.length(); i++)
 			{
 				if(checkSeparators(code, line[i])) continue; // добавление пробелов для разделения между лексемами
+
+				// проверка на пустую строку
+				if (strcmp(&line[0], "\0") == 0) continue;
 
 				// проверка на литерал
 				if (line[i] == '\"' || line[i] == '\'')
@@ -150,28 +155,71 @@ namespace In {
 		int* lexemsPosition = getLineNums(code); // получаю массив с номерами строк лексем ( позиций )
 		char* lexem = strtok(&code[0], " \n");
 		
-		for(int i = 0; lexem != NULL; i++)
+		for(int i = 0, idxIndex = 1; lexem != NULL; i++)
 		{
 			LT::Entry entryLexem;
 			entryLexem.sn = lexemsPosition[i]; // кидаем позицию лексемы в исходном коде
 			entryLexem.lexema[0] = LT::compareLexems(lexem); // кидаем туда идентификатор лексемы
+			idxIndex = entryLexem.updateIndex(idxIndex); 
+
 			LT::Add(lexTable, entryLexem);
-			cout << lexem << "[" << lexemsPosition[i] << "] :" << LT::compareLexems(lexem) << endl; // debug
+			// cout << lexem << "[" << lexemsPosition[i] << "] :" << LT::compareLexems(lexem) << endl; // debug
 			lexem = strtok(NULL, " \n");
 		}
 
+		makeOutWithLT(lexTable);
 
-		cout << "вова: " << LT::GetEntry(lexTable, 1).lexema[0] << endl;
+		// IT debug
 
+		IT::IdTable idTable = IT::Create(MAX_LEXEMS_LENGTH);
+		IT::Entry element;
+		
+		for (int i = 0; i < strlen("1"); i++)
+			element.id[i] = "1"[i];
+		element.id[strlen(element.id)] = '\0';
 
-		LT::Entry entryLexem = *lexTable.head;
-		for (;;)
+		element.iddatatype = IT::STR;
+		element.idtype = IT::V;	
+		element.idxfirstLE = 1;
+		element.value.vint = NULL;
+		element.value.vstr->len = 5;
+
+		for (int i = 0; i < strlen("hello"); i++)
+			element.value.vstr->str[i] = "hello"[i];
+		
+		IT::Add(idTable, element);
+		IT::Add(idTable, element);
+		IT::Add(idTable, element);
+		IT::Add(idTable, element);
+		IT::Add(idTable, element);
+		IT::Add(idTable, element);
+		IT::Add(idTable, element);
+		IT::Add(idTable, element);
+
+		IT::Entry* a = idTable.head;
+		while (a->next != nullptr)
 		{
-			if (&entryLexem.next == nullptr) break;
-			cout << entryLexem.lexema[0] << endl;
-			entryLexem = *entryLexem.next;
+			cout << a->id << '\t' << a->value.vstr->str << endl;
+			a = a->next;
 		}
 
 		return info;
+	}
+
+	void makeOutWithLT(LT::LexTable& table)
+	{
+		LT::Entry* element = table.head;
+
+		int i = 0;
+		cout << "\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ:" << endl;
+		while (element->next != nullptr)
+		{
+			cout << "\n" << element->sn << '\t';
+			while(i == element->sn) {
+				cout << element->lexema[0];
+				element = element->next;
+			}
+			i++;
+		}
 	}
 }
