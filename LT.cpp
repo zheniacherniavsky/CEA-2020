@@ -1,52 +1,70 @@
-#include "LT.h"
+п»ї#include "LT.h"
 #include "Error.h"
+#include "IT.h"
 
 #include <iostream>
 
 namespace LT
 {
+	int Entry::updateIndex(int i)
+	{
+		if (lexema[0] == 'i')
+		{
+			idxTI = i;
+			i++;
+		}
+		else if (lexema[0] == 'l') {
+			idxTI = i;
+			i++;
+		}
+
+		else idxTI = IT_NULL_IDX;
+		return i;
+	}
+
 	LexTable Create(int size)
 	{
 		if (size < LT_MAXSIZE)
 		{
-			LexTable* LT = new LexTable; // выделяем память под таблицу
-			LT->maxsize = size; // указываем размер
+			LexTable* LT = new LexTable; // РІС‹РґРµР»СЏРµРј РїР°РјСЏС‚СЊ РїРѕРґ С‚Р°Р±Р»РёС†Сѓ
+			LT->maxsize = size; // СѓРєР°Р·С‹РІР°РµРј СЂР°Р·РјРµСЂ
 			LT->size = 0;
 			LT->table = new Entry;
 
-			LT->head = LT->table; // ставим начало указателя
+			LT->head = LT->table; // СЃС‚Р°РІРёРј РЅР°С‡Р°Р»Рѕ СѓРєР°Р·Р°С‚РµР»СЏ
 
-			// список будет односвязный, т.к. возвращаться к предыдущему элементу в таблице
-			// лексем не имеет никакого смысла
+			// СЃРїРёСЃРѕРє Р±СѓРґРµС‚ РѕРґРЅРѕСЃРІСЏР·РЅС‹Р№, С‚.Рє. РІРѕР·РІСЂР°С‰Р°С‚СЊСЃСЏ Рє РїСЂРµРґС‹РґСѓС‰РµРјСѓ СЌР»РµРјРµРЅС‚Сѓ РІ С‚Р°Р±Р»РёС†Рµ
+			// Р»РµРєСЃРµРј РЅРµ РёРјРµРµС‚ РЅРёРєР°РєРѕРіРѕ СЃРјС‹СЃР»Р°
 
-			return *LT; // возвращаем указатель на нашу таблицу
+			return *LT; // РІРѕР·РІСЂР°С‰Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅР°С€Сѓ С‚Р°Р±Р»РёС†Сѓ
 		}
-		else throw ERROR_THROW(200); // превышен размер создаваемой таблицы 
+		else throw ERROR_THROW(200); // РїСЂРµРІС‹С€РµРЅ СЂР°Р·РјРµСЂ СЃРѕР·РґР°РІР°РµРјРѕР№ С‚Р°Р±Р»РёС†С‹ 
 	}
 
-	void Add(LexTable& LT, Entry entry) // добавление
+	void Add(LexTable& LT, Entry entry) // РґРѕР±Р°РІР»РµРЅРёРµ
 	{
 		if (LT.table != nullptr)
 		{	
 			LT.table->lexema[0] = entry.lexema[0];
 			
-			if (LT.size <= LT.maxsize) LT.size;
-			// else throw "ЖЕКА НЕ ЗАБУДЬ ОШИБКУ ДОПИСАТЬ"
+			if (LT.size <= LT.maxsize) LT.size++;
+			// else throw "Р–Р•РљРђ РќР• Р—РђР‘РЈР”Р¬ РћРЁРР‘РљРЈ Р”РћРџРРЎРђРўР¬"
 
 			LT.table->idxTI = entry.idxTI;
 			LT.table->sn = entry.sn;
-			// выделяем память и перемещаем наш лист туда
-			// при этом начало списка сохраняется в LT
+			// РІС‹РґРµР»СЏРµРј РїР°РјСЏС‚СЊ Рё РїРµСЂРµРјРµС‰Р°РµРј РЅР°С€ Р»РёСЃС‚ С‚СѓРґР°
+			// РїСЂРё СЌС‚РѕРј РЅР°С‡Р°Р»Рѕ СЃРїРёСЃРєР° СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РІ LT
 			LT.table->next = new Entry;
 			LT.table = LT.table->next;
+			LT.table->next = nullptr;
 		}
-		else throw ERROR_THROW(201); // данной таблицы не существует или её компоненты не проинициализированы.
+		else throw ERROR_THROW(201); // РґР°РЅРЅРѕР№ С‚Р°Р±Р»РёС†С‹ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РёР»Рё РµС‘ РєРѕРјРїРѕРЅРµРЅС‚С‹ РЅРµ РїСЂРѕРёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅС‹.
 	}
 
-	Entry GetEntry(LexTable& LT, int n) // получаем строку по 
+	Entry GetEntry(LexTable& LT, int n) // РїРѕР»СѓС‡Р°РµРј СЃС‚СЂРѕРєСѓ РїРѕ 
 	{
 		Entry* value = LT.head;
-		int pos = 1; // первая строка
+		int pos = 0; // РїРµСЂРІР°СЏ СЃС‚СЂРѕРєР°
 		while (value)
 		{
 			if (pos == n)
@@ -59,7 +77,7 @@ namespace LT
 				pos++;
 			}
 		}
-		throw ERROR_THROW(202) // Не обнаружена лексема в данной строке
+		throw ERROR_THROW(202) // РќРµ РѕР±РЅР°СЂСѓР¶РµРЅР° Р»РµРєСЃРµРјР° РІ РґР°РЅРЅРѕР№ СЃС‚СЂРѕРєРµ
 	}
 
 	void Delete(LexTable& LT)
@@ -67,8 +85,10 @@ namespace LT
 		delete &LT;
 	}
 
-	// функция изменения лексем на идентификаторы
-	char compareLexems(char* lexem) {
+	char compareLexems(char* lexem) // С„СѓРЅРєС†РёСЏ РёР·РјРµРЅРµРЅРёСЏ Р»РµРєСЃРµРј 
+	{
+		// РІ СЌС‚РѕР№ С„СѓРЅРєС†РёРё РёРґС‘С‚ РїСЂРѕРІРµСЂРєР° РЅР° РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ, Рё СЏ СЃСЂР°Р·Сѓ Р¶Рµ РїСЂРё 
+		// РѕР±РЅР°СЂСѓР¶РµРЅРёРё РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР° СЏ Р·Р°РєРёРґС‹РІР°СЋ РµРіРѕ РІ С‚Р°Р±Р»РёС†Сѓ
 		const int SIZE = 17;
 		const char* lexems[SIZE] = { "integer","string", "function", "declare",
 							"return", "print", ";", ",", "{", "}", "(",
@@ -79,13 +99,21 @@ namespace LT
 		for (int i = 0; i < SIZE; i++) {
 			if (strcmp(lexem, lexems[i]) == 0)
 				return idLexems[i];
-
 		}
-		
+
 		if (lexem[0] == *"\"" || lexem[0] == *"\'") {
-			// поменять _ на пробел
+			// РїРѕРјРµРЅСЏС‚СЊ _ РЅР° РїСЂРѕР±РµР»
+			for (int i = 0; i < strlen(lexem); i++)
+				if (lexem[i] == '_') lexem[i] = ' ';
+
+		
 			return LEX_LITERAL;
 		}
-		else return LEX_ID;
+		else
+		{
+			
+
+			return LEX_ID;
+		}
 	}
 }
