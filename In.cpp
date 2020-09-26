@@ -71,6 +71,7 @@ namespace In {
 	}
 
 	void makeOutWithLT(LT::LexTable& table);
+	void makeOutWithIT(IT::IdTable& idTable);
 
 	_IN_ getin(char* dir, char* outdir) {
 		_IN_ info;
@@ -152,6 +153,7 @@ namespace In {
 		// в code находится обработанный код, теперь разбиваем всё на лексемы
 		// и пихаю это всё в таблицу LexTable
 		LT::LexTable lexTable = LT::Create(MAX_LEXEMS_LENGTH); // создаю таблицу лексем
+		IT::IdTable idTable = IT::Create(IT_MAXSIZE); // создаю таблицу идентификаторов
 		int* lexemsPosition = getLineNums(code); // получаю массив с номерами строк лексем ( позиций )
 		char* lexem = strtok(&code[0], " \n");
 		
@@ -159,7 +161,11 @@ namespace In {
 		{
 			LT::Entry entryLexem;
 			entryLexem.sn = lexemsPosition[i]; // кидаем позицию лексемы в исходном коде
-			entryLexem.lexema[0] = LT::compareLexems(lexem); // кидаем туда идентификатор лексемы
+			entryLexem.lexema[0] = LT::compareLexems(lexem, idTable); // кидаем туда идентификатор лексемы
+			/*
+				в compareLexems() сразу идёт проверка на идентификатор и его добавление в таблицу!
+				нет смысла писать отдельную функцию и again проходить все лексемы
+			*/
 			idxIndex = entryLexem.updateIndex(idxIndex); 
 
 			LT::Add(lexTable, entryLexem);
@@ -167,45 +173,14 @@ namespace In {
 			lexem = strtok(NULL, " \n");
 		}
 
+		// debug
 		makeOutWithLT(lexTable);
-
-		// IT debug
-
-		IT::IdTable idTable = IT::Create(MAX_LEXEMS_LENGTH);
-		IT::Entry element;
-		
-		for (int i = 0; i < strlen("1"); i++)
-			element.id[i] = "1"[i];
-		element.id[strlen(element.id)] = '\0';
-
-		element.iddatatype = IT::STR;
-		element.idtype = IT::V;	
-		element.idxfirstLE = 1;
-		element.value.vint = NULL;
-		element.value.vstr->len = 5;
-
-		for (int i = 0; i < strlen("hello"); i++)
-			element.value.vstr->str[i] = "hello"[i];
-		
-		IT::Add(idTable, element);
-		IT::Add(idTable, element);
-		IT::Add(idTable, element);
-		IT::Add(idTable, element);
-		IT::Add(idTable, element);
-		IT::Add(idTable, element);
-		IT::Add(idTable, element);
-		IT::Add(idTable, element);
-
-		IT::Entry* a = idTable.head;
-		while (a->next != nullptr)
-		{
-			cout << a->id << '\t' << a->value.vstr->str << endl;
-			a = a->next;
-		}
+		makeOutWithIT(idTable);
 
 		return info;
 	}
 
+	// debug
 	void makeOutWithLT(LT::LexTable& table)
 	{
 		LT::Entry* element = table.head;
@@ -220,6 +195,24 @@ namespace In {
 				element = element->next;
 			}
 			i++;
+		}
+	}
+
+	// debug
+	void makeOutWithIT(IT::IdTable& idTable)
+	{
+		cout << "\n---=-=-=-=-=-IT TABLE DEBUG=-=-=-=--=-------" << endl;
+		IT::Entry* showTable = idTable.head;
+		while (showTable)
+		{
+			cout << "\nshowTable->id = " << showTable->id << endl;
+			cout << "showTable->iddatatype = " << showTable->iddatatype << endl;
+			cout << "showTable->idtype = " << showTable->idtype << endl;
+			cout << "showTable->idxfirstLE = " << showTable->idxfirstLE << endl;
+			cout << "showTable->value.vstr->len = " << showTable->value.vstr->len << endl;
+			cout << "showTable->value.vstr->str = " << showTable->value.vstr->str << endl;
+			cout << "showTable->value.vint = " << showTable->value.vint << endl;
+			showTable = showTable->next;
 		}
 	}
 }

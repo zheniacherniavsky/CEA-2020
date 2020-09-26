@@ -62,6 +62,6 @@ namespace LT // таблица лексем
 
 	void Delete(LexTable& lextable);
 
-	char compareLexems(char* lexem);
+	char compareLexems(char* lexem, IT::IdTable& idTable);
 }
 

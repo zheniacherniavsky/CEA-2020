@@ -4,78 +4,53 @@
 
 namespace IT
 {
-	IdTable Create(int size) // создание таблицы идентификаторов
+	IdTable Create(int size)
 	{
-		IdTable newTable; // выделяю память под таблицу
+		IdTable newTable;
+
+		if (size <= IT_MAXSIZE)
+			newTable.maxsize = size;
+		else throw ERROR_THROW(0); // допилить ошибку на превышение макс размера таблы
+
+		newTable.size = 0;
+		newTable.table = new Entry(); // выделяем память
+		newTable.head = nullptr; // голова пока пустая. Её буду заполнять при добавлении элементов
 		
-		if (size < IT_MAXSIZE) newTable.maxsize = size;
-		else throw ERROR_THROW(200)
-
-		newTable.size = 0; // текущий размер таблицы
-		newTable.table = new Entry; // выделяю память под элемент
-		newTable.head = newTable.table; // запоминаю начало списка
-
 		return newTable;
 	}
 
-	void Add(IdTable& idtable, Entry entry) // добавление элемента в таблицу
+	void Add(IdTable& idtable, Entry* entry)
 	{
-		if (idtable.table != nullptr)
+		if (idtable.size < idtable.maxsize) // размер должен быть меньше максимального размера таблицы 
 		{
-			for (int i = 0; i < ID_MAXSIZE; i++) // идентификатор
-				idtable.table->id[i] = entry.id[i];
-
-			if (idtable.size < idtable.maxsize) idtable.size++;
-			// else throw "ЖЕКА НЕ ЗАБУДЬ ОШИБКУ ДОПИСАТЬ"
-
-			idtable.table->iddatatype = entry.iddatatype;
-
-			idtable.table->idtype = entry.idtype;
-
-			idtable.table->idxfirstLE = entry.idxfirstLE;
-
-			idtable.table->value.vint = entry.value.vint; // копирование значения int
-			for(int i = 0; i < entry.value.vstr->len; i++) // копирование значения char
-				idtable.table->value.vstr->str[i] = entry.value.vstr->str[i];
-			
-			idtable.table->next = new Entry;
-			idtable.table = idtable.table->next;
-			idtable.table->next = nullptr;
-		}
-		else throw ERROR_THROW(201);
-	}
-
-	Entry GetEntry(IdTable& idtable, int n) // получить элемент таблицы идентификаторов по номеру строки
-	{
-		Entry* value = idtable.head;
-		int pos = 0; // первая строка
-		while (value)
-		{
-			if (pos == n)
+			if (idtable.head == nullptr)
 			{
-				return *value;
+				idtable.head = idtable.table; // ставим начало списка на этот элемент, т.к. он бует первым
 			}
 			else
 			{
-				value = value->next;
-				pos++;
+				idtable.table->next = new Entry(); // иначе выделяем память под следующий элемент
+				idtable.table = idtable.table->next; // и переходим на него
 			}
-		}
-		throw ERROR_THROW(202) // Не обнаружена лексема в данной строке
-	}
 
-	int IsId(IdTable& idtable, char id[ID_MAXSIZE]) // возврат номера строки (если есть) и TI_NULLIDX (если нет)
-	{
-		Entry* value = idtable.head;
-		while (value)
-		{
-			if (strcmp(value->id, id) == 0) return value->idxfirstLE;
-		}
-		return IT_NULL_IDX;
-	}
+			// дальше просто заполняем данными
+			for (int i = 0; i < ID_MAXSIZE; i++)
+			{
+				idtable.table->id[i] = entry->id[i];
+			}
 
-	void Delete(IdTable& idtable)
-	{
-		delete &idtable;
+			idtable.table->iddatatype = entry->iddatatype;
+			idtable.table->idtype = entry->idtype;
+			idtable.table->idxfirstLE = entry->idxfirstLE;
+			idtable.table->value.vint = entry->value.vint;
+			idtable.table->value.vstr->len = entry->value.vstr->len;
+
+			for (int i = 0; i < entry->value.vstr->len; i++)
+				idtable.table->value.vstr->str[i] = entry->value.vstr->str[i];
+
+			idtable.size++;
+		}
+		else throw ERROR_THROW(0) // допилить ошибку для переувеличения размера таблицы id
+		
 	}
 }

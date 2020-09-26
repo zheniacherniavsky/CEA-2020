@@ -17,14 +17,14 @@ namespace IT						// таблица идентификаторов
 		IDDATATYPE	iddatatype;		// тип данных
 		IDTYPE		idtype;			// тип идентификатора
 
-		Entry* next;				// односвязный список (следующий элемент)
+		Entry* next = nullptr;		// односвязный список (следующий элемент)
 
 		union
 		{
 			int vint;				// значение integer
 			struct
 			{
-				char len;						// колво символов в string
+				int len;						// колво символов в string
 				char str[IT_STR_MAXSIZE - 1];	// символы string
 			} vstr[IT_STR_MAXSIZE];				// значение string
 		} value;					// значение идентификатора
@@ -41,7 +41,7 @@ namespace IT						// таблица идентификаторов
 	
 	IdTable Create(int size);		// создать таблицу идентификаторов
 
-	void Add(IdTable& idtable, Entry entry);	// создать таблицу идентификаторов
+	void Add(IdTable& idtable, Entry* entry);	// создать таблицу идентификаторов
 
 	Entry GetEntry(IdTable& idtable, int n);	// получить строку таблицы идентификаторов
 
