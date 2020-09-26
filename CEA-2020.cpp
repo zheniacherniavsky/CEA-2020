@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 		In::_IN_ in = In::getin(parms.in, parms.out);
 		Log::WriteIn(log, in);
 		Log::Close(log);
-		std::cout << "Ready. Check " << parms.in << " DIR" << std::endl;
+		std::cout << "\nReady. Check " << parms.in << " DIR" << std::endl;
 	}
 	catch (Error::ERROR_ e) {
 		std::cout << "\nОшибка " << e.id << ": " << e.message << "\n";
