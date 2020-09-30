@@ -7,21 +7,21 @@
 #define IT_STR_MAXSIZE	255			
 namespace IT						// таблица идентификаторов
 {
-	enum IDDATATYPE {INT=1, STR=2};			// типы данных идентификаторов
-	enum IDTYPE		{V=1, F=2, P=3, L=4};	// типы идентификаторов: перемен., функция, парам., литерал
+	enum IDDATATYPE {INT=1, STR=2, nullData=3};			// типы данных идентификаторов
+	enum IDTYPE		{V=1, F=2, P=3, L=4, nullType=4};	// типы идентификаторов: перемен., функция, парам., литерал
 
 	struct Entry
 	{
-		int		idxfirstLE;			// индекс первой строки в таблице лексем
-		char	id[ID_MAXSIZE];		// идентификатор (автоматически устанавливает до ID_MAXSIZE)
-		IDDATATYPE	iddatatype;		// тип данных
-		IDTYPE		idtype;			// тип идентификатора
+		int		idxfirstLE;				// индекс первой строки в таблице лексем
+		char	id[ID_MAXSIZE];			// идентификатор (автоматически устанавливает до ID_MAXSIZE)
+		IDDATATYPE	iddatatype;			// тип данных
+		IDTYPE		idtype;				// тип идентификатора
 
-		Entry* next = nullptr;		// односвязный список (следующий элемент)
+		Entry* next = nullptr;			// односвязный список (следующий элемент)
 
 		union
 		{
-			int vint;				// значение integer
+			int vint;					// значение integer
 			struct
 			{
 				int len;						// колво символов в string

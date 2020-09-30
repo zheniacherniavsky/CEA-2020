@@ -13,14 +13,16 @@
 #include "In.h"
 #include "Error.h"
 #include "Log.h"
-#include "FST/FST.h"
 #include "LT.h"
+#include "FST.h"
 
 #include <cstring>
 #include <iostream>
 #include <string>
 #include <fstream>
 using namespace std;
+
+char compareLexems(char* lexem, IT::IdTable& idTable); // автомат для лексем
 
 namespace In {
 
@@ -161,7 +163,7 @@ namespace In {
 		{
 			LT::Entry entryLexem;
 			entryLexem.sn = lexemsPosition[i]; // кидаем позицию лексемы в исходном коде
-			entryLexem.lexema[0] = LT::compareLexems(lexem, idTable); // кидаем туда идентификатор лексемы
+			entryLexem.lexema[0] = compareLexems(lexem, idTable); // кидаем туда идентификатор лексемы
 			/*
 				в compareLexems() сразу идёт проверка на идентификатор и его добавление в таблицу!
 				нет смысла писать отдельную функцию и again проходить все лексемы
@@ -214,5 +216,194 @@ namespace In {
 			cout << "showTable->value.vint = " << showTable->value.vint << endl;
 			showTable = showTable->next;
 		}
+	}
+}
+
+char compareLexems(char* lexem, IT::IdTable& idTable) {
+
+	FST::FST fst1(lexem, 8,		//integer
+		FST::NODE(1, FST::RELATION('i', 1)),
+		FST::NODE(1, FST::RELATION('n', 2)),
+		FST::NODE(2, FST::RELATION('t', 3), FST::RELATION('t', 7)),
+		FST::NODE(1, FST::RELATION('e', 4)),
+		FST::NODE(1, FST::RELATION('g', 5)),
+		FST::NODE(1, FST::RELATION('e', 6)),
+		FST::NODE(1, FST::RELATION('r', 7)),
+		FST::NODE()
+	);
+
+	FST::FST fst2(lexem, 7,		//string
+		FST::NODE(1, FST::RELATION('s', 1)),
+		FST::NODE(1, FST::RELATION('t', 2)),
+		FST::NODE(1, FST::RELATION('r', 3)),
+		FST::NODE(1, FST::RELATION('i', 4)),
+		FST::NODE(1, FST::RELATION('n', 5)),
+		FST::NODE(1, FST::RELATION('g', 6)),
+		FST::NODE()
+	);
+
+	FST::FST fst3(lexem, 9,		//function
+		FST::NODE(1, FST::RELATION('f', 1)),
+		FST::NODE(1, FST::RELATION('u', 2)),
+		FST::NODE(1, FST::RELATION('n', 3)),
+		FST::NODE(1, FST::RELATION('c', 4)),
+		FST::NODE(1, FST::RELATION('t', 5)),
+		FST::NODE(1, FST::RELATION('i', 6)),
+		FST::NODE(1, FST::RELATION('o', 7)),
+		FST::NODE(1, FST::RELATION('n', 8)),
+		FST::NODE()
+	);
+
+	FST::FST fst4(lexem, 8,		//declare
+		FST::NODE(1, FST::RELATION('d', 1)),
+		FST::NODE(1, FST::RELATION('e', 2)),
+		FST::NODE(1, FST::RELATION('c', 3)),
+		FST::NODE(1, FST::RELATION('l', 4)),
+		FST::NODE(1, FST::RELATION('a', 5)),
+		FST::NODE(1, FST::RELATION('r', 6)),
+		FST::NODE(1, FST::RELATION('e', 7)),
+		FST::NODE()
+	);
+
+	FST::FST fst5(lexem, 7,		//return
+		FST::NODE(1, FST::RELATION('r', 1)),
+		FST::NODE(1, FST::RELATION('e', 2)),
+		FST::NODE(1, FST::RELATION('t', 3)),
+		FST::NODE(1, FST::RELATION('u', 4)),
+		FST::NODE(1, FST::RELATION('r', 5)),
+		FST::NODE(1, FST::RELATION('n', 6)),
+		FST::NODE()
+	);
+
+	FST::FST fst6(lexem, 6,		//print
+		FST::NODE(1, FST::RELATION('p', 1)),
+		FST::NODE(1, FST::RELATION('r', 2)),
+		FST::NODE(1, FST::RELATION('i', 3)),
+		FST::NODE(1, FST::RELATION('n', 4)),
+		FST::NODE(1, FST::RELATION('t', 5)),
+		FST::NODE()
+	);
+
+	FST::FST fst7(lexem, 2,		//;
+		FST::NODE(1, FST::RELATION(';', 1)),
+		FST::NODE()
+	);
+
+	FST::FST fst8(lexem, 2,		//,
+		FST::NODE(1, FST::RELATION(',', 1)),
+		FST::NODE()
+	);
+
+	FST::FST fst9(lexem, 2,		//{
+		FST::NODE(1, FST::RELATION('{', 1)),
+		FST::NODE()
+	);
+
+	FST::FST fst10(lexem, 2,		//}
+		FST::NODE(1, FST::RELATION('}', 1)),
+		FST::NODE()
+	);
+
+	FST::FST fst11(lexem, 2,		//(
+		FST::NODE(1, FST::RELATION('(', 1)),
+		FST::NODE()
+	);
+
+	FST::FST fst12(lexem, 2,		//)
+		FST::NODE(1, FST::RELATION(')', 1)),
+		FST::NODE()
+	);
+
+	FST::FST fst13(lexem, 2,		//+
+		FST::NODE(1, FST::RELATION('+', 1)),
+		FST::NODE()
+	);
+
+	FST::FST fst14(lexem, 2,		//-
+		FST::NODE(1, FST::RELATION('-', 1)),
+		FST::NODE()
+	);
+
+	FST::FST fst15(lexem, 2,		//*
+		FST::NODE(1, FST::RELATION('*', 1)),
+		FST::NODE()
+	);
+
+	FST::FST fst16(lexem, 2,		//
+		FST::NODE(1, FST::RELATION('/', 1)),
+		FST::NODE()
+	);
+
+	FST::FST fst17(lexem, 2,		//=
+		FST::NODE(1, FST::RELATION('=', 1)),
+		FST::NODE()
+	);
+
+	// добавление элементов в таблицу идентификаторов
+	// будет происходить тут, т.к. тут есть автомат, 
+	// с помощью которого можно определить вид идентификатора
+
+	IT::Entry* element = new IT::Entry;
+
+	// заполнение id 
+	for (int i = 0; i < ID_MAXSIZE; i++)
+	{
+		if (lexem[i])
+			element->id[i] = lexem[i];
+		else
+		{
+			element->id[i] = '\0';
+			break;
+		}
+	}
+
+	element->iddatatype = IT::nullData;
+	element->idtype = IT::nullType; // change later......
+	element->idxfirstLE = 0; // later....
+
+	if (FST::execute(fst1) == -1) // integer
+	{
+		return 't';
+	}
+	else if (FST::execute(fst2) == -1) // string
+	{
+		return 't';
+	}
+	else if (FST::execute(fst3) == -1) // function 
+	{
+		return 'f';
+	}
+	else if (FST::execute(fst4) == -1) // declare
+	{
+		return 'd';
+	}
+	else if (FST::execute(fst5) == -1) // return
+	{
+		return 'r';
+	}
+	else if (FST::execute(fst6) == -1) // print
+	{
+		return 'p';
+	}
+	else if (FST::execute(fst7) == -1) return ';';
+	else if (FST::execute(fst8) == -1) return ',';
+	else if (FST::execute(fst9) == -1) return '{';
+	else if (FST::execute(fst10) == -1) return '}';
+	else if (FST::execute(fst11) == -1) { return '('; }
+	else if (FST::execute(fst12) == -1) { return ')'; }
+	else if (FST::execute(fst13) == -1) return '+';
+	else if (FST::execute(fst14) == -1) return '-';
+	else if (FST::execute(fst15) == -1) return '*';
+	else if (FST::execute(fst16) == -1) return '/';
+	else if (FST::execute(fst17) == -1) return '=';
+	else
+	{
+		if (lexem[0] == '\'' || lexem[0] == '\"')
+			element->iddatatype = IT::STR;
+		else element->iddatatype = IT::INT;
+
+		IT::Add(idTable, element);
+
+		return 'i';
 	}
 }

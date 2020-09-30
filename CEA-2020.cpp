@@ -6,8 +6,6 @@
 #include "Log.h"	// работа с протоколом
 #include "In.h"		// ввод исходного кода
 
-#include "FST/FST.h"
-
 void checkParms(Parm::PARM);
 
 int main(int argc, char* argv[])
@@ -45,6 +43,7 @@ int main(int argc, char* argv[])
 			Log::Close(log);
 		}
 	}
+	system("pause");
 	return 0;
 }
 

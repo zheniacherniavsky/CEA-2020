@@ -149,7 +149,7 @@
   <ItemGroup>
     <ClCompile Include="CEA-2020.cpp" />
     <ClCompile Include="Error.cpp" />
-    <ClCompile Include="FST\FST.cpp" />
+    <ClCompile Include="FST.cpp" />
     <ClCompile Include="In.cpp" />
     <ClCompile Include="IT.cpp" />
     <ClCompile Include="Log.cpp" />
@@ -158,7 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Error.h" />
-    <ClInclude Include="FST\FST.h" />
+    <ClInclude Include="FST.h" />
     <ClInclude Include="In.h" />
     <ClInclude Include="IT.h" />
     <ClInclude Include="Log.h" />

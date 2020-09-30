@@ -1,6 +1,7 @@
 ﻿#include "LT.h"
 #include "Error.h"
 #include "IT.h"
+#include "FST.h"
 
 #include <iostream>
 
@@ -85,8 +86,42 @@ namespace LT
 		delete &LT;
 	}
 
-	char compareLexems(char* lexem, IT::IdTable& idTable) // функция изменения лексем 
+	/* char compareLexems(char* lexem) // функция изменения лексем 
 	{
+		FST::FST fst2(lexem, 8,
+		FST::NODE(1, FST::RELATION('i', 1)),
+		FST::NODE(1, FST::RELATION('n', 2)),
+		FST::NODE(1, FST::RELATION('t', 3)),
+		FST::NODE(1, FST::RELATION('e', 4)),
+		FST::NODE(1, FST::RELATION('g', 5)),
+		FST::NODE(1, FST::RELATION('e', 6)),
+		FST::NODE(1, FST::RELATION('r', 7)),
+		FST::NODE());
+
+		FST::FST fst1(lexem, 2,
+			FST::NODE(1, FST::RELATION('(', 1)),
+			FST::NODE());
+
+		FST::FST fst3(lexem, 7,
+			FST::NODE(1, FST::RELATION('r', 1)),
+			FST::NODE(1, FST::RELATION('e', 2)),
+			FST::NODE(1, FST::RELATION('t', 3)),
+			FST::NODE(1, FST::RELATION('u', 4)),
+			FST::NODE(1, FST::RELATION('r', 5)),
+			FST::NODE(1, FST::RELATION('n', 6)),
+			FST::NODE());
+
+		if (FST::execute(fst1) == -1 || FST::execute(fst2) == -1 || FST::execute(fst3) == -1)
+		{
+			std::cout << "(+) Цепочка распознана:\t\t\t" << lexem << "\n";
+		}
+		else
+		{
+			std::cout << "(-) Цепочка не распознана:\t\t" << lexem << "\n";
+		}
+
+		return LEX_ID;
+		/*
 		// в этой функции идёт проверка на идентификатор, и я сразу же при 
 		// обнаружении идентификатора я закидываю его в таблицу
 		const int SIZE = 17;
@@ -102,11 +137,11 @@ namespace LT
 		}
 
 		if (lexem[0] == '\"' || lexem[0] == '\'') {
-			/*
-				Тут мы понимаем, что работаем с идентификатором.
-				Значит нужно его добавить в таблицу, но сначала создадим объект с
-				информации об этом идентификаторе
-			*/
+			
+			//	Тут мы понимаем, что работаем с идентификатором.
+			//	Значит нужно его добавить в таблицу, но сначала создадим объект с
+			//	информации об этом идентификаторе
+			
 			IT::Entry *elem = new IT::Entry(); // выделяю память под элемент
 			// elem.id - имя идентификатора, сразу укорачивается до ID_MAXSIZE (5)
 			for (int i = 0; i < strlen(lexem); i++)
@@ -149,5 +184,5 @@ namespace LT
 			IT::Add(idTable, elem);
 			return LEX_ID;
 		}
-	}
+		*/
 }

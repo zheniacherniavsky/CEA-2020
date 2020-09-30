@@ -7,7 +7,7 @@ namespace Parm {
 	PARM fillEmpty(PARM p);
 
 	PARM getparm(int argc, char* argv[]) {
-		PARM parms = { "null", "null", "null" };
+		PARM parms = { "null", "out.txt", "log.txt" };
 		if (argc > 4) throw ERROR_THROW(100);
 
 		char keys[PARMS_COUNT][KEY_LENGTH]; // get keys
@@ -45,7 +45,7 @@ namespace Parm {
 		for (int i = 0; i <= strlen(p.log); i++) log[i] = p.log[i];
 		for (int i = 0; i <= strlen(p.out); i++) out[i] = p.out[i];
 
-		if (strcmp(log, "null") == 0) {
+		if (strcmp(log, "log.txt") == 0) {
 			for (int i = 0; i < strlen(p.in); i++)
 				p.log[i] = p.in[i];
 			for (int i = strlen(p.in), j = 0; j < 4; i++, j++)
@@ -53,7 +53,7 @@ namespace Parm {
 			p.log[strlen(p.log)] = '\0';
 		}
 		
-		if (strcmp(out, "null") == 0) {
+		if (strcmp(out, "out.txt") == 0) {
 			for (int i = 0; i < strlen(p.in); i++)
 				p.out[i] = p.in[i];
 			for (int i = strlen(p.in), j = 0; j < 4; i++, j++)
