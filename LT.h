@@ -21,9 +21,6 @@
 #define LEX_STAR '*' // *
 #define LEX_DIRSLASH '/' // /
 
-#include "IT.h"
-
-
 namespace LT // таблица лексем
 {
 

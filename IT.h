@@ -7,12 +7,13 @@
 #define IT_STR_MAXSIZE	255			
 namespace IT						// таблица идентификаторов
 {
-	enum IDDATATYPE {INT=1, STR=2, nullData=3};			// типы данных идентификаторов
-	enum IDTYPE		{V=1, F=2, P=3, L=4, nullType=4};	// типы идентификаторов: перемен., функция, парам., литерал
+	enum IDDATATYPE {INT=1, STR=2};			// типы данных идентификаторов
+	enum IDTYPE		{V=1, F=2, P=3, L=4};	// типы идентификаторов: перемен., функция, парам., литерал
 
 	struct Entry
 	{
 		int		idxfirstLE;				// индекс первой строки в таблице лексем
+		int idxTI;						// индекс в таблице идентификаторов или NULL
 		char	id[ID_MAXSIZE];			// идентификатор (автоматически устанавливает до ID_MAXSIZE)
 		IDDATATYPE	iddatatype;			// тип данных
 		IDTYPE		idtype;				// тип идентификатора
@@ -41,12 +42,11 @@ namespace IT						// таблица идентификаторов
 	
 	IdTable Create(int size);		// создать таблицу идентификаторов
 
-	void Add(IdTable& idtable, Entry* entry);	// создать таблицу идентификаторов
+	void Add(IdTable& idtable, Entry entry);	// создать таблицу идентификаторов
 
 	Entry GetEntry(IdTable& idtable, int n);	// получить строку таблицы идентификаторов
 
-	int IsId(IdTable& idtable, char id[ID_MAXSIZE]);	// возврат: номер строки (если есть), TI_NULLIDX (если нет)
+	int IsId(IdTable& idtable, char id[ID_MAXSIZE]);	// вернёт idx идентификатора
 
 	void Delete(IdTable& idtable); // освободить память (удалить таблицу идентификаторов
-
 }

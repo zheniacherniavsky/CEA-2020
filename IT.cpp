@@ -19,7 +19,7 @@ namespace IT
 		return newTable;
 	}
 
-	void Add(IdTable& idtable, Entry* entry)
+	void Add(IdTable& idtable, Entry entry)
 	{
 		if (idtable.size < idtable.maxsize) // размер должен быть меньше максимального размера таблицы 
 		{
@@ -36,21 +36,39 @@ namespace IT
 			// дальше просто заполняем данными
 			for (int i = 0; i < ID_MAXSIZE; i++)
 			{
-				idtable.table->id[i] = entry->id[i];
+				idtable.table->id[i] = entry.id[i];
 			}
 
-			idtable.table->iddatatype = entry->iddatatype;
-			idtable.table->idtype = entry->idtype;
-			idtable.table->idxfirstLE = entry->idxfirstLE;
-			idtable.table->value.vint = entry->value.vint;
-			idtable.table->value.vstr->len = entry->value.vstr->len;
+			idtable.table->iddatatype = entry.iddatatype;
+			idtable.table->idtype = entry.idtype;
+			idtable.table->idxTI = entry.idxTI;
+			idtable.table->idxfirstLE = entry.idxfirstLE;
+			idtable.table->value.vint = entry.value.vint;
+			idtable.table->value.vstr->len = entry.value.vstr->len;
 
-			for (int i = 0; i < entry->value.vstr->len; i++)
-				idtable.table->value.vstr->str[i] = entry->value.vstr->str[i];
+			for (int i = 0; i < entry.value.vstr->len; i++)
+				idtable.table->value.vstr->str[i] = entry.value.vstr->str[i];
 
 			idtable.size++;
 		}
 		else throw ERROR_THROW(0) // допилить ошибку для переувеличения размера таблицы id
 		
+	}
+
+	int IsId(IdTable& idtable, char id[ID_MAXSIZE])
+	{
+		Entry* element = new Entry();
+		element = idtable.head;
+		while (element)
+		{
+			if (strcmp(element->id, id) == 0)
+			{
+				return element->idxTI;
+
+			}
+				
+			element = element->next;
+		}
+		return IT_NULL_IDX;
 	}
 }

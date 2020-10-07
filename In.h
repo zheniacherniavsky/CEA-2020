@@ -3,6 +3,9 @@
 #define IN_MAX_LEN_LINE 256
 #define IN_CODE_ENDL '\n'
 
+#include "LT.h"
+#include "IT.h"
+
 namespace In {
 	enum { T = 1024, F = 2048, I = 4096 };
 	struct _IN_ {
@@ -52,5 +55,5 @@ namespace In {
 	In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T, In::T  // 16
 	};
 
-	_IN_ getin(char* dir, char* outdir);
+	_IN_ getin(LT::LexTable& lexTable, IT::IdTable& idTable, char* dir, char* outdir);
 };
