@@ -2,14 +2,27 @@
 
 namespace FT
 {
+
 	struct flags
 	{
 		bool _declare		= false; // флаг на объявления переменной
 		bool _literal		= false; // флаг на опознавание литерала
+		bool _number		= false;
 		bool _function		= false; // функция
 		bool _integer		= false; // int
 		bool _string		= false; // string
 		bool _hesisIsOpen	= false; // открытие закрытие скобок для отличения параметров от функции
+
+		void toFalse()	// занулить все флажки
+		{
+			_declare = false;
+			_literal = false;
+			_number = false;
+			_function = false;
+			_integer = false;
+			_string = false;
+			_hesisIsOpen = false;
+		}
 	};
 
 	void fillTables(char* code, LT::LexTable &lt, IT::IdTable &it)
@@ -27,139 +40,145 @@ namespace FT
 			for (int i = 0; i < ID_MAXSIZE; i++)
 				lexemID[i] = lexem[i];
 
-			LT::Entry element;
-			char lexemSymbol = compareLexems(lexem);
-			if (lexemSymbol != 'i' && lexemSymbol != 'n') // если не идентификатор
-			{
-				element.idxTI = IT_NULL_IDX;		// нет элемента в таблице идентификаторов
-				element.lexema[0] = lexemSymbol;	// символ лексемы, полученный из автомата 
-				element.sn = posArray[pos];			// добавляю номер строки в исходном коде
-				pos++;
+			/*
+				создаём элемент таблицы лексем
+				создаём элемент таблицы идентификаторов
 
-				// установка флажков
-				switch(lexemSymbol)
+				элемент = символ лексемы;
+				
+				switch(элемент)
 				{
-				case('d'):
-					flag._declare = true;
+					установка флажков
+				}
+
+				if(элемент идентификатор или литерал)
+				{
+					добавляем его в таблицу идентификаторов
+				}
+
+				добавление в таблицу лексем
+			*/
+
+			IT::Entry itElement; // создаю элемент таблицы идентификаторов
+			LT::Entry ltElement; // элемент таблицы лексем
+			ltElement.idxTI = IT_NULL_IDX;
+			char lexemSymbol = compareLexems(lexem); // получаю символ лексемы
+
+			switch (lexemSymbol)
+			{
+			case('d'):
+				flag._declare = true;
+				break;
+			case('f'):
+				flag._function = true;
+				break;
+			case('t'):
+				if (lexem[0] == 's')
+				{
+					flag._string = true;
 					break;
-				case('f'):
-					flag._function = true;
+				}
+				else
+				{
+					flag._integer = true;
 					break;
-				case('t'):
-					if (lexem[0] == 's') // дешевая проверка на тип ыыыыыыы
+				}
+			case('n'):
+				lexemSymbol = 'i';
+				flag._number = true;
+				flag._literal = true;
+				break;
+			case('('):
+				flag._hesisIsOpen = true;
+				break;
+			case(')'):
+				flag._hesisIsOpen = false;
+				flag._function = false;
+				break;
+			case(';'):
+				flag.toFalse();
+				break;
+			case('{'):
+				flag.toFalse();
+				break;
+			case('}'):
+				flag.toFalse();
+				break;
+			}
+
+			if (lexemSymbol == 'i')
+			{
+				if (lexem[0] == '\'' || lexem[0] == '\"') // строковый и числовой литерал
+				{
+					flag._literal = true;
+					lexemSymbol = 'l';
+				}
+				else if (flag._number) lexemSymbol = 'l';
+
+				int checkIdx = IT::IsId(it, lexemID);
+				bool newElement = false;
+				if (checkIdx == IT_NULL_IDX) // следовательно это новый элемент
+				{
+					newElement = true;
+					itElement.idxTI = idx;
+					ltElement.idxTI = idx++;
+					itElement.idxfirstLE = posArray[pos];
+				} 
+				else
+				{
+					ltElement.idxTI = checkIdx;
+				}
+
+				if (flag._literal)
+				{
+					if (flag._number)
 					{
-						flag._string = true;
-						break;
+						itElement.iddatatype = IT::INT;
+						// добавление значений
 					}
 					else
 					{
-						flag._integer = true;
-						break;
+						itElement.iddatatype = IT::STR;
+						// добавление значений
 					}
-				case('('):
-					flag._hesisIsOpen = true;
-					break;
-				case(')'):
-					flag._hesisIsOpen = false;
-					flag._function = false;
-					break;
 				}
 
-				LT::Add(lt, element);				// добавление в таблицу лексем
-			}
-
-			else if (lexemSymbol == ';' || lexemSymbol == '{')
-			{
-				flag._declare = false;
-				flag._literal = false;
-				flag._function = false;
-				flag._integer = false;
-				flag._string = false;
-			}
-
-			else // если идентификатор
-			{
-				element.lexema[0] = lexemSymbol;
-				if (lexemSymbol != 'n' && flag._declare)
+				if (newElement)
 				{
-					element.idxTI = idx;
-				}
-				else {
-					element.idxTI = IT::IsId(it, lexemID);
-				}
-				if (lexem[0] == '\'' || lexem[0] == '\"')
-				{
-					flag._literal = true; // проверка на литерал
-					element.lexema[0] = 'l';
-					lexemSymbol = 'l';
-				}
-				element.sn = posArray[pos];
-				pos++;
-
-				if (lexemSymbol != 'n' && lexemSymbol != 'l') // если не число
-				{
-					if (flag._declare) // если идёт объявление
+					for (int i = 0; i < ID_MAXSIZE; i++)
 					{
-						IT::Entry idElement;
-						for (int i = 0; i < ID_MAXSIZE; i++)
-						{
-							idElement.id[i] = lexemID[i];
-						}
-						idElement.idtype = IT::V; // переменная
-
-						if(flag._integer)
-							idElement.iddatatype = IT::INT;
-						else if (flag._string)
-							idElement.iddatatype = IT::STR;
-
-						idElement.idxTI = idx;
-						idx++;
-						idElement.idxfirstLE = posArray[pos-1]; // позиция первого вхождения
-						idElement.value.vint = 0;
-						idElement.value.vstr->len = 0;
-						idElement.value.vstr->str[0] = '\0';
-
-						IT::Add(it, idElement);
-						flag._declare = false;
+						itElement.id[i] = lexemID[i];
 					}
-					else if (flag._function)
+					if (flag._function)
 					{
-						IT::Entry idElement;
-						for (int i = 0; i < ID_MAXSIZE; i++)
-						{
-							idElement.id[i] = lexemID[i];
-						}
-						
-						if (flag._hesisIsOpen) idElement.idtype = IT::P; // переменная
-						else idElement.idtype = IT::F; // функция
+						if (flag._hesisIsOpen)
+							itElement.idtype = IT::P; // параметр
+						else itElement.idtype = IT::F; // функция
 
-						if (flag._integer)
-						{
-							idElement.iddatatype = IT::INT;
-							flag._integer = false;
-						}
-						else if (flag._string)
-						{
-							idElement.iddatatype = IT::STR;
-							flag._string = false;
-						}
-
-						idElement.idxTI = idx;
-						element.idxTI = idx;
-						idx++;				
-						idElement.idxfirstLE = posArray[pos - 1]; // позиция первого вхождения
-						idElement.value.vint = 0;
-						idElement.value.vstr->len = 0;
-						idElement.value.vstr->str[0] = '\0';
-
-						IT::Add(it, idElement);
 					}
+					else itElement.idtype = IT::V; // переменная
+
+					if (flag._integer)
+						itElement.iddatatype = IT::INT;
+					else if (flag._string)
+						itElement.iddatatype = IT::STR;
+
+					IT::Add(it, itElement);
+					flag._declare = false;
 				}
-				LT::Add(lt, element);
 			}
+
+			// заполнение таблицы лексем
+			ltElement.sn = posArray[pos++];
+			ltElement.lexema[0] = lexemSymbol;
+			LT::Add(lt, ltElement);
+
 			std::cout << lexem << std::endl;
 			lexem = strtok(NULL, " \n");
 		}
+
+		makeOutWithLT(lt, it);
+		makeOutWithIT(it);
 	}
 
 	int* getLineNums(std::string code) // функция вычисления номера строки исходного кода для его лексем
@@ -374,5 +393,45 @@ namespace FT
 		{
 			return 'i';
 		}
+	}
+
+	// debug
+	void makeOutWithLT(LT::LexTable& table, IT::IdTable it)
+	{
+		LT::Entry* element = table.head;
+
+		int i = 0;
+		std::cout << "\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ:" << std::endl;
+		while (element->next != nullptr)
+		{
+			std::cout << "\n" << i << '\t';
+			while (i == element->sn) {
+				std::cout << element->lexema[0];
+				if (element->idxTI != IT_NULL_IDX)
+					std::cout << '<' << element->idxTI << '>';
+				element = element->next;
+			}
+			i++;
+		}
+	}
+
+	void makeOutWithIT(IT::IdTable& idTable)
+	{
+		std::cout << "\n\t\t\tIT TABLE DEBUG" << std::endl;
+		IT::Entry* showTable = idTable.head;
+		std::cout << "_________________________________________________________________" << std::endl;
+		std::cout << "                                   тип данных    1-перем  2-ф-ция" << std::endl;
+		std::cout << "       номер         уник.id      1-INT  2-STR   3-парам  4-литер" << std::endl;
+		std::cout << "_________________________________________________________________" << std::endl;
+		std::cout << "|\t" << "IDX" << "\t|\t" << "ID" << "\t|\t" << "DATA" << "\t|\t" << "TYPE" << "\t|\t" << std::endl;
+		while (showTable)
+		{
+			std::cout << "|\t" << showTable->idxTI << "\t";
+			std::cout << "|\t" << showTable->id << "\t";
+			std::cout << "|\t" << showTable->iddatatype << "\t";
+			std::cout << "|\t" << showTable->idtype << "\t|" << std::endl;
+			showTable = showTable->next;
+		}
+		std::cout << "_________________________________________________________________" << std::endl;
 	}
 }

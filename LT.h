@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #define LEXEMA_FIXSIZE 1 // фиксированный размер лексемы
 #define LT_MAXSIZE 4096 // максимальное кол-во строк в таблице лексем
 #define LT_TI_NULLIDX 0xffffffff // нет элемента в таблице идентификаторов
