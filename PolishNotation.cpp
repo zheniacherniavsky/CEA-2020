@@ -2,9 +2,13 @@
 #include "IT.h"
 
 #include <iostream>
+#include <stack>
+#include "PolishNotation.h"
 
 namespace PN
 {
+	bool isSymbol(LT::Entry);
+
 	bool PolishNotation( // создание польской записи
 		int lextable_pos, // позиция выражения в таблице лексем
 		LT::LexTable& lexTable, // таблица лексем
@@ -26,9 +30,14 @@ namespace PN
 		*/
 
 		// 1 - получение исходной строки выражения
-		LT::Entry sourceStr = LT::GetEntry(lexTable, lextable_pos);
-		while (sourceStr.sn == lextable_pos)
-			std::cout << sourceStr.lexema << std::endl;
+		
+		std::stack <LT::Entry> symbols;
+		
+		LT::Entry *sourceStr = LT::GetEntry(lexTable, lextable_pos);
+		while (sourceStr->sn == lextable_pos)
+		{
+			std::cout << sourceStr->lexema << std::endl;
+		}
 
 		return true;
 	}

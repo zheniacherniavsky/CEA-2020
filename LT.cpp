@@ -62,7 +62,7 @@ namespace LT
 		else throw ERROR_THROW(201); // данной таблицы не существует или её компоненты не проинициализированы.
 	}
 
-	Entry GetEntry(LexTable& LT, int n) // получаем строку по номеру выражения
+	Entry* GetEntry(LexTable& LT, int n) // получаем строку по номеру выражения
 	{
 		Entry* value = LT.head;
 		int pos = 0; // первая строка
@@ -70,7 +70,7 @@ namespace LT
 		{
 			if (pos == n)
 			{
-				return *value;
+				return value;
 			}
 			else 
 			{

@@ -46,6 +46,8 @@ namespace IT
 			idtable.table->value.vint = entry.value.vint;
 			idtable.table->value.vstr->len = entry.value.vstr->len;
 
+			idtable.table->visibility.area = entry.visibility.area;
+
 			for (int i = 0; i < entry.value.vstr->len; i++)
 				idtable.table->value.vstr->str[i] = entry.value.vstr->str[i];
 
@@ -55,7 +57,7 @@ namespace IT
 		
 	}
 
-	int IsId(IdTable& idtable, char id[ID_MAXSIZE])
+	int IsId(IdTable& idtable, char id[ID_MAXSIZE], short visArea)
 	{
 		Entry* element = new Entry();
 		element = idtable.head;
@@ -63,8 +65,9 @@ namespace IT
 		{
 			if (strcmp(element->id, id) == 0)
 			{
-				return element->idxTI;
-
+				if(element->visibility.area == visArea)
+					return element->idxTI;
+				else if (element->idtype == IT::F) return element->idxTI; // идёт вызов функции
 			}
 				
 			element = element->next;

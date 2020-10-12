@@ -2,7 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning(disable : 4996)
 
-#include <istream>
+#include <iostream>
 #include <string>
 
 #include "IT.h"
@@ -13,7 +13,7 @@
 
 namespace FT
 {
-	void makeOutWithLT(LT::LexTable& lt, IT::IdTable id);
+	void makeOutWithLT(LT::LexTable& lt, IT::IdTable &id);
 	void makeOutWithIT(IT::IdTable& id);
 	char compareLexems(char* lexem); // автомат для лексем
 	int* getLineNums(std::string code);

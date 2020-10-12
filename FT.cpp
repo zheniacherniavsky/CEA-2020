@@ -1,19 +1,79 @@
-#include "FT.h"
+Ôªø#include "FT.h"
+
+/*
+
+	ISSUES:
+				–æ–ø—Ä–µ–¥–µ–ª–µ–Ω–∏–µ –æ–±–ª–∞—Å—Ç–∏ –≤–∏–¥–∏–º–æ—Å—Ç–∏:
+		–û–±–ª–∞—Å—Ç—å –≤–∏–¥–∏–º–æ—Å—Ç–∏ –æ—Ç—Å–ª–µ–∂–∏–≤–∞–µ—Ç—Å—è, –Ω–æ –Ω—É–∂–Ω–æ –¥–æ–±–∞–≤–∏—Ç—å —Å—Ç–µ–∫, –≤ –∫–æ—Ç–æ—Ä—ã–π –±—É–¥–µ—Ç
+	–ø–æ–º–µ—â–∞—Ç—å—Å—è –Ω–∞–∑–≤–∞–Ω–∏–µ —Ñ—É–Ω–∫—Ü–∏–∏ –≤ –¥–∞–Ω–Ω—ã–π –º–æ–º–µ–Ω—Ç, –∏ —É–±–∏—Ä–∞—Ç—å—Å—è —Å–æ–æ—Ç–≤–µ—Ç—Å—Ç–≤–µ–Ω–Ω–æ –∫–æ–≥–¥–∞
+	—Ñ—É–Ω–∫—Ü–∏—è –±—É–¥–µ—Ç –∑–∞–∫–æ–Ω—á–µ–Ω–∞. –≠—Ç–æ –Ω—É–∂–Ω–æ –¥–ª—è –¥–æ–ø–æ–ª–Ω–∏—Ç–µ–ª—å–Ω–æ–π –ø—Ä–æ–≤–µ—Ä–∫–∏ –Ω–∞ –Ω–∞–ª–∏—á–∏–µ –ø–µ—Ä–µ–º–µ–Ω–Ω–æ–π
+	–≤ —Ç–∞–±–ª–∏—Ü–µ –∏–¥–µ–Ω—Ç–∏—Ñ–∏–∫–∞—Ç–æ—Ä–æ–≤. 
+		todo:
+		 1- —Å—Ç–µ–∫ —Å —Ñ—É–Ω–∫—Ü–∏—è–º–∏
+		 2- –¥–æ–±–∞–≤–∏—Ç—å –ø—Ä–æ–≤–µ—Ä–∫—É –Ω–∞ –Ω–∞–∑–≤–∞–Ω–∏–µ —Ñ—É–Ω–∫—Ü–∏–∏ –≤ IT::IsID —Å –¥–æ–ø –∞—Ä–≥—É–º–µ–Ω—Ç–æ–º.
+
+	–ü–æ—Å–ª–µ —ç—Ç–æ–≥–æ —è –¥—É–º–∞—é –≤—Å—ë –±—É–¥–µ—Ç —Ä–∞–±–æ—Ç–∞—Ç—å —Ö–æ—Ä–æ—à–æ. –ê, –∏ –Ω–µ –∑–∞–±—ã—Ç—å –¥–æ–±–∞–≤–∏—Ç—å –ø—Ä–æ–≤–µ—Ä–∫—É
+	–Ω–∞ —Ñ—É–Ω–∫—Ü–∏—é –≤—Ö–æ–¥–∞ main, —É –Ω–µ—ë –ª–µ–∫—Å–µ–º–∞ m !!!!!
+
+
+	++ –µ—â—ë –æ–¥–∏–Ω –±–∞–≥:
+		—Ç–æ—á–∫–∞ –≤—Ö–æ–¥–∞ –∏–º–µ–µ—Ç –æ–±–ª–∞—Å—Ç—å –≤–∏–¥–∏–º–æ—Å—Ç–∏ –Ω–∞ –µ–¥–∏–Ω–∏—Ü—É –±–æ–ª—å—à–µ, —Ç–∞–∫–æ–≥–æ –Ω–µ –¥–æ–ª–∂–Ω–æ –±—ã—Ç—å
+		–≠—Ç–æ –∏—Å–ø—Ä–∞–≤–∏—Ç—Å—è —Å–∞–º–æ, –ø—Ä–∏ –¥–æ–±–∞–≤–ª–µ–Ω–∏–∏ —Å—Ç–µ–∫–∞ —Ñ—É–Ω–∫—Ü–∏–π
+*/
+
+namespace fStk // —Å—Ç–µ–∫ –¥–ª—è –∑–∞–ø–æ–º–∏–Ω–∞–Ω–∏—è –Ω–∞–∑–≤–∞–Ω–∏–π —Ñ—É–Ω–∫—Ü–∏–π
+{
+	struct fStack
+	{
+		char name[ID_MAXSIZE];
+		fStack* next;
+		fStack* prev;
+
+		fStack()
+		{
+			next = nullptr;
+			prev = nullptr;
+		}
+	};
+
+	void Add(fStack* stk, char functionName[ID_MAXSIZE]) // adding element to fStack
+	{
+		for (int i = 0; i < ID_MAXSIZE; i++)
+			stk->name[i] = functionName[i];
+
+		stk->next = new fStack();
+		stk->next->prev = stk;
+		stk = stk->next;
+	}
+
+	void rmLast(fStack* stk) // remove last elem from stack
+	{
+		stk = stk->prev;
+		delete stk->next;
+	}
+
+	void SetFunName(IT::Entry& element, char functionName[ID_MAXSIZE], short visArea) // set info about visibility
+	{
+		element.visibility.area = visArea;
+		for (int i = 0; i < ID_MAXSIZE; i++)
+			element.visibility.functionName[i] = functionName[i];
+	}
+}
 
 namespace FT
 {
 
 	struct flags
 	{
-		bool _declare		= false; // ÙÎ‡„ Ì‡ Ó·˙ˇ‚ÎÂÌËˇ ÔÂÂÏÂÌÌÓÈ
-		bool _literal		= false; // ÙÎ‡„ Ì‡ ÓÔÓÁÌ‡‚‡ÌËÂ ÎËÚÂ‡Î‡
+		bool _declare		= false; // –æ–±—ä—è–≤–ª–µ–Ω–∏–µ –ø–µ—Ä–µ–º–µ–Ω–Ω–æ–π
+		bool _literal		= false; // —Ñ–ª–∞–≥ –Ω–∞ –æ–ø–æ–∑–Ω–∞–≤–∞–Ω–∏–µ –ª–∏—Ç–µ—Ä–∞–ª–∞
 		bool _number		= false;
-		bool _function		= false; // ÙÛÌÍˆËˇ
+		bool _function		= false; // —Ñ—É–Ω–∫—Ü–∏—è
 		bool _integer		= false; // int
 		bool _string		= false; // string
-		bool _hesisIsOpen	= false; // ÓÚÍ˚ÚËÂ Á‡Í˚ÚËÂ ÒÍÓ·ÓÍ ‰Îˇ ÓÚÎË˜ÂÌËˇ Ô‡‡ÏÂÚÓ‚ ÓÚ ÙÛÌÍˆËË
+		bool _hesisIsOpen	= false; // –æ—Ç–∫—Ä—ã—Ç–∏–µ –∑–∞–∫—Ä—ã—Ç–∏–µ —Å–∫–æ–±–æ–∫ –¥–ª—è –æ—Ç–ª–∏—á–µ–Ω–∏—è –ø–∞—Ä–∞–º–µ—Ç—Ä–æ–≤ –æ—Ç —Ñ—É–Ω–∫—Ü–∏–∏
 
-		void toFalse()	// Á‡ÌÛÎËÚ¸ ‚ÒÂ ÙÎ‡ÊÍË
+		void toFalse()	// –∑–∞–Ω—É–ª–∏—Ç—å –≤—Å–µ —Ñ–ª–∞–∂–∫–∏
 		{
 			_declare = false;
 			_literal = false;
@@ -25,54 +85,60 @@ namespace FT
 		}
 	};
 
-	void fillTables(char* code, LT::LexTable &lt, IT::IdTable &it)
+	void fillTables(char* code, LT::LexTable &lt, IT::IdTable &it) // –∑–∞–ø–æ–ª–Ω–µ–Ω–∏–µ —Ç–∞–±–ª–∏—Ü—ã –ª–µ–∫—Å–µ–º –∏ –∏–¥–µ–Ω—Ç–∏—Ñ–∏–∫–∞—Ç–æ—Ä–æ–≤
 	{
-		int* posArray = getLineNums(code);		// Ï‡ÒÒË‚ ÔÓÁËˆËÈ ÒÚÓÍ ËÒıÓ‰ÌÓ„Ó ÍÓ‰‡
-		char* lexem = strtok(&code[0], " \n");	// ‡Á·Ë‚‡˛ ÍÓ‰ Ì‡ ÎÂÍÒÂÏ˚
-		int pos = 0;							// ÌÓÏÂ Ó·‡·‡Ú˚‚‡ÂÏÓÈ ÎÂÍÒÂÏ˚
-		int idx = 0;							// id Ë‰ÂÌÚËÙËÍ‡ÚÓ‡
-		flags flag;
+		int* posArray = getLineNums(code);			// –º–∞—Å—Å–∏–≤ –ø–æ–∑–∏—Ü–∏–π —Å—Ç—Ä–æ–∫ –∏—Å—Ö–æ–¥–Ω–æ–≥–æ –∫–æ–¥–∞
+		char* lexem = strtok(&code[0], " \n");		// —Ä–∞–∑–±–∏–≤–∞—é –∫–æ–¥ –Ω–∞ –ª–µ–∫—Å–µ–º—ã
+		int pos = 0;								// –Ω–æ–º–µ—Ä –æ–±—Ä–∞–±–∞—Ç—ã–≤–∞–µ–º–æ–π –ª–µ–∫—Å–µ–º—ã
+		int idx = 0;								// id –∏–¥–µ–Ω—Ç–∏—Ñ–∏–∫–∞—Ç–æ—Ä–∞
+		short visibArea = 0;						// –æ–±–ª–∞—Å—Ç—å –≤–∏–¥–∏–º–æ—Å—Ç–∏
+		flags flag;									// —Ñ–ª–∞–∂–∫–∏
+		fStk::fStack* funcStk = new fStk::fStack(); // —Å—Ç–µ–∫ –¥–ª—è –æ—Ç—Å–ª–µ–∂–∏–≤–∞–Ω–∏—è —Ñ—É–Ω–∫—Ü–∏–π
+		std::string ErrorMessage = "";
 
-		// ‰Ó·‡‚ÎÂÌËÂ ‚ Ú‡·ÎËˆÛ ÎÂÍÒÂÏ
+		// –¥–æ–±–∞–≤–ª–µ–Ω–∏–µ –≤ —Ç–∞–±–ª–∏—Ü—É –ª–µ–∫—Å–µ–º
 		while (lexem != NULL)
 		{
-			char lexemID[ID_MAXSIZE];
+			char lexemID[ID_MAXSIZE]; // –∞–π–¥–∏ –ª–µ–∫—Å–µ–º—ã
 			for (int i = 0; i < ID_MAXSIZE; i++)
 				lexemID[i] = lexem[i];
 
 			/*
-				ÒÓÁ‰‡∏Ï ˝ÎÂÏÂÌÚ Ú‡·ÎËˆ˚ ÎÂÍÒÂÏ
-				ÒÓÁ‰‡∏Ï ˝ÎÂÏÂÌÚ Ú‡·ÎËˆ˚ Ë‰ÂÌÚËÙËÍ‡ÚÓÓ‚
+				—Å–æ–∑–¥–∞—ë–º —ç–ª–µ–º–µ–Ω—Ç —Ç–∞–±–ª–∏—Ü—ã –ª–µ–∫—Å–µ–º
+				—Å–æ–∑–¥–∞—ë–º —ç–ª–µ–º–µ–Ω—Ç —Ç–∞–±–ª–∏—Ü—ã –∏–¥–µ–Ω—Ç–∏—Ñ–∏–∫–∞—Ç–æ—Ä–æ–≤
 
-				˝ÎÂÏÂÌÚ = ÒËÏ‚ÓÎ ÎÂÍÒÂÏ˚;
+				—ç–ª–µ–º–µ–Ω—Ç = —Å–∏–º–≤–æ–ª –ª–µ–∫—Å–µ–º—ã;
 				
-				switch(˝ÎÂÏÂÌÚ)
+				switch(—ç–ª–µ–º–µ–Ω—Ç)
 				{
-					ÛÒÚ‡ÌÓ‚Í‡ ÙÎ‡ÊÍÓ‚
+					—É—Å—Ç–∞–Ω–æ–≤–∫–∞ —Ñ–ª–∞–∂–∫–æ–≤
 				}
 
-				if(˝ÎÂÏÂÌÚ Ë‰ÂÌÚËÙËÍ‡ÚÓ ËÎË ÎËÚÂ‡Î)
+				if(—ç–ª–µ–º–µ–Ω—Ç –∏–¥–µ–Ω—Ç–∏—Ñ–∏–∫–∞—Ç–æ—Ä –∏–ª–∏ –ª–∏—Ç–µ—Ä–∞–ª)
 				{
-					‰Ó·‡‚ÎˇÂÏ Â„Ó ‚ Ú‡·ÎËˆÛ Ë‰ÂÌÚËÙËÍ‡ÚÓÓ‚
+					–¥–æ–±–∞–≤–ª—è–µ–º –µ–≥–æ –≤ —Ç–∞–±–ª–∏—Ü—É –∏–¥–µ–Ω—Ç–∏—Ñ–∏–∫–∞—Ç–æ—Ä–æ–≤
 				}
 
-				‰Ó·‡‚ÎÂÌËÂ ‚ Ú‡·ÎËˆÛ ÎÂÍÒÂÏ
+				–¥–æ–±–∞–≤–ª–µ–Ω–∏–µ –≤ —Ç–∞–±–ª–∏—Ü—É –ª–µ–∫—Å–µ–º
 			*/
 
-			IT::Entry itElement; // ÒÓÁ‰‡˛ ˝ÎÂÏÂÌÚ Ú‡·ÎËˆ˚ Ë‰ÂÌÚËÙËÍ‡ÚÓÓ‚
-			LT::Entry ltElement; // ˝ÎÂÏÂÌÚ Ú‡·ÎËˆ˚ ÎÂÍÒÂÏ
+			IT::Entry itElement; // —Å–æ–∑–¥–∞—é —ç–ª–µ–º–µ–Ω—Ç —Ç–∞–±–ª–∏—Ü—ã –∏–¥–µ–Ω—Ç–∏—Ñ–∏–∫–∞—Ç–æ—Ä–æ–≤
+			itElement.idxTI = IT_NULL_IDX;
+
+			LT::Entry ltElement; // —ç–ª–µ–º–µ–Ω—Ç —Ç–∞–±–ª–∏—Ü—ã –ª–µ–∫—Å–µ–º
 			ltElement.idxTI = IT_NULL_IDX;
-			char lexemSymbol = compareLexems(lexem); // ÔÓÎÛ˜‡˛ ÒËÏ‚ÓÎ ÎÂÍÒÂÏ˚
+
+			char lexemSymbol = compareLexems(lexem); // –ø–æ–ª—É—á–∞—é —Å–∏–º–≤–æ–ª –ª–µ–∫—Å–µ–º—ã
 
 			switch (lexemSymbol)
 			{
-			case('d'):
+			case(LEX_DECLARE):
 				flag._declare = true;
 				break;
-			case('f'):
+			case(LEX_FUNCTION):
 				flag._function = true;
 				break;
-			case('t'):
+			case(LEX_INTEGER): // or LEX_STRING doesnt matter, they are equals
 				if (lexem[0] == 's')
 				{
 					flag._string = true;
@@ -83,105 +149,107 @@ namespace FT
 					flag._integer = true;
 					break;
 				}
-			case('n'):
-				lexemSymbol = 'i';
+			case(LEX_NUMBER):
+				lexemSymbol = LEX_ID;
 				flag._number = true;
 				flag._literal = true;
 				break;
-			case('('):
-				flag._hesisIsOpen = true;
+			case(LEX_MAIN): // —Ç–æ—á–∫–∞ –≤—Ö–æ–¥–∞ main, —Å–æ–æ—Ç–≤. –æ–±–ª–∞—Å—Ç—å –≤–∏–¥–∏–º–æ—Å—Ç–∏ –ø–æ–≤—ã—à–∞–µ–º –Ω–∞ –µ–¥–∏–Ω–∏—Ü—É
+				visibArea++;
 				break;
-			case(')'):
+			case(LEX_LEFTHESIS):
+				flag._hesisIsOpen = true;
+				if (flag._function) visibArea++;
+				break;
+			case(LEX_RIGHTHESIS):
 				flag._hesisIsOpen = false;
+				if (flag._function) visibArea--;
 				flag._function = false;
 				break;
-			case(';'):
+			case(LEX_SEMICOLON):
 				flag.toFalse();
 				break;
-			case('{'):
+			case(LEX_LEFTBRACE):
+				visibArea++;
 				flag.toFalse();
 				break;
-			case('}'):
+			case(LEX_BRACELET):
+				visibArea--;
 				flag.toFalse();
 				break;
 			}
 
-			if (lexemSymbol == 'i')
+			if (lexemSymbol == LEX_ID)
 			{
-				if (lexem[0] == '\'' || lexem[0] == '\"') // ÒÚÓÍÓ‚˚È Ë ˜ËÒÎÓ‚ÓÈ ÎËÚÂ‡Î
+				if (lexem[0] == '\'' || lexem[0] == '\"') // —Å—Ç—Ä–æ–∫–æ–≤—ã–π –∏ —á–∏—Å–ª–æ–≤–æ–π –ª–∏—Ç–µ—Ä–∞–ª
 				{
 					flag._literal = true;
-					lexemSymbol = 'l';
+					lexemSymbol = LEX_LITERAL;
 				}
-				else if (flag._number) lexemSymbol = 'l';
+				else if (flag._number) lexemSymbol = LEX_LITERAL;
 
-				int checkIdx = IT::IsId(it, lexemID);
+				int checkIdx = IT::IsId(it, lexemID, visibArea);
 				bool newElement = false;
-				if (checkIdx == IT_NULL_IDX) // ÒÎÂ‰Ó‚‡ÚÂÎ¸ÌÓ ˝ÚÓ ÌÓ‚˚È ˝ÎÂÏÂÌÚ
+				if (checkIdx == IT_NULL_IDX) // —Å–ª–µ–¥–æ–≤–∞—Ç–µ–ª—å–Ω–æ —ç—Ç–æ –Ω–æ–≤—ã–π —ç–ª–µ–º–µ–Ω—Ç
 				{
+					if (!flag._declare && !flag._literal && !flag._hesisIsOpen && !flag._function) // –Ω–µ –ª–∏—Ç–µ—Ä–∞–ª –∏ –Ω–µ –ø–∞—Ä–∞–º–µ—Ç—Ä –∏ –Ω–µ —Ñ—É–Ω–∫—Ü–∏—è
+					{
+						ErrorMessage += "\n–í–Ω–∏–º–∞–Ω–∏–µ, –ø–µ—Ä–µ–º–µ–Ω–Ω–∞—è "; ErrorMessage += lexem;
+						ErrorMessage += " –Ω–µ –æ–±—ä—è–≤–ª–µ–Ω–∞!";
+					}
 					newElement = true;
 					itElement.idxTI = idx;
 					ltElement.idxTI = idx++;
 					itElement.idxfirstLE = posArray[pos];
-				} 
-				else
-				{
-					ltElement.idxTI = checkIdx;
 				}
+				else ltElement.idxTI = checkIdx;
 
 				if (flag._literal)
 				{
-					if (flag._number)
-					{
-						itElement.iddatatype = IT::INT;
-						// ‰Ó·‡‚ÎÂÌËÂ ÁÌ‡˜ÂÌËÈ
-					}
-					else
-					{
-						itElement.iddatatype = IT::STR;
-						// ‰Ó·‡‚ÎÂÌËÂ ÁÌ‡˜ÂÌËÈ
-					}
+					itElement.idtype = IT::L;
+					if (flag._number) itElement.iddatatype = IT::INT;
+					else itElement.iddatatype = IT::STR;
 				}
 
 				if (newElement)
 				{
 					for (int i = 0; i < ID_MAXSIZE; i++)
-					{
 						itElement.id[i] = lexemID[i];
-					}
-					if (flag._function)
+
+					itElement.visibility.area = visibArea;
+
+					if (flag._function && !flag._literal)
 					{
-						if (flag._hesisIsOpen)
-							itElement.idtype = IT::P; // Ô‡‡ÏÂÚ
-						else itElement.idtype = IT::F; // ÙÛÌÍˆËˇ
-
+						if (flag._hesisIsOpen) itElement.idtype = IT::P; // –ø–∞—Ä–∞–º–µ—Ç—Ä
+						else itElement.idtype = IT::F; // —Ñ—É–Ω–∫—Ü–∏—è
 					}
-					else itElement.idtype = IT::V; // ÔÂÂÏÂÌÌ‡ˇ
+					else if (!flag._literal) itElement.idtype = IT::V; // –ø–µ—Ä–µ–º–µ–Ω–Ω–∞—è
+					else itElement.idtype = IT::L; // –ª–∏—Ç–µ—Ä–∞–ª
 
-					if (flag._integer)
-						itElement.iddatatype = IT::INT;
-					else if (flag._string)
-						itElement.iddatatype = IT::STR;
+					if (flag._integer) itElement.iddatatype = IT::INT;
+					else if (flag._string) itElement.iddatatype = IT::STR;
 
 					IT::Add(it, itElement);
 					flag._declare = false;
 				}
 			}
 
-			// Á‡ÔÓÎÌÂÌËÂ Ú‡·ÎËˆ˚ ÎÂÍÒÂÏ
+			// –∑–∞–ø–æ–ª–Ω–µ–Ω–∏–µ —Ç–∞–±–ª–∏—Ü—ã –ª–µ–∫—Å–µ–º
 			ltElement.sn = posArray[pos++];
 			ltElement.lexema[0] = lexemSymbol;
 			LT::Add(lt, ltElement);
 
 			std::cout << lexem << std::endl;
+
 			lexem = strtok(NULL, " \n");
 		}
 
 		makeOutWithLT(lt, it);
 		makeOutWithIT(it);
+		std::cout << ErrorMessage << std::endl;
 	}
 
-	int* getLineNums(std::string code) // ÙÛÌÍˆËˇ ‚˚˜ËÒÎÂÌËˇ ÌÓÏÂ‡ ÒÚÓÍË ËÒıÓ‰ÌÓ„Ó ÍÓ‰‡ ‰Îˇ Â„Ó ÎÂÍÒÂÏ
+	int* getLineNums(std::string code) // —Ñ—É–Ω–∫—Ü–∏—è –≤—ã—á–∏—Å–ª–µ–Ω–∏—è –Ω–æ–º–µ—Ä–∞ —Å—Ç—Ä–æ–∫–∏ –∏—Å—Ö–æ–¥–Ω–æ–≥–æ –∫–æ–¥–∞ –¥–ª—è –µ–≥–æ –ª–µ–∫—Å–µ–º
 	{
 		int* array = new int[MAX_LEXEMS_LENGTH];
 		int size = 0;
@@ -273,62 +341,19 @@ namespace FT
 			FST::NODE()
 		);
 
-		FST::FST fst7(lexem, 2,		//;
-			FST::NODE(1, FST::RELATION(';', 1)),
-			FST::NODE()
-		);
+		FST::FST fst7(lexem, 2,	FST::NODE(1, FST::RELATION(';', 1)), FST::NODE());
+		FST::FST fst8(lexem, 2,	FST::NODE(1, FST::RELATION(',', 1)), FST::NODE());
+		FST::FST fst9(lexem, 2, FST::NODE(1, FST::RELATION('{', 1)), FST::NODE());
+		FST::FST fst10(lexem, 2, FST::NODE(1, FST::RELATION('}', 1)), FST::NODE());
+		FST::FST fst11(lexem, 2, FST::NODE(1, FST::RELATION('(', 1)), FST::NODE());
+		FST::FST fst12(lexem, 2, FST::NODE(1, FST::RELATION(')', 1)), FST::NODE());
+		FST::FST fst13(lexem, 2, FST::NODE(1, FST::RELATION('+', 1)), FST::NODE());
+		FST::FST fst14(lexem, 2, FST::NODE(1, FST::RELATION('-', 1)), FST::NODE());
+		FST::FST fst15(lexem, 2, FST::NODE(1, FST::RELATION('*', 1)), FST::NODE());
+		FST::FST fst16(lexem, 2, FST::NODE(1, FST::RELATION('/', 1)), FST::NODE());
+		FST::FST fst17(lexem, 2, FST::NODE(1, FST::RELATION('=', 1)), FST::NODE());
 
-		FST::FST fst8(lexem, 2,		//,
-			FST::NODE(1, FST::RELATION(',', 1)),
-			FST::NODE()
-		);
-
-		FST::FST fst9(lexem, 2,		//{
-			FST::NODE(1, FST::RELATION('{', 1)),
-			FST::NODE()
-		);
-
-		FST::FST fst10(lexem, 2,		//}
-			FST::NODE(1, FST::RELATION('}', 1)),
-			FST::NODE()
-		);
-
-		FST::FST fst11(lexem, 2,		//(
-			FST::NODE(1, FST::RELATION('(', 1)),
-			FST::NODE()
-		);
-
-		FST::FST fst12(lexem, 2,		//)
-			FST::NODE(1, FST::RELATION(')', 1)),
-			FST::NODE()
-		);
-
-		FST::FST fst13(lexem, 2,		//+
-			FST::NODE(1, FST::RELATION('+', 1)),
-			FST::NODE()
-		);
-
-		FST::FST fst14(lexem, 2,		//-
-			FST::NODE(1, FST::RELATION('-', 1)),
-			FST::NODE()
-		);
-
-		FST::FST fst15(lexem, 2,		//*
-			FST::NODE(1, FST::RELATION('*', 1)),
-			FST::NODE()
-		);
-
-		FST::FST fst16(lexem, 2,		//
-			FST::NODE(1, FST::RELATION('/', 1)),
-			FST::NODE()
-		);
-
-		FST::FST fst17(lexem, 2,		//=
-			FST::NODE(1, FST::RELATION('=', 1)),
-			FST::NODE()
-		);
-
-		FST::FST fst18(lexem, 2,		//=
+		FST::FST fst18(lexem, 2,
 			FST::NODE(20, 
 				FST::RELATION('0', 1),
 				FST::RELATION('1', 1),
@@ -353,55 +378,43 @@ namespace FT
 			FST::NODE()
 		);
 
-		if (FST::execute(fst1) == -1) // integer
-		{
-			return 't';
-		}
-		else if (FST::execute(fst2) == -1) // string
-		{
-			return 't';
-		}
-		else if (FST::execute(fst3) == -1) // function 
-		{
-			return 'f';
-		}
-		else if (FST::execute(fst4) == -1) // declare
-		{
-			return 'd';
-		}
-		else if (FST::execute(fst5) == -1) // return
-		{
-			return 'r';
-		}
-		else if (FST::execute(fst6) == -1) // print
-		{
-			return 'p';
-		}
-		else if (FST::execute(fst7) == -1) return ';';
-		else if (FST::execute(fst8) == -1) return ',';
-		else if (FST::execute(fst9) == -1) return '{';
-		else if (FST::execute(fst10) == -1) return '}';
-		else if (FST::execute(fst11) == -1) { return '('; }
-		else if (FST::execute(fst12) == -1) { return ')'; }
-		else if (FST::execute(fst13) == -1) return '+';
-		else if (FST::execute(fst14) == -1) return '-';
-		else if (FST::execute(fst15) == -1) return '*';
-		else if (FST::execute(fst16) == -1) return '/';
-		else if (FST::execute(fst17) == -1) return '=';
-		else if (FST::execute(fst18) == -1) return 'n'; // number
-		else
-		{
-			return 'i';
-		}
+		FST::FST fst19(lexem, 5,		// enter point
+			FST::NODE(1, FST::RELATION('m', 1)),
+			FST::NODE(1, FST::RELATION('a', 2)),
+			FST::NODE(1, FST::RELATION('i', 3)),
+			FST::NODE(1, FST::RELATION('n', 4)),
+			FST::NODE()
+		);
+
+		if (FST::execute(fst1) == -1) return LEX_INTEGER; // integer
+		else if (FST::execute(fst2) == -1) return LEX_STRING; // string
+		else if (FST::execute(fst3) == -1) return LEX_FUNCTION;
+		else if (FST::execute(fst4) == -1) return LEX_DECLARE;
+		else if (FST::execute(fst5) == -1) return LEX_RETURN;
+		else if (FST::execute(fst6) == -1) return LEX_PRINT;
+		else if (FST::execute(fst7) == -1) return LEX_SEMICOLON;
+		else if (FST::execute(fst8) == -1) return LEX_COMMA;
+		else if (FST::execute(fst9) == -1) return LEX_LEFTBRACE;
+		else if (FST::execute(fst10) == -1) return LEX_BRACELET;
+		else if (FST::execute(fst11) == -1) return LEX_LEFTHESIS;
+		else if (FST::execute(fst12) == -1) return LEX_RIGHTHESIS;
+		else if (FST::execute(fst13) == -1) return LEX_PLUS;
+		else if (FST::execute(fst14) == -1) return LEX_MINUS;
+		else if (FST::execute(fst15) == -1) return LEX_STAR;
+		else if (FST::execute(fst16) == -1) return LEX_DIRSLASH;
+		else if (FST::execute(fst17) == -1) return LEX_IS;
+		else if (FST::execute(fst18) == -1) return LEX_NUMBER; // number
+		else if (FST::execute(fst19) == -1) return LEX_MAIN; // main
+		else return LEX_ID;
 	}
 
 	// debug
-	void makeOutWithLT(LT::LexTable& table, IT::IdTable it)
+	void makeOutWithLT(LT::LexTable& table, IT::IdTable &it)
 	{
 		LT::Entry* element = table.head;
 
 		int i = 0;
-		std::cout << "\t¬€¬Œƒ “¿¡À»÷€ À≈ —≈Ã:" << std::endl;
+		std::cout << "\t–í–´–í–û–î –¢–ê–ë–õ–ò–¶–´ –õ–ï–ö–°–ï–ú:" << std::endl;
 		while (element->next != nullptr)
 		{
 			std::cout << "\n" << i << '\t';
@@ -419,17 +432,18 @@ namespace FT
 	{
 		std::cout << "\n\t\t\tIT TABLE DEBUG" << std::endl;
 		IT::Entry* showTable = idTable.head;
-		std::cout << "_________________________________________________________________" << std::endl;
-		std::cout << "                                   ÚËÔ ‰‡ÌÌ˚ı    1-ÔÂÂÏ  2-Ù-ˆËˇ" << std::endl;
-		std::cout << "       ÌÓÏÂ         ÛÌËÍ.id      1-INT  2-STR   3-Ô‡‡Ï  4-ÎËÚÂ" << std::endl;
-		std::cout << "_________________________________________________________________" << std::endl;
-		std::cout << "|\t" << "IDX" << "\t|\t" << "ID" << "\t|\t" << "DATA" << "\t|\t" << "TYPE" << "\t|\t" << std::endl;
+		std::cout << "___________________________________________________________________________________" << std::endl;
+		std::cout << "                                   —Ç–∏–ø –¥–∞–Ω–Ω—ã—Ö    1-–ø–µ—Ä–µ–º  2-—Ñ-—Ü–∏—è      –æ–±–ª–∞—Å—Ç—å     " << std::endl;
+		std::cout << "       –Ω–æ–º–µ—Ä         —É–Ω–∏–∫.id      1-INT  2-STR   3-–ø–∞—Ä–∞–º  4-–ª–∏—Ç–µ—Ä     –≤–∏–¥–∏–º–æ—Å—Ç–∏    "<< std::endl;
+		std::cout << "___________________________________________________________________________________" << std::endl;
+		std::cout << "|\t" << "IDX" << "\t|\t" << "ID" << "\t|\t" << "DATA" << "\t|\t" << "TYPE" << "\t|\t" << "VIS" << "\t|\t" << std::endl;
 		while (showTable)
 		{
 			std::cout << "|\t" << showTable->idxTI << "\t";
 			std::cout << "|\t" << showTable->id << "\t";
 			std::cout << "|\t" << showTable->iddatatype << "\t";
-			std::cout << "|\t" << showTable->idtype << "\t|" << std::endl;
+			std::cout << "|\t" << showTable->idtype << "\t";
+			std::cout << "|\t" << showTable->visibility.area << "\t|" << std::endl;
 			showTable = showTable->next;
 		}
 		std::cout << "_________________________________________________________________" << std::endl;

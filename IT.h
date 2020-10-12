@@ -17,6 +17,12 @@ namespace IT						// таблица идентификаторов
 		char	id[ID_MAXSIZE];			// идентификатор (автоматически устанавливает до ID_MAXSIZE)
 		IDDATATYPE	iddatatype;			// тип данных
 		IDTYPE		idtype;				// тип идентификатора
+		
+		union
+		{
+			char functionName[ID_MAXSIZE];
+			short area;
+		} visibility;
 
 		Entry* next = nullptr;			// односвязный список (следующий элемент)
 
@@ -46,7 +52,7 @@ namespace IT						// таблица идентификаторов
 
 	Entry GetEntry(IdTable& idtable, int n);	// получить строку таблицы идентификаторов
 
-	int IsId(IdTable& idtable, char id[ID_MAXSIZE]);	// вернёт idx идентификатора
+	int IsId(IdTable& idtable, char id[ID_MAXSIZE], short visArea);	// вернёт idx идентификатора
 
 	void Delete(IdTable& idtable); // освободить память (удалить таблицу идентификаторов
 }

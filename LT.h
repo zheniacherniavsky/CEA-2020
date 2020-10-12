@@ -7,10 +7,12 @@
 #define LEX_STRING 't' // лексема для string
 #define LEX_ID 'i' // лексема для идентификатора
 #define LEX_LITERAL 'l' // лексема для литерала
+#define LEX_NUMBER 'n' // для числа
 #define LEX_FUNCTION 'f' // лексема для функции
 #define LEX_DECLARE 'd' // лексема для declare
 #define LEX_RETURN 'r' // лексема для return
 #define LEX_PRINT 'p' // лексема для print
+#define LEX_MAIN 'm' // main
 #define LEX_SEMICOLON ';' // лексема для ;
 #define LEX_COMMA ',' // ,
 #define LEX_LEFTBRACE '{'
@@ -21,6 +23,7 @@
 #define LEX_MINUS '-' // - 
 #define LEX_STAR '*' // *
 #define LEX_DIRSLASH '/' // /
+#define LEX_IS '='
 
 namespace LT // таблица лексем
 {
@@ -53,7 +56,7 @@ namespace LT // таблица лексем
 		Entry entry // строка таблицы лексем
 	);
 
-	Entry GetEntry( // получить строку таблицы лексем
+	Entry* GetEntry( // получить строку таблицы лексем
 		LexTable& lextable, // откуда , т.е. табл. лексем
 		int n // номер получаемой строки
 	);
