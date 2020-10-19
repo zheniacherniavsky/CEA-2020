@@ -1,10 +1,10 @@
-#pragma once
+п»ї#pragma once
 
 namespace PN {
-	bool PolishNotation( // создание польской записи
-		int lextable_pos, // позиция выражения в таблице лексем
-		LT::LexTable& lexTable, // таблица лексем
-		IT::IdTable& idTable, // таблица идентификаторов
+	bool PolishNotation( // СЃРѕР·РґР°РЅРёРµ РїРѕР»СЊСЃРєРѕР№ Р·Р°РїРёСЃРё
+		int lextable_pos, // РїРѕР·РёС†РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ РІ С‚Р°Р±Р»РёС†Рµ Р»РµРєСЃРµРј
+		LT::LexTable& lexTable, // С‚Р°Р±Р»РёС†Р° Р»РµРєСЃРµРј
+		IT::IdTable& idTable, // С‚Р°Р±Р»РёС†Р° РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ
 		bool debug = false
 	);
 }
