@@ -11,6 +11,8 @@
 
 #define TBL_LENGTH 2048 // размеры создаваемых таблиц лексем и идентификаторов
 
+void makeOutWithLT(LT::LexTable& table, IT::IdTable& it);
+
 int main(int argc, char* argv[])
 {
 	SetConsoleOutputCP(1251);
@@ -29,6 +31,10 @@ int main(int argc, char* argv[])
 
 		In::_IN_ in = In::getin(lexTable, idTable, parms.in, parms.out);	// получение in структуры
 
+		//for(int i = 0; i < 16; i++)
+		//	bool f = PN::PolishNotation(i, lexTable, idTable, true); // last arg is debug
+		//makeOutWithLT(lexTable, idTable);
+
 		Log::WriteIn(log, in);
 		Log::Close(log);
 		std::cout << "Ready. Check " << parms.in << " DIR" << std::endl;
@@ -44,4 +50,23 @@ int main(int argc, char* argv[])
 	}
 	system("pause");
 	return 0;
+}
+
+void makeOutWithLT(LT::LexTable& table, IT::IdTable& it)
+{
+	LT::Entry* element = table.head;
+
+	int i = 0;
+	std::cout << "\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ:" << std::endl;
+	while (element->next != nullptr)
+	{
+		std::cout << "\n" << i << '\t';
+		while (i == element->sn) {
+			std::cout << element->lexema[0];
+			if (element->idxTI != IT_NULL_IDX)
+				std::cout << '<' << element->idxTI << '>';
+			element = element->next;
+		}
+		i++;
+	}
 }

@@ -33,6 +33,7 @@ namespace LT // таблица лексем
 		char lexema[LEXEMA_FIXSIZE]; // лексема
 		int sn; // номер строки в исходном тексте
 		int idxTI; // индекс в таблице идентификаторов или NULL
+		int priority;
 
 		Entry* next = nullptr;
 

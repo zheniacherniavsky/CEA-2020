@@ -19,46 +19,9 @@
 	++ ещё один баг:
 		точка входа имеет область видимости на единицу больше, такого не должно быть
 		Это исправится само, при добавлении стека функций
+
+	++ добавить проверку на кол-во скобок в коде
 */
-
-namespace fStk // стек для запоминания названий функций
-{
-	struct fStack
-	{
-		char name[ID_MAXSIZE];
-		fStack* next;
-		fStack* prev;
-
-		fStack()
-		{
-			next = nullptr;
-			prev = nullptr;
-		}
-	};
-
-	void Add(fStack* stk, char functionName[ID_MAXSIZE]) // adding element to fStack
-	{
-		for (int i = 0; i < ID_MAXSIZE; i++)
-			stk->name[i] = functionName[i];
-
-		stk->next = new fStack();
-		stk->next->prev = stk;
-		stk = stk->next;
-	}
-
-	void rmLast(fStack* stk) // remove last elem from stack
-	{
-		stk = stk->prev;
-		delete stk->next;
-	}
-
-	void SetFunName(IT::Entry& element, char functionName[ID_MAXSIZE], short visArea) // set info about visibility
-	{
-		element.visibility.area = visArea;
-		for (int i = 0; i < ID_MAXSIZE; i++)
-			element.visibility.functionName[i] = functionName[i];
-	}
-}
 
 namespace FT
 {
@@ -93,8 +56,9 @@ namespace FT
 		int idx = 0;								// id идентификатора
 		short visibArea = 0;						// область видимости
 		flags flag;									// флажки
-		fStk::fStack* funcStk = new fStk::fStack(); // стек для отслеживания функций
 		std::string ErrorMessage = "";
+
+		int linePos = 0;	// позиция лексемы в строке
 
 		// добавление в таблицу лексем
 		while (lexem != NULL)
@@ -127,8 +91,9 @@ namespace FT
 
 			LT::Entry ltElement; // элемент таблицы лексем
 			ltElement.idxTI = IT_NULL_IDX;
+			ltElement.priority = NULL;	// приоритеты выставляются в compareLexem
 
-			char lexemSymbol = compareLexems(lexem); // получаю символ лексемы
+			char lexemSymbol = compareLexems(lexem, &ltElement); // получаю символ лексемы
 
 			switch (lexemSymbol)
 			{
@@ -236,6 +201,7 @@ namespace FT
 
 			// заполнение таблицы лексем
 			ltElement.sn = posArray[pos++];
+
 			ltElement.lexema[0] = lexemSymbol;
 			LT::Add(lt, ltElement);
 
@@ -276,7 +242,7 @@ namespace FT
 		return array;
 	}
 
-	char compareLexems(char* lexem) {
+	char compareLexems(char* lexem, LT::Entry* ltElement) {
 
 		FST::FST fst1(lexem, 8,		//integer
 			FST::NODE(1, FST::RELATION('i', 1)),
@@ -396,12 +362,36 @@ namespace FT
 		else if (FST::execute(fst8) == -1) return LEX_COMMA;
 		else if (FST::execute(fst9) == -1) return LEX_LEFTBRACE;
 		else if (FST::execute(fst10) == -1) return LEX_BRACELET;
-		else if (FST::execute(fst11) == -1) return LEX_LEFTHESIS;
-		else if (FST::execute(fst12) == -1) return LEX_RIGHTHESIS;
-		else if (FST::execute(fst13) == -1) return LEX_PLUS;
-		else if (FST::execute(fst14) == -1) return LEX_MINUS;
-		else if (FST::execute(fst15) == -1) return LEX_STAR;
-		else if (FST::execute(fst16) == -1) return LEX_DIRSLASH;
+		else if (FST::execute(fst11) == -1)
+		{
+			ltElement->priority = 0;  
+			return LEX_LEFTHESIS;
+		}
+		else if (FST::execute(fst12) == -1)
+		{
+			ltElement->priority = 0;
+			return LEX_RIGHTHESIS;
+		}
+		else if (FST::execute(fst13) == -1)
+		{
+			ltElement->priority = 2;
+			return LEX_PLUS;
+		}
+		else if (FST::execute(fst14) == -1)
+		{
+			ltElement->priority = 2;
+			return LEX_MINUS;
+		}
+		else if (FST::execute(fst15) == -1)
+		{
+			ltElement->priority = 3;
+			return LEX_STAR;
+		}
+		else if (FST::execute(fst16) == -1)
+		{
+			ltElement->priority = 2;
+			return LEX_DIRSLASH;
+		}
 		else if (FST::execute(fst17) == -1) return LEX_IS;
 		else if (FST::execute(fst18) == -1) return LEX_NUMBER; // number
 		else if (FST::execute(fst19) == -1) return LEX_MAIN; // main
@@ -418,7 +408,7 @@ namespace FT
 		while (element->next != nullptr)
 		{
 			std::cout << "\n" << i << '\t';
-			while (i == element->sn) {
+			while (i == element->sn && element->lexema[0] != NULL) {
 				std::cout << element->lexema[0];
 				if (element->idxTI != IT_NULL_IDX)
 					std::cout << '<' << element->idxTI << '>';

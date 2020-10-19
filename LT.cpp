@@ -53,6 +53,7 @@ namespace LT
 
 			LT.table->idxTI = entry.idxTI;
 			LT.table->sn = entry.sn;
+			LT.table->priority = entry.priority;
 			// выделяем память и перемещаем наш лист туда
 			// при этом начало списка сохраняется в LT
 			LT.table->next = new Entry;
@@ -66,16 +67,18 @@ namespace LT
 	{
 		Entry* value = LT.head;
 		int pos = 0; // первая строка
-		while (value)
+		while (value != nullptr)
 		{
 			if (pos == n)
 			{
 				return value;
 			}
-			else 
+			else
 			{
 				value = value->next;
-				pos++;
+				if (value != nullptr)
+					pos = value->sn;
+				else return nullptr;
 			}
 		}
 		throw ERROR_THROW(202) // Не обнаружена лексема в данной строке
