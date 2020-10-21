@@ -31,9 +31,9 @@ int main(int argc, char* argv[])
 
 		In::_IN_ in = In::getin(lexTable, idTable, parms.in, parms.out);	// получение in структуры
 
-		//for(int i = 0; i < 16; i++)
-		//	bool f = PN::PolishNotation(i, lexTable, idTable, true); // last arg is debug
-		//makeOutWithLT(lexTable, idTable);
+		for(int i = 0; i < 16; i++)
+			bool f = PN::PolishNotation(i, lexTable, idTable, true); // last arg is debug
+		makeOutWithLT(lexTable, idTable);
 
 		Log::WriteIn(log, in);
 		Log::Close(log);

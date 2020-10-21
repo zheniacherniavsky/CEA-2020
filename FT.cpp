@@ -1,4 +1,5 @@
 ﻿#include "FT.h"
+#include <stack>
 
 /*
 
@@ -25,6 +26,12 @@
 
 namespace FT
 {
+	// область видимости : ISSUES #1
+	// stack with functions name
+	// добавить в структуру название функции
+	// в getEntry деать проверку по названию функции
+
+	std::stack <char*> stkFunc;
 
 	struct flags
 	{
@@ -32,6 +39,7 @@ namespace FT
 		bool _literal		= false; // флаг на опознавание литерала
 		bool _number		= false;
 		bool _function		= false; // функция
+		bool _functionName	= false; // запоминание названия функции
 		bool _integer		= false; // int
 		bool _string		= false; // string
 		bool _hesisIsOpen	= false; // открытие закрытие скобок для отличения параметров от функции
@@ -67,6 +75,7 @@ namespace FT
 			for (int i = 0; i < ID_MAXSIZE; i++)
 				lexemID[i] = lexem[i];
 
+
 			/*
 				создаём элемент таблицы лексем
 				создаём элемент таблицы идентификаторов
@@ -95,6 +104,12 @@ namespace FT
 
 			char lexemSymbol = compareLexems(lexem, &ltElement); // получаю символ лексемы
 
+			if (flag._functionName)		// стек
+			{
+				stkFunc.push(lexem);
+				flag._functionName = false;
+			}
+
 			switch (lexemSymbol)
 			{
 			case(LEX_DECLARE):
@@ -102,6 +117,7 @@ namespace FT
 				break;
 			case(LEX_FUNCTION):
 				flag._function = true;
+				flag._functionName = true;
 				break;
 			case(LEX_INTEGER): // or LEX_STRING doesnt matter, they are equals
 				if (lexem[0] == 's')
@@ -120,6 +136,7 @@ namespace FT
 				flag._literal = true;
 				break;
 			case(LEX_MAIN): // точка входа main, соотв. область видимости повышаем на единицу
+				stkFunc.push(lexem);
 				visibArea++;
 				break;
 			case(LEX_LEFTHESIS):
@@ -139,6 +156,7 @@ namespace FT
 				flag.toFalse();
 				break;
 			case(LEX_BRACELET):
+				stkFunc.pop();		// убираем название функции из стека
 				visibArea--;
 				flag.toFalse();
 				break;
@@ -218,27 +236,38 @@ namespace FT
 	int* getLineNums(std::string code) // функция вычисления номера строки исходного кода для его лексем
 	{
 		int* array = new int[MAX_LEXEMS_LENGTH];
-		int size = 0;
-		for (int i = 0, line = 0, pos = 0; i < code.length(); i++)
+		char* p = &code[0];
+		bool endLine;
+		bool emptyLine;
+		for (int line = 0, pos = 0; *p != '\0'; *p++)
 		{
-			if (code[i] != ' ')
+			endLine = false;
+			emptyLine = true;
+			while (*p != '\n')
 			{
-				if (code[i] == '\n') {
-					line++;
-					continue;
-				}
-
-				array[pos] = line;
-				pos++; size++;
-				while (code[i] != ' ') {
-					if (code[i] == '\n' || code[i] == ' ') {
-						i--;
+				if (*p == ' ') while (*p == ' ') *p++; // пропускаем пробелы
+				while (*p != ' ') {
+					if (*p != '\n') {
+						*p++; // проходим лексему
+						emptyLine = false;
+					}
+					else
+					{
+						endLine = true;
 						break;
 					}
-					i++;
+				}
+				if (!endLine)
+				{
+					array[pos] = line;
+					pos++;
 				}
 			}
+			if (!emptyLine) line++;
 		}
+		
+		std::cout << "getLineNums\n\n\n" << std::endl;
+		std::cout << code << std::endl;
 		return array;
 	}
 
