@@ -31,13 +31,12 @@ int main(int argc, char* argv[])
 
 		In::_IN_ in = In::getin(lexTable, idTable, parms.in, parms.out);	// получение in структуры
 
-		for(int i = 0; i < 16; i++)
-			bool f = PN::PolishNotation(i, lexTable, idTable, true); // last arg is debug
+		bool f = PN::PolishNotation(-1, lexTable, idTable, true); // last arg is debug
 		makeOutWithLT(lexTable, idTable);
 
 		Log::WriteIn(log, in);
 		Log::Close(log);
-		std::cout << "Ready. Check " << parms.in << " DIR" << std::endl;
+		std::cout << "\nReady. Check " << parms.in << " DIR" << std::endl;
 	}
 	catch (Error::ERROR_ e) {
 		std::cout << "\nОшибка " << e.id << ": " << e.message << "\n";
@@ -58,13 +57,13 @@ void makeOutWithLT(LT::LexTable& table, IT::IdTable& it)
 
 	int i = 0;
 	std::cout << "\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ:" << std::endl;
-	while (element->next != nullptr)
+	while (element && element->next != nullptr)
 	{
 		std::cout << "\n" << i << '\t';
-		while (i == element->sn) {
+		while (element && i == element->sn) {
 			std::cout << element->lexema[0];
-			if (element->idxTI != IT_NULL_IDX)
-				std::cout << '<' << element->idxTI << '>';
+			//if (element->idxTI != IT_NULL_IDX)
+				//std::cout << '<' << element->idxTI << '>';
 			element = element->next;
 		}
 		i++;

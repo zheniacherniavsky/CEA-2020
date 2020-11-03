@@ -30,7 +30,7 @@ namespace PN
 	void addRusult(polishNotation& p, LT::Entry* element);
 
 	bool PolishNotation( // создание польской записи
-		int lextable_pos, // позиция выражения в таблице лексем
+		int lextable_pods, // позиция выражения в таблице лексем
 		LT::LexTable& lexTable, // таблица лексем
 		IT::IdTable& idTable, // таблица идентификаторов
 		bool debug // вывод польской записи
@@ -65,118 +65,133 @@ namespace PN
 		//				abc+*
 		
 		polishNotation pol;
-		LT::Entry* sourceStr = LT::GetEntry(lexTable, lextable_pos);
-		LT::Entry* nextLine = LT::GetEntry(lexTable, lextable_pos + 1);
-		LT::Entry* head = sourceStr;
-		
-		LT::Entry* beforePN = sourceStr;
-
-		if (debug)
+		int lextable_pos = 0;
+		LT::Entry* sourceStr;
+		while (LT::Entry* sourceStr = LT::GetEntry(lexTable, lextable_pos))
 		{
-			std::cout << "До Польской записи:" << std::endl;
-			while (beforePN->sn == lextable_pos)
+			LT::Entry* nextLine = LT::GetEntry(lexTable, lextable_pos + 1);
+			LT::Entry* head = sourceStr;
+			LT::Entry* beforePN = sourceStr;
+			if (debug)
 			{
-				std::cout << beforePN->lexema[0];
-				beforePN = beforePN->next;
-			}
-			std::cout << std::endl;
-		}
-		
-		// algorithm
-		/*
-		
-		while(строка совпадает с выбранной)
-		{
-			if(НЕ символ операции)
-			{
-				добавление в результирующую строку, возврат false и доп. провека
-			}
-			else // У нас символ операции
-			{
-				if(ПРОВЕРКА на правую скобку) { ... } // выполнения алгоритма правой скобки
-				else
+				std::cout << "\n\nДо Польской записи:" << std::endl;
+				while (beforePN->sn == lextable_pos)
 				{
-					...  заполнения стека или добавление в результирующую строку
+					std::cout << beforePN->lexema[0];
+					beforePN = beforePN->next;
 				}
+				std::cout << std::endl;
 			}
-		}
 
-		*/
+			// algorithm
+			/*
 
-
-		while (sourceStr != nullptr && sourceStr->sn == lextable_pos)
-		{
-			char s = sourceStr->lexema[0]; // lex symbol
-			if (!isSymbol(sourceStr))
+			while(строка совпадает с выбранной)
 			{
-				if (s == LEX_SEMICOLON)
+				if(НЕ символ операции)
 				{
-					while (!pol.symbols.empty())
+					добавление в результирующую строку, возврат false и доп. провека
+				}
+				else // У нас символ операции
+				{
+					if(ПРОВЕРКА на правую скобку) { ... } // выполнения алгоритма правой скобки
+					else
 					{
-						addRusult(pol, &pol.symbols.top()); // добавляем в резалт наши знаки
-						pol.symbols.pop(); // убираем эти знаки из стека
+						...  заполнения стека или добавление в результирующую строку
 					}
 				}
-				else if (s != LEX_ID && s != LEX_IS)
+			}
+
+			*/
+
+			bool pn = false;
+			while (sourceStr->sn == lextable_pos)
+			{
+				addRusult(pol, sourceStr);
+				if (sourceStr->lexema[0] == '=')
 				{
-					if (debug) {
-						std::cout << "Польская запись для этой строчки не построена!" << std::endl;
-					}
-					return false;
+					pn = true;
+					sourceStr = sourceStr->next;
+					break;
 				}
-				addRusult(pol, sourceStr); // если идентификатор, то кидаем в резалт
+				else sourceStr = sourceStr->next;
+			}
+
+			if (pn) // если строка подходит
+			{
+
+				while (sourceStr != nullptr && sourceStr->sn == lextable_pos)
+				{
+					char s = sourceStr->lexema[0]; // lex symbol
+					if (!isSymbol(sourceStr))
+					{
+						if (s == LEX_SEMICOLON)
+						{
+							while (!pol.symbols.empty())
+							{
+								addRusult(pol, &pol.symbols.top()); // добавляем в резалт наши знаки
+								pol.symbols.pop(); // убираем эти знаки из стека
+							}
+						}
+						else if (s != LEX_ID && s != LEX_LITERAL)
+						{
+							if (debug) {
+								std::cout << "Польская запись для этой строчки не построена!" << std::endl;
+							}
+							return false;
+						}
+						addRusult(pol, sourceStr); // если идентификатор, то кидаем в резалт
+					}
+					else
+					{
+						if (s == LEX_RIGHTHESIS) // если встречаем ), то
+						{
+							while (pol.symbols.top().lexema[0] != LEX_LEFTHESIS) // пока не встретим (
+							{
+								addRusult(pol, &pol.symbols.top()); // добавляем в резалт наши знаки
+								pol.symbols.pop(); // убираем эти знаки из стека
+							}
+							pol.symbols.pop(); // удаляем (
+						}
+						else
+						{
+							if (!pol.symbols.empty())
+							{
+								while ((pol.symbols.top().priority >= sourceStr->priority) && sourceStr->priority != 0)
+								{
+									addRusult(pol, &pol.symbols.top()); // добавляем в резалт наши знаки
+									pol.symbols.pop(); // убираем эти знаки из стека
+									if (pol.symbols.empty()) break;
+								}
+							}
+							pol.symbols.push(*sourceStr); // иначе добавляем символ в стек
+						}
+					}
+					sourceStr = sourceStr->next;
+				}
+
 			}
 			else
 			{
-				if (s == LEX_RIGHTHESIS) // если встречаем ), то
-				{
-					while (pol.symbols.top().lexema[0] != LEX_LEFTHESIS) // пока не встретим (
-					{
-						addRusult(pol, &pol.symbols.top()); // добавляем в резалт наши знаки
-						pol.symbols.pop(); // убираем эти знаки из стека
-					}
-					pol.symbols.pop(); // удаляем (
-				}
-				else
-				{
-					if (!pol.symbols.empty())
-					{
-						while ((pol.symbols.top().priority >= sourceStr->priority) && sourceStr->priority != 0)
-						{
-							addRusult(pol, &pol.symbols.top()); // добавляем в резалт наши знаки
-							pol.symbols.pop(); // убираем эти знаки из стека
-							if (pol.symbols.empty()) break;
-						}
-					}
-					pol.symbols.push(*sourceStr); // иначе добавляем символ в стек
+				if (debug) {
+					std::cout << "Польская запись для этой строчки не построена!" << std::endl;
 				}
 			}
-			sourceStr = sourceStr->next;
+
+			// ISSUE: утечка памяти, удалять lextable
+
+			head->idxTI = pol.resultHead->idxTI;
+			head->lexema[0] = pol.resultHead->lexema[0];
+			head->priority = pol.resultHead->priority;
+			head->sn = pol.resultHead->sn;
+
+			head->next = pol.resultHead->next;
+			while (head->next != nullptr) head = head->next;
+			head->next = nextLine;
+
+			lextable_pos++;
+			
 		}
-
-		if (debug)
-		{
-			std::cout << "\nПосле Польской записи:" << std::endl;
-			LT::Entry* out = pol.resultHead;
-			while (out != nullptr)
-			{
-				std::cout << out->lexema[0];
-				out = out->next;
-			}
-			std::cout << std::endl;
-		}
-
-		// ISSUE: утечка памяти, удалять lextable
-
-		head->idxTI = pol.resultHead->idxTI;
-		head->lexema[0] = pol.resultHead->lexema[0];
-		head->priority = pol.resultHead->priority;
-		head->sn = pol.resultHead->sn;
-
-		head->next = pol.resultHead->next;
-		while (head->next != nullptr) head = head->next;
-		head->next = nextLine;
-		
 		return true;
 	}
 

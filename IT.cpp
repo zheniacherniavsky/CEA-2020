@@ -43,10 +43,12 @@ namespace IT
 			idtable.table->idtype = entry.idtype;
 			idtable.table->idxTI = entry.idxTI;
 			idtable.table->idxfirstLE = entry.idxfirstLE;
-			idtable.table->value.vint = entry.value.vint;
-			idtable.table->value.vstr->len = entry.value.vstr->len;
+			if(entry.value.vint != NULL) idtable.table->value.vint = entry.value.vint;
+			if(entry.value.vstr != NULL) idtable.table->value.vstr->len = entry.value.vstr->len;
 
 			idtable.table->visibility.area = entry.visibility.area;
+			for (int i = 0; i < strlen(entry.visibility.functionName); i++)
+				idtable.table->visibility.functionName[i] = entry.visibility.functionName[i];
 
 			for (int i = 0; i < entry.value.vstr->len; i++)
 				idtable.table->value.vstr->str[i] = entry.value.vstr->str[i];
@@ -57,7 +59,7 @@ namespace IT
 		
 	}
 
-	int IsId(IdTable& idtable, char id[ID_MAXSIZE], short visArea)
+	int IsId(IdTable& idtable, char id[ID_MAXSIZE], short visArea, char fnkName[])
 	{
 		Entry* element = new Entry();
 		element = idtable.head;
@@ -65,11 +67,12 @@ namespace IT
 		{
 			if (strcmp(element->id, id) == 0)
 			{
-				if(element->visibility.area == visArea)
-					return element->idxTI;
-				else if (element->idtype == IT::F) return element->idxTI; // идёт вызов функции
-			}
-				
+				if (element->idtype == IT::F) return element->idxTI; // идёт вызов функции
+
+				else if(element->visibility.area == visArea)
+					if(strcmp(element->visibility.functionName, fnkName) == 0)
+						return element->idxTI;
+			}	
 			element = element->next;
 		}
 		return IT_NULL_IDX;

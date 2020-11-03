@@ -18,11 +18,12 @@ namespace IT						// таблица идентификаторов
 		IDDATATYPE	iddatatype;			// тип данных
 		IDTYPE		idtype;				// тип идентификатора
 		
-		union
+		struct
 		{
 			char functionName[ID_MAXSIZE];
-			short area;
+			int area;
 		} visibility;
+		
 
 		Entry* next = nullptr;			// односвязный список (следующий элемент)
 
@@ -50,9 +51,9 @@ namespace IT						// таблица идентификаторов
 
 	void Add(IdTable& idtable, Entry entry);	// создать таблицу идентификаторов
 
-	Entry GetEntry(IdTable& idtable, int n);	// получить строку таблицы идентификаторов
+	Entry GetEntry(IdTable& idtable, int n);	// получить элемент таблицы идентификаторов по idx
 
-	int IsId(IdTable& idtable, char id[ID_MAXSIZE], short visArea);	// вернёт idx идентификатора
+	int IsId(IdTable& idtable, char id[ID_MAXSIZE], short visArea, char fnkName[]);	// вернёт idx идентификатора
 
 	void Delete(IdTable& idtable); // освободить память (удалить таблицу идентификаторов
 }

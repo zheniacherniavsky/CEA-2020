@@ -1,35 +1,11 @@
 ﻿#include "FT.h"
+#include "Error.h"
 #include <stack>
-
-/*
-
-	ISSUES:
-				определение области видимости:
-		Область видимости отслеживается, но нужно добавить стек, в который будет
-	помещаться название функции в данный момент, и убираться соответственно когда
-	функция будет закончена. Это нужно для дополнительной проверки на наличие переменной
-	в таблице идентификаторов. 
-		todo:
-		 1- стек с функциями
-		 2- добавить проверку на название функции в IT::IsID с доп аргументом.
-
-	После этого я думаю всё будет работать хорошо. А, и не забыть добавить проверку
-	на функцию входа main, у неё лексема m !!!!!
-
-
-	++ ещё один баг:
-		точка входа имеет область видимости на единицу больше, такого не должно быть
-		Это исправится само, при добавлении стека функций
-
-	++ добавить проверку на кол-во скобок в коде
-*/
+#include <sstream>
+#include <iomanip>
 
 namespace FT
 {
-	// область видимости : ISSUES #1
-	// stack with functions name
-	// добавить в структуру название функции
-	// в getEntry деать проверку по названию функции
 
 	std::stack <char*> stkFunc;
 
@@ -40,19 +16,24 @@ namespace FT
 		bool _number		= false;
 		bool _function		= false; // функция
 		bool _functionName	= false; // запоминание названия функции
+		bool _body			= false; // тело
+		bool _main			= false;
 		bool _integer		= false; // int
 		bool _string		= false; // string
 		bool _hesisIsOpen	= false; // открытие закрытие скобок для отличения параметров от функции
+		bool _functionParms = false;
+		bool _unchecked		= false;
 
 		void toFalse()	// занулить все флажки
 		{
 			_declare = false;
 			_literal = false;
 			_number = false;
-			_function = false;
 			_integer = false;
 			_string = false;
 			_hesisIsOpen = false;
+
+			// flag._function я контролирую сам в switch !!!!
 		}
 	};
 
@@ -64,6 +45,9 @@ namespace FT
 		int idx = 0;								// id идентификатора
 		short visibArea = 0;						// область видимости
 		flags flag;									// флажки
+		short hesisCount = 0;						// слежу за правильным количеством скобок
+		int literalCount = 1;						// отслеживание количества литералов
+
 		std::string ErrorMessage = "";
 
 		int linePos = 0;	// позиция лексемы в строке
@@ -104,7 +88,7 @@ namespace FT
 
 			char lexemSymbol = compareLexems(lexem, &ltElement); // получаю символ лексемы
 
-			if (flag._functionName)		// стек
+			if (flag._functionName)
 			{
 				stkFunc.push(lexem);
 				flag._functionName = false;
@@ -116,9 +100,13 @@ namespace FT
 				flag._declare = true;
 				break;
 			case(LEX_FUNCTION):
-				flag._function = true;
-				flag._functionName = true;
-				break;
+				if (!flag._function)
+				{
+					flag._function = true;
+					flag._functionParms = true;
+					flag._functionName = true;
+				}
+				
 			case(LEX_INTEGER): // or LEX_STRING doesnt matter, they are equals
 				if (lexem[0] == 's')
 				{
@@ -132,33 +120,51 @@ namespace FT
 				}
 			case(LEX_NUMBER):
 				lexemSymbol = LEX_ID;
-				flag._number = true;
+				if(!flag._string) flag._number = true;
 				flag._literal = true;
 				break;
 			case(LEX_MAIN): // точка входа main, соотв. область видимости повышаем на единицу
+				if (!flag._main) flag._main = true;
+				else throw ERROR_THROW(205); // two or more mains
 				stkFunc.push(lexem);
-				visibArea++;
+				flag._function = true;
 				break;
 			case(LEX_LEFTHESIS):
 				flag._hesisIsOpen = true;
-				if (flag._function) visibArea++;
+				hesisCount++;
+				if (flag._function && flag._functionParms) visibArea++;
 				break;
 			case(LEX_RIGHTHESIS):
 				flag._hesisIsOpen = false;
-				if (flag._function) visibArea--;
-				flag._function = false;
+				hesisCount--;
+				if (flag._function && flag._functionParms)
+				{
+					visibArea--;
+					flag._functionParms = false;
+				}
 				break;
 			case(LEX_SEMICOLON):
 				flag.toFalse();
 				break;
 			case(LEX_LEFTBRACE):
 				visibArea++;
+				hesisCount++;
+				flag._body = true;
 				flag.toFalse();
 				break;
 			case(LEX_BRACELET):
-				stkFunc.pop();		// убираем название функции из стека
 				visibArea--;
+				hesisCount--;
+				flag._body = false;
 				flag.toFalse();
+				if (flag._function)
+				{
+					if(!stkFunc.empty()) stkFunc.pop();
+					flag._function = false; // отслеживаю закрытие блока функции
+				}
+				break;
+			case('u'):	// unchecked, special for stack overflow exceptions
+				flag._unchecked = true;
 				break;
 			}
 
@@ -171,7 +177,19 @@ namespace FT
 				}
 				else if (flag._number) lexemSymbol = LEX_LITERAL;
 
-				int checkIdx = IT::IsId(it, lexemID, visibArea);
+				// определение типа
+				IT::IDTYPE _idtype;
+				if (flag._function && !flag._literal)
+				{
+					if (flag._hesisIsOpen) _idtype = IT::P; // параметр
+					else if (!flag._body) _idtype = IT::F; // функция
+					else _idtype = IT::V;
+				}
+				else if (!flag._literal) _idtype = IT::V; // переменная
+				else _idtype = IT::L; // литерал
+
+				// проверка на наличие в табллице
+				int checkIdx = IT::IsId(it, lexemID, visibArea, stkFunc.top());
 				bool newElement = false;
 				if (checkIdx == IT_NULL_IDX) // следовательно это новый элемент
 				{
@@ -190,24 +208,78 @@ namespace FT
 				if (flag._literal)
 				{
 					itElement.idtype = IT::L;
-					if (flag._number) itElement.iddatatype = IT::INT;
+					if (flag._number) { // tut problems s return 0
+						itElement.iddatatype = IT::INT;
+						flag._number = false;
+					}
 					else itElement.iddatatype = IT::STR;
 				}
 
 				if (newElement)
 				{
-					for (int i = 0; i < ID_MAXSIZE; i++)
-						itElement.id[i] = lexemID[i];
+					if (flag._body && !flag._literal && !flag._declare) 
+						throw ERROR_THROW(206);
 
-					itElement.visibility.area = visibArea;
-
-					if (flag._function && !flag._literal)
+					if (!flag._literal)
 					{
-						if (flag._hesisIsOpen) itElement.idtype = IT::P; // параметр
-						else itElement.idtype = IT::F; // функция
+						for (int i = 0; i < ID_MAXSIZE; i++)
+							itElement.id[i] = lexemID[i];
+
+						itElement.value.vint = NULL;
+						itElement.value.vstr->len = NULL;
+						itElement.value.vstr->str[0] = NULL;
 					}
-					else if (!flag._literal) itElement.idtype = IT::V; // переменная
-					else itElement.idtype = IT::L; // литерал
+					else // литерал дожен получить уникальный ID и присвоить себе значение, будь то число или строка.
+					{
+						itElement.id[0] = 'c';
+						std::stringstream a;
+						a << literalCount;
+						std::string sliteralCount;
+						a >> sliteralCount;
+						for (int i = 1;; i++)
+						{
+							if (sliteralCount[i - 1] != NULL) itElement.id[i] = sliteralCount[i - 1];
+							else
+							{
+								itElement.id[i] = NULL;
+								break;
+							}
+
+						}
+						if (itElement.iddatatype == IT::INT)
+						{
+							std::stringstream b;
+							b << lexem;
+							int number;
+							b >> number;
+							if (number > 0 && number <= 256)
+								itElement.value.vint = number;
+							else if (flag._unchecked)
+								itElement.value.vint = number % 256;
+							else throw ERROR_THROW(207);
+						}
+						else if (itElement.iddatatype == IT::STR)
+						{
+							if (!((lexem[0] == '"' || lexem[0] == '\'') && (lexem[strlen(lexem) - 1] == '"' || lexem[strlen(lexem) - 1] == '\'')))
+								throw ERROR_THROW(208);
+							itElement.value.vstr->len = strlen(lexem) - 2;
+							for (int i = 1; i < strlen(lexem) - 1; i++)
+								itElement.value.vstr->str[i - 1] = lexem[i];
+							itElement.value.vstr->str[strlen(lexem) - 2] = NULL;
+						}
+						literalCount++;
+					}
+
+					if (!stkFunc.empty())
+					{
+						for (int i = 0; i < ID_MAXSIZE; i++)
+							itElement.visibility.functionName[i] = stkFunc.top()[i];
+						itElement.visibility.functionName[strlen(itElement.visibility.functionName)] = '\0';
+					}
+					else itElement.visibility.functionName[0] = '\0';
+					itElement.visibility.area = visibArea;
+					
+					itElement.idtype = _idtype; // параметр
 
 					if (flag._integer) itElement.iddatatype = IT::INT;
 					else if (flag._string) itElement.iddatatype = IT::STR;
@@ -222,11 +294,11 @@ namespace FT
 
 			ltElement.lexema[0] = lexemSymbol;
 			LT::Add(lt, ltElement);
-
-			std::cout << lexem << std::endl;
-
 			lexem = strtok(NULL, " \n");
 		}
+
+		if (hesisCount != 0) throw ERROR_THROW(203);
+		if (!flag._main) throw ERROR_THROW(204);
 
 		makeOutWithLT(lt, it);
 		makeOutWithIT(it);
@@ -239,10 +311,12 @@ namespace FT
 		char* p = &code[0];
 		bool endLine;
 		bool emptyLine;
-		for (int line = 0, pos = 0; *p != '\0'; *p++)
+		short _count = 0;
+		for (int line = 0, pos = 0, count = 0; *p != '\0'; *p++)
 		{
 			endLine = false;
 			emptyLine = true;
+			count = 0;
 			while (*p != '\n')
 			{
 				if (*p == ' ') while (*p == ' ') *p++; // пропускаем пробелы
@@ -259,15 +333,18 @@ namespace FT
 				}
 				if (!endLine)
 				{
+					count++;
+					array[pos] = line;
+					pos++;
+				} if (endLine && !count)
+				{
 					array[pos] = line;
 					pos++;
 				}
 			}
 			if (!emptyLine) line++;
+			_count += count;
 		}
-		
-		std::cout << "getLineNums\n\n\n" << std::endl;
-		std::cout << code << std::endl;
 		return array;
 	}
 
@@ -381,6 +458,19 @@ namespace FT
 			FST::NODE()
 		);
 
+		FST::FST fst20(lexem, 10,		// enter point
+			FST::NODE(1, FST::RELATION('u', 1)),
+			FST::NODE(1, FST::RELATION('n', 2)),
+			FST::NODE(1, FST::RELATION('c', 3)),
+			FST::NODE(1, FST::RELATION('h', 4)),
+			FST::NODE(1, FST::RELATION('e', 5)),
+			FST::NODE(1, FST::RELATION('c', 6)),
+			FST::NODE(1, FST::RELATION('k', 7)),
+			FST::NODE(1, FST::RELATION('e', 8)),
+			FST::NODE(1, FST::RELATION('d', 9)),
+			FST::NODE()
+		);
+
 		if (FST::execute(fst1) == -1) return LEX_INTEGER; // integer
 		else if (FST::execute(fst2) == -1) return LEX_STRING; // string
 		else if (FST::execute(fst3) == -1) return LEX_FUNCTION;
@@ -424,6 +514,7 @@ namespace FT
 		else if (FST::execute(fst17) == -1) return LEX_IS;
 		else if (FST::execute(fst18) == -1) return LEX_NUMBER; // number
 		else if (FST::execute(fst19) == -1) return LEX_MAIN; // main
+		else if (FST::execute(fst20) == -1) return 'u'; // unchecked!
 		else return LEX_ID;
 	}
 
@@ -451,20 +542,58 @@ namespace FT
 	{
 		std::cout << "\n\t\t\tIT TABLE DEBUG" << std::endl;
 		IT::Entry* showTable = idTable.head;
-		std::cout << "___________________________________________________________________________________" << std::endl;
-		std::cout << "                                   тип данных    1-перем  2-ф-ция      область     " << std::endl;
-		std::cout << "       номер         уник.id      1-INT  2-STR   3-парам  4-литер     видимости    "<< std::endl;
-		std::cout << "___________________________________________________________________________________" << std::endl;
-		std::cout << "|\t" << "IDX" << "\t|\t" << "ID" << "\t|\t" << "DATA" << "\t|\t" << "TYPE" << "\t|\t" << "VIS" << "\t|\t" << std::endl;
+		std::cout << std::setfill('_') << std::setw(91) << '_' << std::endl;
+		std::cout << std::setfill(' ')
+			<< std::setw(8) << "номер"
+			<< std::setw(6) << "id"
+			<< std::setw(6) << "тип"
+			<< std::setw(10) << "DATA"
+			<< std::setw(20) << "обл. видимости"
+			<< std::setw(12) << "функция"
+			<< std::setw(20) << "содержимое"
+			<< std::setw(10) << '|' << std::endl;
+		std::cout << std::setfill('_') << std::setw(91) << '_' << std::endl;
 		while (showTable)
 		{
-			std::cout << "|\t" << showTable->idxTI << "\t";
-			std::cout << "|\t" << showTable->id << "\t";
-			std::cout << "|\t" << showTable->iddatatype << "\t";
-			std::cout << "|\t" << showTable->idtype << "\t";
-			std::cout << "|\t" << showTable->visibility.area << "\t|" << std::endl;
+			std::cout << std::setfill(' ')
+				<< std::setw(6) << showTable->idxTI
+				<< std::setw(8) << showTable->id;
+			if (showTable->iddatatype == IT::INT)
+				std::cout << std::setw(6) << "INT";
+			else if (showTable->iddatatype == IT::STR)
+				std::cout << std::setw(6) << "STR";
+			if(showTable->idtype == IT::F)
+				std::cout << std::setw(12) << "функция";
+			else if (showTable->idtype == IT::P)
+				std::cout << std::setw(12) << "параметр";
+			else if (showTable->idtype == IT::L)
+				std::cout << std::setw(12) << "литерал";
+			else if (showTable->idtype == IT::V)
+				std::cout << std::setw(12) << "переменная";
+			std::cout << std::setw(10) << showTable->visibility.area;
+			std::cout << std::setw(19) << showTable->visibility.functionName;
+
+			if (showTable->iddatatype == IT::INT)
+				std::cout << std::setw(17) << showTable->value.vint;
+			else if (showTable->iddatatype == IT::STR)
+				if(showTable->value.vstr->len == NULL) std::cout << std::setw(19) << "NULL";
+				else
+				{
+					std::cout << std::setw(10);
+					for (int i = 0; i < showTable->value.vstr->len; i++)
+					{
+						std::cout << showTable->value.vstr->str[i];
+						if (i == 8)
+						{
+							std::cout << "...";
+							break;
+						}
+					}
+					std::cout << "[len: " << showTable->value.vstr->len << ']';
+				}
+			std::cout << std::endl;
 			showTable = showTable->next;
 		}
-		std::cout << "_________________________________________________________________" << std::endl;
+		std::cout << std::setfill('_') << std::setw(91) << '_' << std::endl;
 	}
 }
