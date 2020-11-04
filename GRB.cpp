@@ -1,4 +1,4 @@
-#include "GRB.h"
+п»ї#include "GRB.h"
 #include "Rules.h"
 #include <iostream>
 
@@ -6,8 +6,8 @@ namespace GRB
 {
 
 	Rule::Chain::Chain(
-		short psize, // кол-во символов в цепочке
-		GRBALPHABET s, ... // символы
+		short psize, // РєРѕР»-РІРѕ СЃРёРјРІРѕР»РѕРІ РІ С†РµРїРѕС‡РєРµ
+		GRBALPHABET s, ... // СЃРёРјРІРѕР»С‹
 	)
 	{
 		nt = new GRBALPHABET[size = psize];
@@ -16,7 +16,7 @@ namespace GRB
 	}
 
 	Rule::Rule(
-		GRBALPHABET pnn, // нетерминал
+		GRBALPHABET pnn, // РЅРµС‚РµСЂРјРёРЅР°Р»
 		int piderror,
 		short psize,
 		Chain c, ...
@@ -30,10 +30,10 @@ namespace GRB
 	}
 
 	Greibach::Greibach(
-		GRBALPHABET pstartN, // стартовый символ
-		GRBALPHABET pstbottomT, // дно стека
-		short psize, // кол-во правил
-		Rule r, ... // правила
+		GRBALPHABET pstartN, // СЃС‚Р°СЂС‚РѕРІС‹Р№ СЃРёРјРІРѕР»
+		GRBALPHABET pstbottomT, // РґРЅРѕ СЃС‚РµРєР°
+		short psize, // РєРѕР»-РІРѕ РїСЂР°РІРёР»
+		Rule r, ... // РїСЂР°РІРёР»Р°
 	)
 	{
 		startN = pstartN;
@@ -61,7 +61,7 @@ namespace GRB
 		return rc;
 	}
 
-	char* Rule::getCRule(char* b, short nchain) // получить правило в виде N->цепочка
+	char* Rule::getCRule(char* b, short nchain) // РїРѕР»СѓС‡РёС‚СЊ РїСЂР°РІРёР»Рѕ РІ РІРёРґРµ N->С†РµРїРѕС‡РєР°
 	{
 		char bchain[200];
 		b[0] = Chain::alphabet_to_char(nn); b[1] = '-'; b[2] = '>'; b[3] = 0x00;
@@ -79,7 +79,7 @@ namespace GRB
 		return rc;
 	}
 
-	char* Rule::Chain::getCChain(char* b) // получиьт правую сторону правила
+	char* Rule::Chain::getCChain(char* b) // РїРѕР»СѓС‡РёСЊС‚ РїСЂР°РІСѓСЋ СЃС‚РѕСЂРѕРЅСѓ РїСЂР°РІРёР»Р°
 	{
 		for (int i = 0; i < size; i++) b[i] = Chain::alphabet_to_char(nt[i]);
 		b[size] = 0x00;
