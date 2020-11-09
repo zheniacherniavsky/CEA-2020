@@ -62,6 +62,8 @@ namespace LT // таблица лексем
 		int n // номер получаемой строки
 	);
 
+	int getSnByPos(LexTable& lex, int pos); // получить номер строки по ноеру элемента в таблице
+
 	void Delete(LexTable& lextable);
 
 }

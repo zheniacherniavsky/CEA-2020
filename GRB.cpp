@@ -81,7 +81,8 @@ namespace GRB
 
 	char* Rule::Chain::getCChain(char* b) // получиьт правую сторону правила
 	{
-		for (int i = 0; i < size; i++) b[i] = Chain::alphabet_to_char(nt[i]);
+		for (int i = 0; i < size; i++) 
+			b[i] = Chain::alphabet_to_char(nt[i]);
 		b[size] = 0x00;
 		return b;
 	}

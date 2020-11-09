@@ -8,6 +8,7 @@
 #include "IT.h"		// таблица идентификаторов
 #include "LT.h"		// таблица лексем
 #include "PolishNotation.h" // Польская запись
+#include "MFST.h"	// автомат 
 
 #define TBL_LENGTH 2048 // размеры создаваемых таблиц лексем и идентификаторов
 
@@ -30,6 +31,14 @@ int main(int argc, char* argv[])
 		IT::IdTable idTable = IT::Create(TBL_LENGTH); // создаю таблицу идентификаторов размеров 2048
 
 		In::_IN_ in = In::getin(lexTable, idTable, parms.in, parms.out);	// получение in структуры
+
+		MFST_TRACE_START;								// оладка
+		MFST::Mfst mfst(lexTable, GRB::getGreibach()); 	// автомат
+		mfst.start();
+
+		mfst.savededucation();
+
+		mfst.printrules();
 
 		bool f = PN::PolishNotation(-1, lexTable, idTable, true); // last arg is debug
 		makeOutWithLT(lexTable, idTable);
@@ -68,4 +77,5 @@ void makeOutWithLT(LT::LexTable& table, IT::IdTable& it)
 		}
 		i++;
 	}
+	std::cout << "\nРазмер таблицы: " << table.size << std::endl;
 }

@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iomanip>
 
+#define UNCHECKED_FUNCTION true
+
 namespace FT
 {
 
@@ -22,7 +24,7 @@ namespace FT
 		bool _string		= false; // string
 		bool _hesisIsOpen	= false; // открытие закрытие скобок для отличения параметров от функции
 		bool _functionParms = false;
-		bool _unchecked		= false;
+		bool _unchecked		= UNCHECKED_FUNCTION;
 
 		void toFalse()	// занулить все флажки
 		{
@@ -536,6 +538,7 @@ namespace FT
 			}
 			i++;
 		}
+		std::cout << "\n" <<table.size << std::endl;
 	}
 
 	void makeOutWithIT(IT::IdTable& idTable)

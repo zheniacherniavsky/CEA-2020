@@ -4,6 +4,7 @@ typedef short GRBALPHABET; // терминалы > 0, нетерминалы < 0
 
 #define NS(s) (GRB::Rule::Chain::N(s))
 #define TS(s) (GRB::Rule::Chain::T(s))
+#define ISNS(n) (GRB::Rule::Chain::isN(n))
 
 namespace GRB
 {

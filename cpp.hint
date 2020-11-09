@@ -1,5 +1,0 @@
-// Файлы указаний помогают среде IDE Visual Studio интерпретировать идентификаторы Visual C++
-// (например, имена функций и макросов).
-// Дополнительные сведения: https://go.microsoft.com/fwlink/?linkid=865984
-#define NS(n) GRB::Rule::Chain::N(n);
-#define TS(n) GRB::Rule::Chain::T(n);

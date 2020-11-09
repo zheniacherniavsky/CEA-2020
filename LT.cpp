@@ -84,6 +84,18 @@ namespace LT
 		throw ERROR_THROW(202) // Не обнаружена лексема в данной строке
 	}
 
+	int getSnByPos(LexTable& lex, int pos)
+	{
+		Entry* element = lex.head;
+		for (int i = 0; i < pos; i++)
+		{
+			if (element->next != NULL)
+				element = element->next;
+		}
+		if (element) return element->sn;
+		else return 0;
+	}
+
 	void Delete(LexTable& LT)
 	{
 		delete &LT;

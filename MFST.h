@@ -4,19 +4,73 @@
 #include "GRB.h"
 #include "LT.h"
 
-#define MFST_DIAGN_NUMBER 3
-typedef std::stack<short> MFSTSTSTACK;			// стек автомата
+// MFST TRACES
+#include <iomanip>
+
+#define MFST_TRACE_START		{std::cout << std::endl						\
+								<< std::setw( 4) << std::left << "Шаг" << ":"	\
+								<< std::setw(20) << std::left << "Правило"		\
+								<< std::setw(30) << std::left << "Входная лента"\
+								<< std::setw(20) << std::left << "Стек"			\
+								<< std::endl;}								
+
+#define MFST_TRACE1				{std::cout << std::setw(4) << std::left << ++FST_TRACE_n << ": "\
+								<< std::setw(20) << std::left << rule.getCRule(rbuf,nrulechain)	\
+								<< std::setw(30) << std::left << getCLenta(lbuf, lenta_position)\
+								<< std::setw(20) << std::left << getCSt(sbuf)					\
+								<< std::endl;}													
+
+#define MFST_TRACE2				{std::cout << std::setw(4) << std::left << ++FST_TRACE_n << ": "\
+								<< std::setw(20) << std::left << " "							\
+								<< std::setw(30) << std::left << getCLenta(lbuf, lenta_position)\
+								<< std::setw(20) << std::left << getCSt(sbuf)					\
+								<< std::endl;}													
+
+#define MFST_TRACE3				{std::cout << std::setw(4) << std::left << ++FST_TRACE_n << ": "\
+								<< std::setw(20) << std::left << " "							\
+								<< std::setw(30) << std::left << getCLenta(lbuf, lenta_position)\
+								<< std::setw(20) << std::left << getCSt(sbuf)					\
+								<< std::endl;}
+
+#define MFST_TRACE4(c)			std::cout << std::setw(4) << std::left << ++ FST_TRACE_n << ": " << std::setw(20) << std::left << c << std::endl;
+
+#define MFST_TRACE5(c)			std::cout << std::setw(4) << std::left <<    FST_TRACE_n << ": " << std::setw(20) << std::left << c <<std::endl;
+
+#define MFST_TRACE6(c,k)		std::cout << std::setw(4) << std::left <<    FST_TRACE_n << ": " << std::setw(20) << std::left << c << k <<  std::endl;
+
+#define MFST_TRACE7				std::cout << std::setw(4) << std::left << state.lenta_position  << ": " \
+								<< std::setw(20) << std::left << rule.getCRule(rbuf,state.nrulechain)	\
+								<< std::endl;
+
+#define MFST_DIAGN_NUMBER 10
+#define MFST_DIAGN_MAXSIZE 255*2
+#define ERROR_MAXSIZE_MESSAGE 255
+
+class my_stack_SHORT :public std::stack<short> {
+public:
+	using std::stack<short>::c; // КОНТЕЙНЕР
+};
+
+typedef my_stack_SHORT MFSTSTSTACK;			// стек автомата
+
 namespace MFST
 {
 	struct MfstState							// Состояние автомата (для сохранения)
 	{
 		short lenta_position;					// позиция на ленте
+		short nrule;							// номер правила
 		short nrulechain;						// номер текущей цепочки, текущего правила
 		MFSTSTSTACK st;							// стек автомата
 		MfstState();
 		MfstState(
 			short pposition,					// позиция на ленте
 			MFSTSTSTACK pst,					// стек автомата
+			short pnrulechain					// номер текущей цепочки, текущего правила
+		);
+		MfstState(
+			short pposition,					// позиция на ленте
+			MFSTSTSTACK pst,					// стек автомата
+			short pnrule,						// номер текущего правила
 			short pnrulechain					// номер текущей цепочки, текущего правила
 		);
 	};
@@ -50,15 +104,21 @@ namespace MFST
 			);
 		} diagnosis[MFST_DIAGN_NUMBER];			// последние самые глубокие сообщения
 
+		class my_stack_MfstState :public std::stack<MfstState> {
+		public:
+			using std::stack<MfstState>::c; // container
+		};
+
 		GRBALPHABET* lenta;						// перекодированная (TS,NS) лента из LEX
 		short lenta_position;					// текущая позиция на ленте
 		short nrule;							// номер текущего правила
-		short nrule_chain;						// номер текущей цепочки текущего правила
+		short nrulechain;						// номер текущей цепочки текущего правила
 		short lenta_size;						// размер ленты
 		GRB::Greibach greibach;					// грамматика Грейбах
 		LT::LexTable lex;						// результат работы лексического анализатора
+		LT::Entry* element = lex.head;			// указатель на начальный элемент
 		MFSTSTSTACK st;							// стек автомата
-		std::stack<MfstState> storestate;		// стек для сохранения состояний
+		my_stack_MfstState storestate;		// стек для сохранения состояний
 		Mfst();
 		Mfst(
 			LT::LexTable plex,					// результат работы лексического анализатора
@@ -77,5 +137,15 @@ namespace MFST
 		bool savediagnosis(
 			RC_STEP pprc_step					// код завершения шага
 		);	
+		void printrules();
+
+		struct Deducation
+		{
+			short size;
+			short* nrules;
+			short* nrulechains;
+			Deducation() { size = 0; nrules = 0; nrulechains = 0; };
+		} deducation;
+		bool savededucation();
 	};
 }
