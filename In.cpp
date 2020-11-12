@@ -107,10 +107,9 @@ namespace In {
 			info.lines++;
 		}
 		sourceCode.close(); // закрываем файл
-
+		std::cout << code << std::endl;
 		// в code находится обработанный код
 		FT::fillTables(&code[0], lexTable, idTable); // ф-ция заполнения таблиц
-
 		return info;
 	}
 }

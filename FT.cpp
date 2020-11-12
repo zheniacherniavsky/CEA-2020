@@ -24,6 +24,7 @@ namespace FT
 		bool _string		= false; // string
 		bool _hesisIsOpen	= false; // открытие закрытие скобок для отличения параметров от функции
 		bool _functionParms = false;
+		bool _return		= false;
 		bool _unchecked		= UNCHECKED_FUNCTION;
 
 		void toFalse()	// занулить все флажки
@@ -34,6 +35,7 @@ namespace FT
 			_integer = false;
 			_string = false;
 			_hesisIsOpen = false;
+			_return = false;
 
 			// flag._function я контролирую сам в switch !!!!
 		}
@@ -92,6 +94,7 @@ namespace FT
 
 			if (flag._functionName)
 			{
+				lexem[5] = 0x00;
 				stkFunc.push(lexem);
 				flag._functionName = false;
 			}
@@ -108,6 +111,7 @@ namespace FT
 					flag._functionParms = true;
 					flag._functionName = true;
 				}
+				break;
 				
 			case(LEX_INTEGER): // or LEX_STRING doesnt matter, they are equals
 				if (lexem[0] == 's')
@@ -168,6 +172,9 @@ namespace FT
 			case('u'):	// unchecked, special for stack overflow exceptions
 				flag._unchecked = true;
 				break;
+			case(LEX_RETURN):
+				flag._return = true;
+				break;
 			}
 
 			if (lexemSymbol == LEX_ID)
@@ -191,7 +198,11 @@ namespace FT
 				else _idtype = IT::L; // литерал
 
 				// проверка на наличие в табллице
-				int checkIdx = IT::IsId(it, lexemID, visibArea, stkFunc.top());
+				int checkIdx = NULL;
+
+				if (!stkFunc.empty()) checkIdx = IT::IsId(it, lexemID, visibArea, stkFunc.top());
+				else throw ERROR_THROW(600);
+
 				bool newElement = false;
 				if (checkIdx == IT_NULL_IDX) // следовательно это новый элемент
 				{
@@ -219,8 +230,11 @@ namespace FT
 
 				if (newElement)
 				{
-					if (flag._body && !flag._literal && !flag._declare) 
+					if (flag._body && !flag._literal && !flag._declare && !flag._return)
+					{
+						std::cout << "------------- строка " << posArray[pos] << " -------------";
 						throw ERROR_THROW(206);
+					}
 
 					if (!flag._literal)
 					{
@@ -276,7 +290,7 @@ namespace FT
 					{
 						for (int i = 0; i < ID_MAXSIZE; i++)
 							itElement.visibility.functionName[i] = stkFunc.top()[i];
-						itElement.visibility.functionName[strlen(itElement.visibility.functionName)] = '\0';
+						itElement.visibility.functionName[5] = 0x00;
 					}
 					else itElement.visibility.functionName[0] = '\0';
 					itElement.visibility.area = visibArea;
@@ -538,7 +552,7 @@ namespace FT
 			}
 			i++;
 		}
-		std::cout << "\n" <<table.size << std::endl;
+		std::cout << "\nTABLE SIZE: " << table.size << std::endl;
 	}
 
 	void makeOutWithIT(IT::IdTable& idTable)

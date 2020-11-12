@@ -9,26 +9,26 @@
 
 #define MFST_TRACE_START		{std::cout << std::endl						\
 								<< std::setw( 4) << std::left << "Шаг" << ":"	\
-								<< std::setw(20) << std::left << "Правило"		\
-								<< std::setw(30) << std::left << "Входная лента"\
+								<< std::setw(30) << std::left << " Правило"		\
+								<< std::setw(40) << std::left << "Входная лента"\
 								<< std::setw(20) << std::left << "Стек"			\
 								<< std::endl;}								
 
 #define MFST_TRACE1				{std::cout << std::setw(4) << std::left << ++FST_TRACE_n << ": "\
-								<< std::setw(20) << std::left << rule.getCRule(rbuf,nrulechain)	\
-								<< std::setw(30) << std::left << getCLenta(lbuf, lenta_position)\
+								<< std::setw(30) << std::left << rule.getCRule(rbuf,nrulechain)	\
+								<< std::setw(40) << std::left << getCLenta(lbuf, lenta_position)\
 								<< std::setw(20) << std::left << getCSt(sbuf)					\
 								<< std::endl;}													
 
 #define MFST_TRACE2				{std::cout << std::setw(4) << std::left << ++FST_TRACE_n << ": "\
-								<< std::setw(20) << std::left << " "							\
-								<< std::setw(30) << std::left << getCLenta(lbuf, lenta_position)\
+								<< std::setw(30) << std::left << " "							\
+								<< std::setw(40) << std::left << getCLenta(lbuf, lenta_position)\
 								<< std::setw(20) << std::left << getCSt(sbuf)					\
 								<< std::endl;}													
 
 #define MFST_TRACE3				{std::cout << std::setw(4) << std::left << ++FST_TRACE_n << ": "\
-								<< std::setw(20) << std::left << " "							\
-								<< std::setw(30) << std::left << getCLenta(lbuf, lenta_position)\
+								<< std::setw(30) << std::left << " "							\
+								<< std::setw(40) << std::left << getCLenta(lbuf, lenta_position)\
 								<< std::setw(20) << std::left << getCSt(sbuf)					\
 								<< std::endl;}
 
@@ -39,7 +39,7 @@
 #define MFST_TRACE6(c,k)		std::cout << std::setw(4) << std::left <<    FST_TRACE_n << ": " << std::setw(20) << std::left << c << k <<  std::endl;
 
 #define MFST_TRACE7				std::cout << std::setw(4) << std::left << state.lenta_position  << ": " \
-								<< std::setw(20) << std::left << rule.getCRule(rbuf,state.nrulechain)	\
+								<< std::setw(30) << std::left << rule.getCRule(rbuf,state.nrulechain)	\
 								<< std::endl;
 
 #define MFST_DIAGN_NUMBER 10

@@ -4,6 +4,8 @@
 
 namespace IT
 {
+	bool equal(char a[ID_MAXSIZE], char b[ID_MAXSIZE]);
+
 	IdTable Create(int size)
 	{
 		IdTable newTable;
@@ -62,6 +64,7 @@ namespace IT
 	int IsId(IdTable& idtable, char id[ID_MAXSIZE], short visArea, char fnkName[])
 	{
 		Entry* element = new Entry();
+
 		element = idtable.head;
 		while (element)
 		{
@@ -69,12 +72,23 @@ namespace IT
 			{
 				if (element->idtype == IT::F) return element->idxTI; // идёт вызов функции
 
+				else if (element->idtype == IT::P)
+				{
+					if (equal(element->visibility.functionName, fnkName)) return element->idxTI;
+				}
+
 				else if(element->visibility.area == visArea)
-					if(strcmp(element->visibility.functionName, fnkName) == 0)
-						return element->idxTI;
+					if (equal(element->visibility.functionName, fnkName)) return element->idxTI;
 			}	
 			element = element->next;
 		}
 		return IT_NULL_IDX;
+	}
+
+	bool equal(char a[ID_MAXSIZE], char b[ID_MAXSIZE])
+	{
+		for (int i = 0; i < ID_MAXSIZE; i++)
+			if (a[i] != b[i]) return false;
+		return true;
 	}
 }

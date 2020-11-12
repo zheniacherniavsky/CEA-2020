@@ -62,11 +62,11 @@ int main(int argc, char* argv[])
 
 void makeOutWithLT(LT::LexTable& table, IT::IdTable& it)
 {
-	LT::Entry* element = table.head;
+	LT::Entry* element = table.head->next;
 
 	int i = 0;
 	std::cout << "\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ:" << std::endl;
-	while (element && element->next != nullptr)
+	while (element)
 	{
 		std::cout << "\n" << i << '\t';
 		while (element && i == element->sn) {
@@ -77,5 +77,4 @@ void makeOutWithLT(LT::LexTable& table, IT::IdTable& it)
 		}
 		i++;
 	}
-	std::cout << "\nРазмер таблицы: " << table.size << std::endl;
 }
