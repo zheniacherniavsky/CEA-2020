@@ -41,7 +41,7 @@ namespace FT
 		}
 	};
 
-	void fillTables(char* code, LT::LexTable &lt, IT::IdTable &it) // заполнение таблицы лексем и идентификаторов
+	void fillTables(char* code, char* sCode, LT::LexTable &lt, IT::IdTable &it) // заполнение таблицы лексем и идентификаторов
 	{
 		int* posArray = getLineNums(code);			// массив позиций строк исходного кода
 		char* lexem = strtok(&code[0], " \n");		// разбиваю код на лексемы
