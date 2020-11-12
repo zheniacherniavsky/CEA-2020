@@ -51,7 +51,7 @@ namespace IT						// таблица идентификаторов
 
 	void Add(IdTable& idtable, Entry entry);	// создать таблицу идентификаторов
 
-	Entry GetEntry(IdTable& idtable, int n);	// получить элемент таблицы идентификаторов по idx
+	Entry* GetEntry(IdTable& idtable, int idx);	// получить элемент таблицы идентификаторов по idx
 
 	int IsId(IdTable& idtable, char id[ID_MAXSIZE], short visArea, char fnkName[]);	// вернёт idx идентификатора
 

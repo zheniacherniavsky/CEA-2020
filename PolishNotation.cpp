@@ -5,29 +5,11 @@
 #include <stack>
 #include "PolishNotation.h"
 
-/*
-	ISSUES:
-		- Пустые строки брикают процесс, решить  (+++ РЕШИЛ)
-		- Утечка памяти при изменении таблы лексем :(((((((((( прога болеет памагите
-*/
-
 namespace PN
 {
-	struct polishNotation
-	{
-		LT::Entry* result;
-		LT::Entry* resultHead;
-		std::stack <LT::Entry> symbols;
-
-		polishNotation()
-		{
-			result = nullptr;
-			resultHead = nullptr;
-		}
-	};
-
-	bool isSymbol(LT::Entry* element);
-	void addRusult(polishNotation& p, LT::Entry* element);
+	void addResult(LT::Entry& result, LT::Entry& lentaElement, IT::IdTable& idTable);
+	void addResult(LT::Entry& result, LT::Entry& lentaElement, bool memory = false);
+	void addToStack(std::stack<LT::Entry*>& stack, LT::Entry* result, LT::Entry* element);
 
 	bool PolishNotation( // создание польской записи
 		int lextable_pods, // позиция выражения в таблице лексем
@@ -36,191 +18,169 @@ namespace PN
 		bool debug // вывод польской записи
 	)
 	{
-		/*
-		Алгоритм построения:
-		1 - исходная строка: выражение;
-		- результирующая строка: польская запись;
-		- стек: пустой;
-		- исходная строка просматривается слева направо;
-		- операнды переносятся в результирующую строку в порядке их следования;
-		- операция записывается в стек, если стек пуст или в вершине стека лежит отрывающая скобка;
-		- операция выталкивает все операции с большим или равным приоритетом в результирующую строку;
-		- открывающая скобка помещается в стек;
-		- закрывающая скобка выталкивает все операции до открывающей скобки, после чего обе скобки уничтожаются;
-		- по концу разбора исходной строки все операции, оставшиеся в стеке, выталкиваются в результирующую строку
-		*/
+		LT::Entry *lenta = LT::GetEntry(lexTable, 0);
+		std::stack<LT::Entry*> stack;
 
-		// 1 - получение исходной строки выражения
-
-		// i=a*(b+c)
-		// 
-		// a*(b+c)     
-		// *(b+c)       a	
-		// (b+c)		a		*
-		// b+c)			a		*(
-		// +c)			ab		*(
-		// c)			ab		*(+
-		// )			abc		*(+
-		//				abc+	*
-		//				abc+*
-		
-		polishNotation pol;
-		int lextable_pos = 0;
-		LT::Entry* sourceStr;
-		while (LT::Entry* sourceStr = LT::GetEntry(lexTable, lextable_pos))
+		while (lenta->next != NULL)
 		{
-			LT::Entry* nextLine = LT::GetEntry(lexTable, lextable_pos + 1);
-			LT::Entry* head = sourceStr;
-			LT::Entry* beforePN = sourceStr;
-			if (debug)
+			if (lenta->lexema[0] == '=')
 			{
-				std::cout << "\n\nДо Польской записи:" << std::endl;
-				while (beforePN->sn == lextable_pos)
-				{
-					std::cout << beforePN->lexema[0];
-					beforePN = beforePN->next;
-				}
-				std::cout << std::endl;
-			}
+				std::cout << lenta->lexema[0];
+				// обработка польской записи
+				LT::Entry* result = new LT::Entry();
+				LT::Entry* resultHead = new LT::Entry();
+				LT::Entry* unionChain = lenta->next;	// символ после равно, который мы потом заменим на resultHead 
+														// чтобы сцепить цепочки
 
-			// algorithm
-			/*
+				//if (lenta->lexema[0] != LEX_LEFTHESIS && lenta->lexema[0] != LEX_RIGHTHESIS)
+					//addResult(*result, *lenta, idTable);		// выражение должно начинаться с литерала или идентификатора
+																// но надо помнить про вызов функции, поэтому добавим проверку
+																// на вызов функции в сам addResult!!!
 
-			while(строка совпадает с выбранной)
-			{
-				if(НЕ символ операции)
+				bool saved = false;
+
+				while(lenta->lexema[0] != LEX_SEMICOLON)
 				{
-					добавление в результирующую строку, возврат false и доп. провека
-				}
-				else // У нас символ операции
-				{
-					if(ПРОВЕРКА на правую скобку) { ... } // выполнения алгоритма правой скобки
-					else
+					if (result->lexema[0] != NULL && saved) result = result->next;
+					
+
+					lenta = lenta->next;
+					switch (lenta->lexema[0])
 					{
-						...  заполнения стека или добавление в результирующую строку
+					case LEX_ID:
+					case LEX_LITERAL:
+						addResult(*result, *lenta, idTable);
+						if (!saved)
+						{
+							resultHead = result;	// сохраняю начало цепочки
+							saved = true;
+						}
+						result = result->next;
+						break;
+					case LEX_RIGHTHESIS:
+					case LEX_LEFTHESIS:
+					case LEX_PLUS:
+					case LEX_MINUS:
+					case LEX_STAR:
+					case LEX_DIRSLASH:
+					case LEX_SEMICOLON:
+						addToStack(stack, result, lenta);
+						break;
 					}
 				}
+				//for (int i = 0 ; resultHead->lexema[0] != NULL; i++)
+				//{
+				//	std::cout << resultHead->lexema[0];
+				//	resultHead = resultHead->next;
+				//}
+
+				*unionChain = *resultHead;
+				*lenta = *unionChain;
 			}
+			
+			std::cout << lenta->lexema[0];
+			lenta = lenta->next; // следующее выражение
+		}
 
-			*/
+		system("pause");
+		return false;
+	}
 
-			bool pn = false;
-			while (sourceStr->sn == lextable_pos)
+	void addResult(LT::Entry& result, LT::Entry& lentaElement, IT::IdTable& idTable)
+	{
+		switch (lentaElement.lexema[0])
+		{
+		case(LEX_ID):
+			if (IT::GetEntry(idTable, lentaElement.idxTI)->idtype == IT::F)
 			{
-				addRusult(pol, sourceStr);
-				if (sourceStr->lexema[0] == '=')
+				int parms = 0;
+				result.idxTI = lentaElement.idxTI;
+				result.sn = lentaElement.sn;
+				while (lentaElement.lexema[0] != LEX_RIGHTHESIS)
 				{
-					pn = true;
-					sourceStr = sourceStr->next;
+					lentaElement = *lentaElement.next;
+					if (lentaElement.lexema[0] == LEX_ID || lentaElement.lexema[0] == LEX_LITERAL)
+						parms++;
+				}
+				result.lexema[0] = '@';
+				result.next = new LT::Entry();
+				result.priority = 0;
+				break;
+			}
+		case(LEX_LITERAL):
+			result.idxTI = lentaElement.idxTI;
+			result.lexema[0] = lentaElement.lexema[0];
+			result.priority = lentaElement.priority;
+			result.sn = lentaElement.sn;
+			result.next = new LT::Entry();
+			break;
+		}
+	}
+
+	void addResult(LT::Entry& result, LT::Entry& lentaElement, bool memory)
+	{
+		result.idxTI = lentaElement.idxTI;
+		result.lexema[0] = lentaElement.lexema[0];
+		result.priority = lentaElement.priority;
+		result.sn = lentaElement.sn;
+		if (!memory) result.next = new LT::Entry();
+		else result.next = lentaElement.next;
+	}
+
+	void addToStack(std::stack<LT::Entry*>& stack, LT::Entry* result, LT::Entry* element)
+	{
+		switch (element->lexema[0])
+		{
+		case LEX_LEFTHESIS:
+			stack.push(element);
+			break;
+		case LEX_RIGHTHESIS:
+			while (!stack.empty())
+			{
+				if (stack.top()->lexema[0] == LEX_LEFTHESIS)
+				{
+					stack.pop();
 					break;
 				}
-				else sourceStr = sourceStr->next;
-			}
-
-			if (pn) // если строка подходит
-			{
-
-				while (sourceStr != nullptr && sourceStr->sn == lextable_pos)
+				else
 				{
-					char s = sourceStr->lexema[0]; // lex symbol
-					if (!isSymbol(sourceStr))
-					{
-						if (s == LEX_SEMICOLON)
-						{
-							while (!pol.symbols.empty())
-							{
-								addRusult(pol, &pol.symbols.top()); // добавляем в резалт наши знаки
-								pol.symbols.pop(); // убираем эти знаки из стека
-							}
-						}
-						else if (s != LEX_ID && s != LEX_LITERAL)
-						{
-							if (debug) {
-								std::cout << "Польская запись для этой строчки не построена!" << std::endl;
-							}
-							return false;
-						}
-						addRusult(pol, sourceStr); // если идентификатор, то кидаем в резалт
-					}
-					else
-					{
-						if (s == LEX_RIGHTHESIS) // если встречаем ), то
-						{
-							while (pol.symbols.top().lexema[0] != LEX_LEFTHESIS) // пока не встретим (
-							{
-								addRusult(pol, &pol.symbols.top()); // добавляем в резалт наши знаки
-								pol.symbols.pop(); // убираем эти знаки из стека
-							}
-							pol.symbols.pop(); // удаляем (
-						}
-						else
-						{
-							if (!pol.symbols.empty())
-							{
-								while ((pol.symbols.top().priority >= sourceStr->priority) && sourceStr->priority != 0)
-								{
-									addRusult(pol, &pol.symbols.top()); // добавляем в резалт наши знаки
-									pol.symbols.pop(); // убираем эти знаки из стека
-									if (pol.symbols.empty()) break;
-								}
-							}
-							pol.symbols.push(*sourceStr); // иначе добавляем символ в стек
-						}
-					}
-					sourceStr = sourceStr->next;
+					addResult(*result, *stack.top());
+					stack.pop();
 				}
-
 			}
+			break;
+		case LEX_PLUS:
+		case LEX_MINUS:
+			if (stack.empty() || element->priority >= stack.top()->priority)
+				stack.push(element);
 			else
 			{
-				if (debug) {
-					std::cout << "Польская запись для этой строчки не построена!" << std::endl;
-				}
+				addResult(*result, *stack.top());
+				stack.pop();
+				stack.push(element);
 			}
-
-			// ISSUE: утечка памяти, удалять lextable
-
-			head->idxTI = pol.resultHead->idxTI;
-			head->lexema[0] = pol.resultHead->lexema[0];
-			head->priority = pol.resultHead->priority;
-			head->sn = pol.resultHead->sn;
-
-			head->next = pol.resultHead->next;
-			while (head->next != nullptr) head = head->next;
-			head->next = nextLine;
-
-			lextable_pos++;
-			
+			break;
+		case LEX_STAR:
+		case LEX_DIRSLASH:
+			if (stack.empty() || element->priority >= stack.top()->priority)
+				stack.push(element);
+			else
+			{
+				addResult(*result, *stack.top());
+				*result = *result->next;
+				stack.pop();
+				stack.push(element);
+			}
+			break;
+		case LEX_SEMICOLON:
+			while (!stack.empty())
+			{
+				addResult(*result, *stack.top());
+				result = result->next;
+				stack.pop();
+			}
+			addResult(*result, *element, true); // связываем ; с цепочкой. Остаётся связать только голову
+			break;
 		}
-		return true;
-	}
-
-	void addRusult(polishNotation& p, LT::Entry* element)
-	{
-		if (p.result == nullptr)
-		{
-			p.result = new LT::Entry();
-			p.resultHead = p.result;
-		}
-		else
-		{
-			p.result->next = new LT::Entry();
-			p.result = p.result->next;
-		}
-
-		p.result->idxTI = element->idxTI;
-		p.result->lexema[0] = element->lexema[0];
-		p.result->sn = element->sn;
-	}
-	
-	bool isSymbol(LT::Entry* element)
-	{
-		const char* s = "(),+-*/"; // ISSUES: add []
-
-		for (int i = 0; i < strlen(s); i++)
-		{
-			if (element->lexema[0] == s[i]) return true;
-		}
-		return false;
 	}
 }

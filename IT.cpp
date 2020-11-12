@@ -52,13 +52,27 @@ namespace IT
 			for (int i = 0; i < strlen(entry.visibility.functionName); i++)
 				idtable.table->visibility.functionName[i] = entry.visibility.functionName[i];
 
-			for (int i = 0; i < entry.value.vstr->len; i++)
-				idtable.table->value.vstr->str[i] = entry.value.vstr->str[i];
+			if(entry.value.vstr->len < 256)
+				for (int i = 0; i < entry.value.vstr->len; i++)
+					idtable.table->value.vstr->str[i] = entry.value.vstr->str[i];
 
 			idtable.size++;
 		}
 		else throw ERROR_THROW(0) // допилить ошибку для переувеличения размера таблицы id
 		
+	}
+
+	Entry* GetEntry(IdTable& idtable, int idx)
+	{
+		Entry* element = new Entry();
+
+		element = idtable.head;
+		while (element)
+		{
+			if (element->idxTI == idx) return element;
+			else element = element->next;
+		}
+		return NULL;
 	}
 
 	int IsId(IdTable& idtable, char id[ID_MAXSIZE], short visArea, char fnkName[])
@@ -68,7 +82,7 @@ namespace IT
 		element = idtable.head;
 		while (element)
 		{
-			if (strcmp(element->id, id) == 0)
+			if (equal(element->id, id))
 			{
 				if (element->idtype == IT::F) return element->idxTI; // идёт вызов функции
 

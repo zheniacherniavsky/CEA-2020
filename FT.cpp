@@ -59,6 +59,8 @@ namespace FT
 		// добавление в таблицу лексем
 		while (lexem != NULL)
 		{
+			if (posArray[pos] != posArray[pos - 1]) flag.toFalse();
+
 			char lexemID[ID_MAXSIZE]; // айди лексемы
 			for (int i = 0; i < ID_MAXSIZE; i++)
 				lexemID[i] = lexem[i];
@@ -200,7 +202,8 @@ namespace FT
 				// проверка на наличие в табллице
 				int checkIdx = NULL;
 
-				if (!stkFunc.empty()) checkIdx = IT::IsId(it, lexemID, visibArea, stkFunc.top());
+				if (!stkFunc.empty()) 
+					checkIdx = IT::IsId(it, lexemID, visibArea, stkFunc.top());
 				else throw ERROR_THROW(600);
 
 				bool newElement = false;
@@ -276,8 +279,6 @@ namespace FT
 						}
 						else if (itElement.iddatatype == IT::STR)
 						{
-							if (!((lexem[0] == '"' || lexem[0] == '\'') && (lexem[strlen(lexem) - 1] == '"' || lexem[strlen(lexem) - 1] == '\'')))
-								throw ERROR_THROW(208);
 							itElement.value.vstr->len = strlen(lexem) - 2;
 							for (int i = 1; i < strlen(lexem) - 1; i++)
 								itElement.value.vstr->str[i - 1] = lexem[i];
@@ -503,12 +504,12 @@ namespace FT
 		else if (FST::execute(fst10) == -1) return LEX_BRACELET;
 		else if (FST::execute(fst11) == -1)
 		{
-			ltElement->priority = 0;  
+			ltElement->priority = 1;  
 			return LEX_LEFTHESIS;
 		}
 		else if (FST::execute(fst12) == -1)
 		{
-			ltElement->priority = 0;
+			ltElement->priority = 1;
 			return LEX_RIGHTHESIS;
 		}
 		else if (FST::execute(fst13) == -1)
@@ -528,7 +529,7 @@ namespace FT
 		}
 		else if (FST::execute(fst16) == -1)
 		{
-			ltElement->priority = 2;
+			ltElement->priority = 3;
 			return LEX_DIRSLASH;
 		}
 		else if (FST::execute(fst17) == -1) return LEX_IS;
@@ -545,11 +546,11 @@ namespace FT
 
 		int i = 0;
 		std::cout << "\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ:" << std::endl;
-		while (element->next != nullptr)
+		while (element && element->next != nullptr)
 		{
 			std::cout << std::setw(4) << std::right << i << '\t';
 			int memory = element->sn;
-			while (memory == element->sn && element->lexema[0] != NULL) {
+			while (element && element->lexema[0] != NULL && memory == element->sn) {
 				std::cout << element->lexema[0];
 				if (element->idxTI != IT_NULL_IDX)
 					std::cout << '<' << element->idxTI << '>';

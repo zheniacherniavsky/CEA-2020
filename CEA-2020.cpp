@@ -34,11 +34,12 @@ int main(int argc, char* argv[])
 
 		MFST_TRACE_START;								// оладка
 		MFST::Mfst mfst(lexTable, GRB::getGreibach()); 	// автомат
+		
 		mfst.start();
-
 		mfst.savededucation();
-
 		mfst.printrules();
+
+		system("pause");
 
 		bool f = PN::PolishNotation(-1, lexTable, idTable, true); // last arg is debug
 		makeOutWithLT(lexTable, idTable);
@@ -62,19 +63,22 @@ int main(int argc, char* argv[])
 
 void makeOutWithLT(LT::LexTable& table, IT::IdTable& it)
 {
-	LT::Entry* element = table.head->next;
+	LT::Entry* element = table.head;
 
 	int i = 0;
-	std::cout << "\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ:" << std::endl;
-	while (element)
+	std::cout << "\n\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ (ПОЛЬСКАЯ ЗАПИСЬ):" << std::endl;
+	while (element->next != nullptr)
 	{
-		std::cout << "\n" << i << '\t';
-		while (element && i == element->sn) {
+		std::cout << std::setfill(' ') << std::setw(4) << std::right << i << ": ";
+		int memory = element->sn;
+		while (memory == element->sn && element->lexema[0] != NULL) {
 			std::cout << element->lexema[0];
-			//if (element->idxTI != IT_NULL_IDX)
-				//std::cout << '<' << element->idxTI << '>';
+			if (element->idxTI != IT_NULL_IDX)
+				std::cout << '<' << element->idxTI << '>';
 			element = element->next;
 		}
+		std::cout << '\n';
 		i++;
 	}
+	std::cout << "\nTABLE SIZE: " << table.size << std::endl;
 }
