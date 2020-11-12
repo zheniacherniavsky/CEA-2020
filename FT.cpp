@@ -41,9 +41,9 @@ namespace FT
 		}
 	};
 
-	void fillTables(char* code, char* sCode, LT::LexTable &lt, IT::IdTable &it) // заполнение таблицы лексем и идентификаторов
+	void fillTables(char* code, LT::LexTable &lt, IT::IdTable &it) // заполнение таблицы лексем и идентификаторов
 	{
-		int* posArray = getLineNums(code);			// массив позиций строк исходного кода
+		int* posArray = getLineNums(code);			// массив позиций строк обработанного кода
 		char* lexem = strtok(&code[0], " \n");		// разбиваю код на лексемы
 		int pos = 0;								// номер обрабатываемой лексемы
 		int idx = 0;								// id идентификатора
@@ -328,18 +328,17 @@ namespace FT
 		bool endLine;
 		bool emptyLine;
 		short _count = 0;
-		for (int line = 0, pos = 0, count = 0; *p != '\0'; *p++)
+		for (int line = 0, pos = 0; *p != '\0'; *p++)
 		{
 			endLine = false;
 			emptyLine = true;
-			count = 0;
+			int count = 0;
 			while (*p != '\n')
 			{
 				if (*p == ' ') while (*p == ' ') *p++; // пропускаем пробелы
 				while (*p != ' ') {
 					if (*p != '\n') {
 						*p++; // проходим лексему
-						emptyLine = false;
 					}
 					else
 					{
@@ -358,9 +357,14 @@ namespace FT
 					pos++;
 				}
 			}
-			if (!emptyLine) line++;
+			line++;
 			_count += count;
 		}
+		for (int i = 0; i <= _count; i++)
+		{
+			std::cout << array[i] << " ";
+		}
+		std::cout << std::endl;
 		return array;
 	}
 
@@ -543,13 +547,15 @@ namespace FT
 		std::cout << "\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ:" << std::endl;
 		while (element->next != nullptr)
 		{
-			std::cout << "\n" << i << '\t';
-			while (i == element->sn && element->lexema[0] != NULL) {
+			std::cout << std::setw(4) << std::right << i << '\t';
+			int memory = element->sn;
+			while (memory == element->sn && element->lexema[0] != NULL) {
 				std::cout << element->lexema[0];
 				if (element->idxTI != IT_NULL_IDX)
 					std::cout << '<' << element->idxTI << '>';
 				element = element->next;
 			}
+			std::cout << '\n';
 			i++;
 		}
 		std::cout << "\nTABLE SIZE: " << table.size << std::endl;

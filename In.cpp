@@ -63,11 +63,9 @@ namespace In {
 
 		string line; // сюда получаем строку исходного кода и обрабатываем её
 		string code = ""; // полученный код
-		string sCode = ""; // исходный код, он должен сохраниться
 
 		while (getline(sourceCode, line))
 		{
-			sCode += line + '\n';
 			bool _literal = false;
 			for (int i = 0, spaceControl = 0; i <= line.length(); i++)
 			{
@@ -110,10 +108,11 @@ namespace In {
 		}
 		sourceCode.close(); // закрываем файл
 
-		std::cout << sCode << std::endl; // sourceCode
+		std::cout << code << "\n----------------------" << std::endl;
 
 		// в code находится обработанный код
-		FT::fillTables(&code[0], &sCode[0], lexTable, idTable); // ф-ция заполнения таблиц
+		// в sCode находится исходный код
+		FT::fillTables(&code[0], lexTable, idTable); // ф-ция заполнения таблиц
 		return info;
 	}
 }

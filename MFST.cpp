@@ -166,11 +166,9 @@ namespace MFST
 		case NS_NORULE:		MFST_TRACE4("------>NS_NORULE")
 			std::cout << "----------------------------------------------------------------------- ----" << std::endl;
 			
-			for (int i = MFST_DIAGN_NUMBER; i >= 0; i--)
-			{
-				char* diagnos = getDiagnosis(i, buf);
-				if (diagnos != "") std::cout << diagnos << std::endl;
-			}
+			std::cout << getDiagnosis(1, buf) << std::endl;
+			std::cout << getDiagnosis(2, buf) << std::endl;
+			std::cout << getDiagnosis(3, buf) << std::endl;
 			break;
 		case NS_NORULECHAIN:	MFST_TRACE4("------>NS_NORULECHAIN") break;
 		case NS_ERROR:			MFST_TRACE4("------>NS_ERROR") break;
