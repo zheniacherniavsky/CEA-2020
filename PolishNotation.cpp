@@ -12,7 +12,6 @@ namespace PN
 	void addToStack(std::stack<LT::Entry*>& stack, LT::Entry* result, LT::Entry* element);
 
 	bool PolishNotation( // создание польской записи
-		int lextable_pods, // позиция выражения в таблице лексем
 		LT::LexTable& lexTable, // таблица лексем
 		IT::IdTable& idTable, // таблица идентификаторов
 		bool debug // вывод польской записи
@@ -100,8 +99,12 @@ namespace PN
 				{
 					lentaElement = *lentaElement.next;
 					if (lentaElement.lexema[0] == LEX_ID || lentaElement.lexema[0] == LEX_LITERAL)
+					{
+						result.func.idx[parms] = lentaElement.idxTI;
 						parms++;
+					}
 				}
+				result.func.count = parms;
 				result.lexema[0] = '@';
 				result.next = new LT::Entry();
 				result.priority = 0;

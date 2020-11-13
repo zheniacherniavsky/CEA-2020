@@ -2,6 +2,8 @@
 
 #define LEXEMA_FIXSIZE 1 // фиксированный размер лексемы
 #define LT_MAXSIZE 4096 // максимальное кол-во строк в таблице лексем
+#define LT_FUNCTION_MAX_PARMS 8 // максимальное кол-во параметров в функции
+
 #define LT_TI_NULLIDX 0xffffffff // нет элемента в таблице идентификаторов
 #define LEX_INTEGER 't' // лексема для integer
 #define LEX_STRING 't' // лексема для string
@@ -36,6 +38,12 @@ namespace LT // таблица лексем
 		int priority;
 
 		Entry* next = nullptr;
+
+		struct funcParms
+		{
+			int count;
+			int idx[LT_FUNCTION_MAX_PARMS];
+		} func;
 
 		int updateIndex(int i); // обновление индекса идентификатора
 	};
