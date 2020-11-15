@@ -41,49 +41,53 @@ namespace FT
 		}
 	};
 
+	void createLexArr(char* code, char *lexArr[4096])
+	{
+		int pos = 0;
+		int spos = 0;
+		while (*code)
+		{
+			lexArr[pos] = new char();
+			while (*code != ' ' && *code != '\n')
+			{
+				lexArr[pos][spos++] = *code;
+				*code++;
+			}
+			lexArr[pos][spos] = 0x00;
+			pos++; spos = 0;
+			while (*code == ' ' || *code == '\n')
+				*code++;
+			
+		}
+		lexArr[pos] = NULL;
+	}
+
 	void fillTables(char* code, LT::LexTable &lt, IT::IdTable &it) // заполнение таблицы лексем и идентификаторов
 	{
 		int* posArray = getLineNums(code);			// массив позиций строк обработанного кода
-		char* lexem = strtok(&code[0], " \n");		// разбиваю код на лексемы
+
+		char *lexArr[4096];
+		createLexArr(&code[0], lexArr);
+		int lexPos = 0;								// номер лексемы
+		char *lexem = lexArr[lexPos++];
+
 		int pos = 0;								// номер обрабатываемой лексемы
 		int idx = 0;								// id идентификатора
 		short visibArea = 0;						// область видимости
 		flags flag;									// флажки
-		short hesisCount = 0;						// слежу за правильным количеством скобок
 		int literalCount = 1;						// отслеживание количества литералов
 
-		std::string ErrorMessage = "";
-
+		
 		int linePos = 0;	// позиция лексемы в строке
 
 		// добавление в таблицу лексем
 		while (lexem != NULL)
 		{
 			if (posArray[pos] != posArray[pos - 1]) flag.toFalse();
-
+			
 			char lexemID[ID_MAXSIZE]; // айди лексемы
 			for (int i = 0; i < ID_MAXSIZE; i++)
 				lexemID[i] = lexem[i];
-
-
-			/*
-				создаём элемент таблицы лексем
-				создаём элемент таблицы идентификаторов
-
-				элемент = символ лексемы;
-				
-				switch(элемент)
-				{
-					установка флажков
-				}
-
-				if(элемент идентификатор или литерал)
-				{
-					добавляем его в таблицу идентификаторов
-				}
-
-				добавление в таблицу лексем
-			*/
 
 			IT::Entry itElement; // создаю элемент таблицы идентификаторов
 			itElement.idxTI = IT_NULL_IDX;
@@ -139,12 +143,12 @@ namespace FT
 				break;
 			case(LEX_LEFTHESIS):
 				flag._hesisIsOpen = true;
-				hesisCount++;
+				//hesisCount++;
 				if (flag._function && flag._functionParms) visibArea++;
 				break;
 			case(LEX_RIGHTHESIS):
 				flag._hesisIsOpen = false;
-				hesisCount--;
+				//hesisCount--;
 				if (flag._function && flag._functionParms)
 				{
 					visibArea--;
@@ -156,13 +160,13 @@ namespace FT
 				break;
 			case(LEX_LEFTBRACE):
 				visibArea++;
-				hesisCount++;
+				//hesisCount++;
 				flag._body = true;
 				flag.toFalse();
 				break;
 			case(LEX_BRACELET):
 				visibArea--;
-				hesisCount--;
+				//hesisCount--;
 				flag._body = false;
 				flag.toFalse();
 				if (flag._function)
@@ -209,11 +213,11 @@ namespace FT
 				bool newElement = false;
 				if (checkIdx == IT_NULL_IDX) // следовательно это новый элемент
 				{
-					if (!flag._declare && !flag._literal && !flag._hesisIsOpen && !flag._function) // не литерал и не параметр и не функция
-					{
-						ErrorMessage += "\nВнимание, переменная "; ErrorMessage += lexem;
-						ErrorMessage += " не объявлена!";
-					}
+					//if (!flag._declare && !flag._literal && !flag._hesisIsOpen && !flag._function) // не литерал и не параметр и не функция
+					//{
+					//	ErrorMessage += "\nВнимание, переменная "; ErrorMessage += lexem;
+					//	ErrorMessage += " не объявлена!";
+					//}
 					newElement = true;
 					itElement.idxTI = idx;
 					ltElement.idxTI = idx++;
@@ -311,15 +315,15 @@ namespace FT
 
 			ltElement.lexema[0] = lexemSymbol;
 			LT::Add(lt, ltElement);
-			lexem = strtok(NULL, " \n");
+			lexem = lexArr[lexPos++];
 		}
 
-		if (hesisCount != 0) throw ERROR_THROW(203);
-		if (!flag._main) throw ERROR_THROW(204);
+		// if (hesisCount != 0) throw ERROR_THROW(203);
+		// if (!flag._main) throw ERROR_THROW(204);
 
 		makeOutWithLT(lt, it);
 		makeOutWithIT(it);
-		std::cout << ErrorMessage << std::endl;
+		// std::cout << ErrorMessage << std::endl;
 	}
 
 	int* getLineNums(std::string code) // функция вычисления номера строки исходного кода для его лексем
