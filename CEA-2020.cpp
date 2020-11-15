@@ -35,18 +35,20 @@ int main(int argc, char* argv[])
 		MFST_TRACE_START;								// оладка
 		MFST::Mfst mfst(lexTable, GRB::getGreibach()); 	// автомат
 		
-		mfst.start();
-		mfst.savededucation();
-		mfst.printrules();
+		if (mfst.start())
+		{
+			mfst.savededucation();
+			mfst.printrules();
 
-		system("pause");
+			system("pause");
 
-		bool f = PN::PolishNotation(lexTable, idTable, true); // last arg is debug
-		makeOutWithLT(lexTable, idTable, true, true);
+			bool f = PN::PolishNotation(lexTable, idTable, true); // last arg is debug
+			makeOutWithLT(lexTable, idTable, true, true);
 
-		Log::WriteIn(log, in);
-		Log::Close(log);
-		std::cout << "\nReady. Check " << parms.in << " DIR" << std::endl;
+			Log::WriteIn(log, in);
+			Log::Close(log);
+			std::cout << "\nReady. Check " << parms.in << " DIR" << std::endl;
+		}
 	}
 	catch (Error::ERROR_ e) {
 		std::cout << "\nОшибка " << e.id << ": " << e.message << "\n";
