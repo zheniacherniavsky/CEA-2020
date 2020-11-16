@@ -84,15 +84,10 @@ namespace IT
 		{
 			if (equal(element->id, id))
 			{
-				if (element->idtype == IT::F) return element->idxTI; // идёт вызов функции
-
-				else if (element->idtype == IT::P)
-				{
-					if (equal(element->visibility.functionName, fnkName)) return element->idxTI;
-				}
-
-				else if(element->visibility.area == visArea)
-					if (equal(element->visibility.functionName, fnkName)) return element->idxTI;
+				if (equal(element->visibility.functionName, fnkName)) // параметры и переменные
+					return element->idxTI;
+				else if (element->idtype == IT::F) // вызов функции
+					return element->idxTI;		
 			}	
 			element = element->next;
 		}
@@ -101,7 +96,7 @@ namespace IT
 
 	bool equal(char a[ID_MAXSIZE], char b[ID_MAXSIZE])
 	{
-		for (int i = 0; i < ID_MAXSIZE; i++)
+		for (int i = 0; i < strlen(a) && i < ID_MAXSIZE; i++)
 			if (a[i] != b[i]) return false;
 		return true;
 	}

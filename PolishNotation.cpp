@@ -11,7 +11,7 @@ namespace PN
 	void addResult(LT::Entry& result, LT::Entry& lentaElement, bool memory = false);
 	void addToStack(std::stack<LT::Entry*>& stack, LT::Entry* result, LT::Entry* element);
 
-	bool PolishNotation( // создание польской записи
+	void PolishNotation( // создание польской записи
 		LT::LexTable& lexTable, // таблица лексем
 		IT::IdTable& idTable, // таблица идентификаторов
 		bool debug // вывод польской записи
@@ -22,19 +22,13 @@ namespace PN
 
 		while (lenta->next != NULL)
 		{
-			if (lenta->lexema[0] == '=')
+			if (lenta->lexema[0] == LEX_IS || lenta->lexema[0] == LEX_RETURN)
 			{
-				std::cout << lenta->lexema[0];
 				// обработка польской записи
 				LT::Entry* result = new LT::Entry();
 				LT::Entry* resultHead = new LT::Entry();
 				LT::Entry* unionChain = lenta->next;	// символ после равно, который мы потом заменим на resultHead 
 														// чтобы сцепить цепочки
-
-				//if (lenta->lexema[0] != LEX_LEFTHESIS && lenta->lexema[0] != LEX_RIGHTHESIS)
-					//addResult(*result, *lenta, idTable);		// выражение должно начинаться с литерала или идентификатора
-																// но надо помнить про вызов функции, поэтому добавим проверку
-																// на вызов функции в сам addResult!!!
 
 				bool saved = false;
 
@@ -64,25 +58,15 @@ namespace PN
 					case LEX_DIRSLASH:
 					case LEX_SEMICOLON:
 						addToStack(stack, result, lenta);
+						if (result->lexema[0] != NULL) result = result->next;
 						break;
 					}
 				}
-				//for (int i = 0 ; resultHead->lexema[0] != NULL; i++)
-				//{
-				//	std::cout << resultHead->lexema[0];
-				//	resultHead = resultHead->next;
-				//}
-
 				*unionChain = *resultHead;
 				*lenta = *unionChain;
 			}
-			
-			std::cout << lenta->lexema[0];
 			lenta = lenta->next; // следующее выражение
 		}
-
-		system("pause");
-		return false;
 	}
 
 	void addResult(LT::Entry& result, LT::Entry& lentaElement, IT::IdTable& idTable)
@@ -148,13 +132,14 @@ namespace PN
 				else
 				{
 					addResult(*result, *stack.top());
+					result = result->next;
 					stack.pop();
 				}
 			}
 			break;
 		case LEX_PLUS:
 		case LEX_MINUS:
-			if (stack.empty() || element->priority >= stack.top()->priority)
+			if (stack.empty() || element->priority > stack.top()->priority)
 				stack.push(element);
 			else
 			{
@@ -165,12 +150,11 @@ namespace PN
 			break;
 		case LEX_STAR:
 		case LEX_DIRSLASH:
-			if (stack.empty() || element->priority >= stack.top()->priority)
+			if (stack.empty() || element->priority > stack.top()->priority)
 				stack.push(element);
 			else
 			{
 				addResult(*result, *stack.top());
-				*result = *result->next;
 				stack.pop();
 				stack.push(element);
 			}

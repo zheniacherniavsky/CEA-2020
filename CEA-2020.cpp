@@ -42,8 +42,8 @@ int main(int argc, char* argv[])
 
 			system("pause");
 
-			bool f = PN::PolishNotation(lexTable, idTable, true); // last arg is debug
-			makeOutWithLT(lexTable, idTable, true, true);
+			PN::PolishNotation(lexTable, idTable, true); // last arg is debug
+			makeOutWithLT(lexTable, idTable, false, false);
 
 			Log::WriteIn(log, in);
 			Log::Close(log);

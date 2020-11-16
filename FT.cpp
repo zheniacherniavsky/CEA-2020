@@ -4,8 +4,6 @@
 #include <sstream>
 #include <iomanip>
 
-#define UNCHECKED_FUNCTION true
-
 namespace FT
 {
 
@@ -25,7 +23,6 @@ namespace FT
 		bool _hesisIsOpen	= false; // открытие закрытие скобок для отличения параметров от функции
 		bool _functionParms = false;
 		bool _return		= false;
-		bool _unchecked		= UNCHECKED_FUNCTION;
 
 		void toFalse()	// занулить все флажки
 		{
@@ -136,19 +133,15 @@ namespace FT
 				flag._literal = true;
 				break;
 			case(LEX_MAIN): // точка входа main, соотв. область видимости повышаем на единицу
-				if (!flag._main) flag._main = true;
-				else throw ERROR_THROW(205); // two or more mains
 				stkFunc.push(lexem);
 				flag._function = true;
 				break;
 			case(LEX_LEFTHESIS):
 				flag._hesisIsOpen = true;
-				//hesisCount++;
 				if (flag._function && flag._functionParms) visibArea++;
 				break;
 			case(LEX_RIGHTHESIS):
 				flag._hesisIsOpen = false;
-				//hesisCount--;
 				if (flag._function && flag._functionParms)
 				{
 					visibArea--;
@@ -160,13 +153,11 @@ namespace FT
 				break;
 			case(LEX_LEFTBRACE):
 				visibArea++;
-				//hesisCount++;
 				flag._body = true;
 				flag.toFalse();
 				break;
 			case(LEX_BRACELET):
 				visibArea--;
-				//hesisCount--;
 				flag._body = false;
 				flag.toFalse();
 				if (flag._function)
@@ -174,9 +165,6 @@ namespace FT
 					if(!stkFunc.empty()) stkFunc.pop();
 					flag._function = false; // отслеживаю закрытие блока функции
 				}
-				break;
-			case('u'):	// unchecked, special for stack overflow exceptions
-				flag._unchecked = true;
 				break;
 			case(LEX_RETURN):
 				flag._return = true;
@@ -208,16 +196,11 @@ namespace FT
 
 				if (!stkFunc.empty()) 
 					checkIdx = IT::IsId(it, lexemID, visibArea, stkFunc.top());
-				else throw ERROR_THROW(600);
+				else throw ERROR_THROW(208);
 
 				bool newElement = false;
 				if (checkIdx == IT_NULL_IDX) // следовательно это новый элемент
 				{
-					//if (!flag._declare && !flag._literal && !flag._hesisIsOpen && !flag._function) // не литерал и не параметр и не функция
-					//{
-					//	ErrorMessage += "\nВнимание, переменная "; ErrorMessage += lexem;
-					//	ErrorMessage += " не объявлена!";
-					//}
 					newElement = true;
 					itElement.idxTI = idx;
 					ltElement.idxTI = idx++;
@@ -237,11 +220,11 @@ namespace FT
 
 				if (newElement)
 				{
-					if (flag._body && !flag._literal && !flag._declare && !flag._return)
-					{
-						std::cout << "------------- строка " << posArray[pos] << " -------------";
-						throw ERROR_THROW(206);
-					}
+					// if (flag._body && !flag._literal && !flag._declare && !flag._return)
+					// {
+					//	std::cout << "------------- строка " << posArray[pos] << " -------------";
+					//	throw ERROR_THROW(206);
+					// }
 
 					if (!flag._literal)
 					{
@@ -275,11 +258,7 @@ namespace FT
 							b << lexem;
 							int number;
 							b >> number;
-							if (number > 0 && number <= 256)
-								itElement.value.vint = number;
-							else if (flag._unchecked)
-								itElement.value.vint = number % 256;
-							else throw ERROR_THROW(207);
+							itElement.value.vint = number;
 						}
 						else if (itElement.iddatatype == IT::STR)
 						{
@@ -317,13 +296,8 @@ namespace FT
 			LT::Add(lt, ltElement);
 			lexem = lexArr[lexPos++];
 		}
-
-		// if (hesisCount != 0) throw ERROR_THROW(203);
-		// if (!flag._main) throw ERROR_THROW(204);
-
 		makeOutWithLT(lt, it);
 		makeOutWithIT(it);
-		// std::cout << ErrorMessage << std::endl;
 	}
 
 	int* getLineNums(std::string code) // функция вычисления номера строки исходного кода для его лексем
@@ -332,7 +306,6 @@ namespace FT
 		char* p = &code[0];
 		bool endLine;
 		bool emptyLine;
-		short _count = 0;
 		for (int line = 0, pos = 0; *p != '\0'; *p++)
 		{
 			endLine = false;
@@ -363,11 +336,6 @@ namespace FT
 				}
 			}
 			line++;
-			_count += count;
-		}
-		for (int i = 0; i <= _count; i++)
-		{
-			std::cout << array[i] << " ";
 		}
 		std::cout << std::endl;
 		return array;
@@ -483,19 +451,6 @@ namespace FT
 			FST::NODE()
 		);
 
-		FST::FST fst20(lexem, 10,		// enter point
-			FST::NODE(1, FST::RELATION('u', 1)),
-			FST::NODE(1, FST::RELATION('n', 2)),
-			FST::NODE(1, FST::RELATION('c', 3)),
-			FST::NODE(1, FST::RELATION('h', 4)),
-			FST::NODE(1, FST::RELATION('e', 5)),
-			FST::NODE(1, FST::RELATION('c', 6)),
-			FST::NODE(1, FST::RELATION('k', 7)),
-			FST::NODE(1, FST::RELATION('e', 8)),
-			FST::NODE(1, FST::RELATION('d', 9)),
-			FST::NODE()
-		);
-
 		if (FST::execute(fst1) == -1) return LEX_INTEGER; // integer
 		else if (FST::execute(fst2) == -1) return LEX_STRING; // string
 		else if (FST::execute(fst3) == -1) return LEX_FUNCTION;
@@ -539,7 +494,6 @@ namespace FT
 		else if (FST::execute(fst17) == -1) return LEX_IS;
 		else if (FST::execute(fst18) == -1) return LEX_NUMBER; // number
 		else if (FST::execute(fst19) == -1) return LEX_MAIN; // main
-		else if (FST::execute(fst20) == -1) return 'u'; // unchecked!
 		else return LEX_ID;
 	}
 
