@@ -45,6 +45,7 @@ namespace IT
 			idtable.table->idtype = entry.idtype;
 			idtable.table->idxTI = entry.idxTI;
 			idtable.table->idxfirstLE = entry.idxfirstLE;
+			idtable.table->declared = entry.declared;
 			if(entry.value.vint != NULL) idtable.table->value.vint = entry.value.vint;
 			if(entry.value.vstr != NULL) idtable.table->value.vstr->len = entry.value.vstr->len;
 

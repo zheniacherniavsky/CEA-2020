@@ -202,6 +202,13 @@ namespace FT
 				if (checkIdx == IT_NULL_IDX) // следовательно это новый элемент
 				{
 					newElement = true;
+					if (flag._declare ||
+						_idtype == IT::P ||
+						(_idtype == IT::F && !flag._body))
+					{
+						itElement.declared = true;
+					}
+					else itElement.declared = false;
 					itElement.idxTI = idx;
 					ltElement.idxTI = idx++;
 					itElement.idxfirstLE = posArray[pos];
@@ -524,7 +531,7 @@ namespace FT
 	{
 		std::cout << "\n\t\t\tIT TABLE DEBUG" << std::endl;
 		IT::Entry* showTable = idTable.head;
-		std::cout << std::setfill('_') << std::setw(91) << '_' << std::endl;
+		std::cout << std::setfill('_') << std::setw(101) << '_' << std::endl;
 		std::cout << std::setfill(' ')
 			<< std::setw(8) << "номер"
 			<< std::setw(6) << "id"
@@ -532,9 +539,10 @@ namespace FT
 			<< std::setw(10) << "DATA"
 			<< std::setw(20) << "обл. видимости"
 			<< std::setw(12) << "функция"
+			<< std::setw(10) << "declared"
 			<< std::setw(20) << "содержимое"
 			<< std::setw(10) << '|' << std::endl;
-		std::cout << std::setfill('_') << std::setw(91) << '_' << std::endl;
+		std::cout << std::setfill('_') << std::setw(101) << '_' << std::endl;
 		while (showTable)
 		{
 			std::cout << std::setfill(' ')
@@ -555,6 +563,9 @@ namespace FT
 			std::cout << std::setw(10) << showTable->visibility.area;
 			std::cout << std::setw(19) << showTable->visibility.functionName;
 
+			if (showTable->declared == true) std::cout << std::setw(10) << "YES";
+			else std::cout << std::setw(10) << "NO";
+
 			if (showTable->iddatatype == IT::INT)
 				std::cout << std::setw(17) << showTable->value.vint;
 			else if (showTable->iddatatype == IT::STR)
@@ -573,9 +584,11 @@ namespace FT
 					}
 					std::cout << "[len: " << showTable->value.vstr->len << ']';
 				}
-			std::cout << std::endl;
+
+			
+			std::cout << std::setfill(' ') << std::endl;
 			showTable = showTable->next;
 		}
-		std::cout << std::setfill('_') << std::setw(91) << '_' << std::endl;
+		std::cout << std::setfill('_') << std::setw(101) << '_' << std::endl;
 	}
 }

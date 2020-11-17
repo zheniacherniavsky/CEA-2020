@@ -17,6 +17,8 @@ namespace IT						// таблица идентификаторов
 		char	id[ID_MAXSIZE];			// идентификатор (автоматически устанавливает до ID_MAXSIZE)
 		IDDATATYPE	iddatatype;			// тип данных
 		IDTYPE		idtype;				// тип идентификатора
+
+		bool declared;
 		
 		struct
 		{
