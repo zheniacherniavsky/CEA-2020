@@ -1,19 +1,19 @@
-#include "LT.h"
+ï»¿#include "LT.h"
 #include "IT.h"
 #include <iostream>
 
 #include <iomanip>
-#define SEM_START		{std::cout << "\n\n" << std::left << std::setfill('_') << std::setw(60) << "ÑÅÌÀÍÒÈ×ÅÑÊÈÉ ÀÍÀËÈÇÀÒÎÐ" << std::endl;}
+#define SEM_START		{std::cout << "\n\n" << std::left << std::setfill('_') << std::setw(60) << "Ð¡Ð•ÐœÐÐÐ¢Ð˜Ð§Ð•Ð¡ÐšÐ˜Ð™ ÐÐÐÐ›Ð˜Ð—ÐÐ¢ÐžÐ " << std::endl;}
 
 #define SEM_TRACE1		{std::cout << '\n' << std::setw(4) << line << ":\t";}
 
 #define SEM_END		{	std::cout << '\n' << std::setw(60);																				\
 						if(errorCount == 0) {																							\
-							std::cout << "\nÑÅÌÀÍÒÈ×ÅÑÊÈÉ ÀÍÀËÈÇ ÇÀÂÅÐØ¨Í ÁÅÇ ÎØÈÁÎÊ" << std::endl;										\
+							std::cout << "\nÐ¡Ð•ÐœÐÐÐ¢Ð˜Ð§Ð•Ð¡ÐšÐ˜Ð™ ÐÐÐÐ›Ð˜Ð— Ð—ÐÐ’Ð•Ð Ð¨ÐÐ Ð‘Ð•Ð— ÐžÐ¨Ð˜Ð‘ÐžÐš" << std::endl;										\
 							return true;																								\
 						}																												\
 						else {																											\
-							std::cout << "\nÑÅÌÀÍÒÈ×ÅÑÊÈÉ ÀÍÀËÈÇ ÇÀÂÅÐØ¨Í C ÎØÈÁÊÎÉ. ÊÎË-ÂÎ ÎØÈÁÎÊ: " << errorCount << std::endl;		\
+							std::cout << "\nÐ¡Ð•ÐœÐÐÐ¢Ð˜Ð§Ð•Ð¡ÐšÐ˜Ð™ ÐÐÐÐ›Ð˜Ð— Ð—ÐÐ’Ð•Ð Ð¨ÐÐ C ÐžÐ¨Ð˜Ð‘ÐšÐžÐ™. ÐšÐžÐ›-Ð’Ðž ÐžÐ¨Ð˜Ð‘ÐžÐš: " << errorCount << std::endl;		\
 							return false;																								\
 						}																												\
 					}

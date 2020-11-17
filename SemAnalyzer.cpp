@@ -1,4 +1,4 @@
-#include "SemAnalyzer.h"
+ï»¿#include "SemAnalyzer.h"
 
 namespace SemAnalyzer
 {
@@ -10,11 +10,11 @@ namespace SemAnalyzer
 
 	bool semAnalyzer(LT::LexTable lt, IT::IdTable it)
 	{
-		LT::Entry *lexem = lt.head; // òàáëèöà ëåêñåì
-		int line = 0;				// äëÿ âûâîäà àíàëèçà
+		LT::Entry *lexem = lt.head; // Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ð° Ð»ÐµÐºÑÐµÐ¼
+		int line = 0;				// Ð´Ð»Ñ Ð²Ñ‹Ð²Ð¾Ð´Ð° Ð°Ð½Ð°Ð»Ð¸Ð·Ð°
 		int errorCount = 0;			
 
-		flag f;		// ôëàæêè
+		flag f;		// Ñ„Ð»Ð°Ð¶ÐºÐ¸
 
 		enum Type	
 		{
@@ -28,7 +28,7 @@ namespace SemAnalyzer
 		while (lexem->next)
 		{
 			SEM_TRACE1
-			while (lexem) // ðàçáîð ñòðîêè
+			while (lexem) // Ñ€Ð°Ð·Ð±Ð¾Ñ€ ÑÑ‚Ñ€Ð¾ÐºÐ¸
 			{
 				switch (lexem->lexema[0])
 				{
