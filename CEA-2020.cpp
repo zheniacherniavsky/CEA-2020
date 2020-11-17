@@ -9,6 +9,7 @@
 #include "LT.h"		// таблица лексем
 #include "PolishNotation.h" // Польская запись
 #include "MFST.h"	// автомат 
+#include "SemAnalyzer.h"
 
 #define TBL_LENGTH 2048 // размеры создаваемых таблиц лексем и идентификаторов
 
@@ -44,6 +45,8 @@ int main(int argc, char* argv[])
 
 			PN::PolishNotation(lexTable, idTable, true); // last arg is debug
 			makeOutWithLT(lexTable, idTable, false, false);
+
+			bool h = SemAnalyzer::semAnalyzer(lexTable, idTable);
 
 			Log::WriteIn(log, in);
 			Log::Close(log);
