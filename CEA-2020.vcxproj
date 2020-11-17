@@ -159,6 +159,7 @@
     <ClCompile Include="MFST.cpp" />
     <ClCompile Include="Parm.cpp" />
     <ClCompile Include="PolishNotation.cpp" />
+    <ClCompile Include="SemAnalyzer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Error.h" />
@@ -173,6 +174,7 @@
     <ClInclude Include="Parm.h" />
     <ClInclude Include="PolishNotation.h" />
     <ClInclude Include="Rules.h" />
+    <ClInclude Include="SemAnalyzer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

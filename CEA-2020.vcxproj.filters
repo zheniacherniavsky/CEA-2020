@@ -51,6 +51,9 @@
     <ClCompile Include="MFST.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="SemAnalyzer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Error.h">
@@ -87,6 +90,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Rules.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="SemAnalyzer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
