@@ -2,27 +2,25 @@
 
 namespace SemAnalyzer
 {
-	struct flag
+	struct Flag
 	{
 		bool declare = false;
-		bool checkDivideByZero = false;
+		bool function = false;
+		bool returnExpression = false;
+		bool main = false;
 	};
 
 	bool semAnalyzer(LT::LexTable lt, IT::IdTable it)
 	{
 		LT::Entry *lexem = lt.head; // таблица лексем
-		int line = 0;				// для вывода анализа
-		int errorCount = 0;			
+		int line = 0;				// для вывода анализа	
+		int errorCount = 0;
+		std::string errorMessage = "";
 
-		flag f;		// флажки
+		Flag f;		// флажки
 
-		enum Type	
-		{
-			INT = 1,
-			STR = 2
-		};
-
-		short expressionType = 0;
+		IT::IDDATATYPE expressionType = IT::EMPTY, functionType = IT::EMPTY;
+		IT::Entry* element;
 
 		SEM_START
 		while (lexem->next)
@@ -32,19 +30,46 @@ namespace SemAnalyzer
 			{
 				switch (lexem->lexema[0])
 				{
+				case LEX_LITERAL:
 				case LEX_ID:
-					std::cout << getType(IT::GetEntry(it, lexem->idxTI));
+					element = IT::GetEntry(it, lexem->idxTI);
+					std::cout << getType(element);
+					if (f.function)
+					{
+						if(!f.main) functionType = element->iddatatype;
+						f.function = false;
+					}
+					else if (f.returnExpression)
+					{
+						if (element->iddatatype != functionType)
+						{
+							errorCount++;
+							if(!f.main) errorMessage = "ВОЗРАЩАЕМОЕ ЗНАЧЕНИЕ НЕ СОВПАДАЕТ С ТИПОМ ФУНКЦИИ";
+							else errorMessage = "ВОЗРАЩАЕМОЕ ЗНАЧЕНИЕ НЕ СОВПАДАЕТ С ТИПОМ ФУНКЦИИ (ТИП ФУНКЦИИ MAIN -> INT)";
+						}
+					}
 					break;
 				case LEX_DECLARE:
 					// flag declare for line
 					f.declare = true;
 					break;
-				case LEX_DIRSLASH:
-					// null check
-					f.checkDivideByZero = true;
-					break;
 				case LEX_IS:
 					f.declare = false;
+					break; 
+				case LEX_MAIN:
+					functionType = IT::INT;
+					f.main = true;
+					break;
+				case LEX_FUNCTION:
+					f.function = true; // function body
+					break;
+				case LEX_RETURN:
+					f.returnExpression = true;
+					break;
+				case LEX_BRACELET:
+					f.returnExpression = false;
+					functionType = IT::EMPTY;
+					f.main = false;
 					break;
 				}
 
@@ -52,7 +77,13 @@ namespace SemAnalyzer
 				if (lexem->next && lexem->sn == lexem->next->sn) lexem = lexem->next;
 				else break;
 			} 
-			expressionType = 0;
+			if (errorMessage != "")
+			{
+				SEM_ERROR(errorMessage)
+				errorMessage = "";
+			}
+				
+			expressionType = IT::EMPTY;
 			line++;
 			lexem = lexem->next;
 		}

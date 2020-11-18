@@ -7,7 +7,7 @@
 #define IT_STR_MAXSIZE	255			
 namespace IT						// таблица идентификаторов
 {
-	enum IDDATATYPE {INT=1, STR=2};			// типы данных идентификаторов
+	enum IDDATATYPE {EMPTY = 0, INT=1, STR=2};			// типы данных идентификаторов
 	enum IDTYPE		{V=1, F=2, P=3, L=4};	// типы идентификаторов: перемен., функция, парам., литерал
 
 	struct Entry
