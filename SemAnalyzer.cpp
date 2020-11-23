@@ -6,6 +6,7 @@ namespace SemAnalyzer
 	{
 		bool declare = false;
 		bool function = false;
+		bool expression = false;
 		bool returnExpression = false;
 		bool main = false;
 	};
@@ -34,18 +35,28 @@ namespace SemAnalyzer
 				case LEX_ID:
 					element = IT::GetEntry(it, lexem->idxTI);
 					std::cout << getType(element);
-					if (f.function)
-					{
-						if(!f.main) functionType = element->iddatatype;
-						f.function = false;
-					}
-					else if (f.returnExpression)
+					
+					if (expressionType == IT::EMPTY) expressionType = element->iddatatype;
+					if (f.returnExpression)
 					{
 						if (element->iddatatype != functionType)
 						{
 							errorCount++;
-							if(!f.main) errorMessage = "ВОЗРАЩАЕМОЕ ЗНАЧЕНИЕ НЕ СОВПАДАЕТ С ТИПОМ ФУНКЦИИ";
+							if (!f.main) errorMessage = "ВОЗРАЩАЕМОЕ ЗНАЧЕНИЕ НЕ СОВПАДАЕТ С ТИПОМ ФУНКЦИИ";
 							else errorMessage = "ВОЗРАЩАЕМОЕ ЗНАЧЕНИЕ НЕ СОВПАДАЕТ С ТИПОМ ФУНКЦИИ (ТИП ФУНКЦИИ MAIN -> INT)";
+						}
+					}
+					else if (f.function)
+					{
+						if (!f.main) functionType = element->iddatatype;
+						f.function = false;
+					}
+					else if (f.expression)
+					{
+						if(element->iddatatype != expressionType)
+						{
+							errorCount++;
+							errorMessage = "НЕ СОВПАДАЮТ ТИПЫ ВЫРАЖЕНИЯ";
 						}
 					}
 					break;
@@ -55,6 +66,7 @@ namespace SemAnalyzer
 					break;
 				case LEX_IS:
 					f.declare = false;
+					f.expression = true;
 					break; 
 				case LEX_MAIN:
 					functionType = IT::INT;
@@ -68,7 +80,9 @@ namespace SemAnalyzer
 					break;
 				case LEX_BRACELET:
 					f.returnExpression = false;
+					f.expression = false;
 					functionType = IT::EMPTY;
+					expressionType = IT::EMPTY;
 					f.main = false;
 					break;
 				}

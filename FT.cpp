@@ -288,8 +288,11 @@ namespace FT
 					
 					itElement.idtype = _idtype; // параметр
 
-					if (flag._integer) itElement.iddatatype = IT::INT;
-					else if (flag._string) itElement.iddatatype = IT::STR;
+					if (!flag._literal) 
+					{
+						if (flag._integer) itElement.iddatatype = IT::INT;
+						else if (flag._string) itElement.iddatatype = IT::STR;
+					}
 
 					IT::Add(it, itElement);
 					flag._declare = false;

@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 		MFST_TRACE_START;								// оладка
 		MFST::Mfst mfst(lexTable, GRB::getGreibach()); 	// автомат
 		
-		if (mfst.start())
+		if (mfst.start()) // синтаксическийй анализ
 		{
 			mfst.savededucation();
 			mfst.printrules();
@@ -46,11 +46,13 @@ int main(int argc, char* argv[])
 			PN::PolishNotation(lexTable, idTable, true); // last arg is debug
 			makeOutWithLT(lexTable, idTable, false, false);
 
-			bool h = SemAnalyzer::semAnalyzer(lexTable, idTable);
+			if (SemAnalyzer::semAnalyzer(lexTable, idTable)) // семантический анализ
+			{
+				Log::WriteIn(log, in);
+				Log::Close(log);
+				std::cout << "\nReady. Check " << parms.in << " DIR" << std::endl;
 
-			Log::WriteIn(log, in);
-			Log::Close(log);
-			std::cout << "\nReady. Check " << parms.in << " DIR" << std::endl;
+			}
 		}
 	}
 	catch (Error::ERROR_ e) {
