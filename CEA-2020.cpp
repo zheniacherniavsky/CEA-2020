@@ -51,8 +51,19 @@ int main(int argc, char* argv[])
 			{
 				Log::WriteIn(log, in);
 				Log::Close(log);
-				if(CG::CodeGeneration(idTable, lexTable)) std::cout << "\nReady. Check " << parms.in << " DIR" << std::endl;
+				if(CG::CodeGeneration(idTable, lexTable)) std::cout << "\n\n-*-*-*-*-*-*-* A S S E M B L E R _ C O D E *-*-*-*-*-*-*-*-\n\n\n" << std::endl;
 
+				// *-*-*-*-*-*-*-*-*-* get assembly result:
+				std::ifstream assemblerFile;
+				assemblerFile.open("code.asm");
+				if (assemblerFile.is_open())
+				{
+					char* line = new char();
+					while (assemblerFile.getline(line, 1024))
+						std::cout << "\t\t" << line << std::endl;
+					assemblerFile.close();
+				}
+				
 			}
 		}
 	}
