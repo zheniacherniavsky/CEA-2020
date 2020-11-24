@@ -2,6 +2,9 @@
 
 namespace SemAnalyzer
 {
+
+	// ++ non declared variables should be tracked!
+
 	struct Flag
 	{
 		bool declare = false;

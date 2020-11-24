@@ -218,7 +218,7 @@ namespace FT
 				if (flag._literal)
 				{
 					itElement.idtype = IT::L;
-					if (flag._number) { // tut problems s return 0
+					if (flag._number) {
 						itElement.iddatatype = IT::INT;
 						flag._number = false;
 					}
@@ -227,12 +227,6 @@ namespace FT
 
 				if (newElement)
 				{
-					// if (flag._body && !flag._literal && !flag._declare && !flag._return)
-					// {
-					//	std::cout << "------------- строка " << posArray[pos] << " -------------";
-					//	throw ERROR_THROW(206);
-					// }
-
 					if (!flag._literal)
 					{
 						for (int i = 0; i < ID_MAXSIZE; i++)

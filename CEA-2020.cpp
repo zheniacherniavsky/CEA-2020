@@ -10,6 +10,7 @@
 #include "PolishNotation.h" // Польская запись
 #include "MFST.h"	// автомат 
 #include "SemAnalyzer.h"
+#include "CodeGeneration.h"
 
 #define TBL_LENGTH 2048 // размеры создаваемых таблиц лексем и идентификаторов
 
@@ -50,7 +51,7 @@ int main(int argc, char* argv[])
 			{
 				Log::WriteIn(log, in);
 				Log::Close(log);
-				std::cout << "\nReady. Check " << parms.in << " DIR" << std::endl;
+				if(CG::CodeGeneration(idTable, lexTable)) std::cout << "\nReady. Check " << parms.in << " DIR" << std::endl;
 
 			}
 		}

@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CEA-2020.cpp" />
+    <ClCompile Include="CodeGeneration.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="FT.cpp" />
     <ClCompile Include="FST.cpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="SemAnalyzer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CodeGeneration.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="FST.h" />
     <ClInclude Include="FT.h" />
@@ -177,6 +179,7 @@
     <ClInclude Include="SemAnalyzer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="code.asm" />
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
