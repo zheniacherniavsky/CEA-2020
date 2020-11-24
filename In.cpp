@@ -66,6 +66,7 @@ namespace In {
 
 		while (getline(sourceCode, line))
 		{
+			if (line[0] == '.') continue; // комментарий
 			bool _literal = false;
 			for (int i = 0, spaceControl = 0; i <= line.length(); i++)
 			{

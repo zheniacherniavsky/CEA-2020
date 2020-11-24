@@ -1,6 +1,6 @@
 .686
-.MODEL FLAT, C
-.STACK 4096
+.MODEL FLAT, STDCALL
+includelib kernel32.lib
 ExitProcess PROTO, :DWORD
 ; // ----------- EXTRN functions declarations -----------
 
@@ -8,62 +8,78 @@ ExitProcess PROTO, :DWORD
 
 .STACK 4096
 .DATA
-	 name	DD	"0",0
-	  age	DD	0
-	 info	DD	"0",0
-	    a	DD	0
-	vnvik	DD	"0",0
 	examp	DD	0
+	    b	DD	0
+	danik	DD	0
 .CONST
-	   c1	DD	23
-	   c2	DD	"4",0
-	   c3	DD	1
-	   c4	DD	1
-	   c5	DD	1
-	   c6	DD	1
-	   c7	DD	1
-	   c8	DD	7
-	   c9	DD	3
-	  c10	DD	12
+	   c1	DD	3
+	   c2	DD	9
+	   c3	DD	4
+	   c4	DD	8
+	   c5	DD	7
+	   c6	DD	50
+	   c7	DD	85
+	   c8	DD	74
+	   c9	DD	59
+	  c10	DD	94
 	  c11	DD	0
-	  c12	DD	3
-	  c13	DD	4
-	  c14	DD	3
-	  c15	DD	7
-	  c16	DD	7
-	  c17	DD	7
-	  c18	DD	7
-	  c19	DD	7
-	  c20	DD	7
-	  c21	DD	7
-	  c22	DD	7
-	  c23	DD	7
-	  c24	DD	7
-	  c25	DD	5
-	  c26	DD	1
-	  c27	DD	2
-	  c28	DD	3
-	  c29	DD	5
-	  c30	DD	6
-	  c31	DD	1
-	  c32	DD	2
-	  c33	DD	3
-	  c34	DD	4
-	  c35	DD	5
-	  c36	DD	4
-	  c37	DD	7
-	  c38	DD	7
-	  c39	DD	7
-	  c40	DD	7
-	  c41	DD	5
-	  c42	DD	69
-	  c43	DD	0
 .CODE
 	; // ----------- codefunctions declaration -----------
 
 
 cea2020:
-	; // this special plase for code
-	INVOKE ExitProcess, 0
+
+
+	; // this is examp exsseption!
+	push	c1
+	push	c2
+	pop	eax
+	pop	ebx
+	add	eax,	ebx
+	push	eax
+	pop	examp
+
+
+	; // this is b exsseption!
+	push	c3
+	push	c4
+	push	c5
+	pop	eax
+	pop	ebx
+	imul	ebx
+	push	eax
+	pop	eax
+	pop	ebx
+	add	eax,	ebx
+	push	eax
+	pop	b
+
+
+	; // this is danik exsseption!
+	push	c6
+	push	c7
+	push	c8
+	push	c9
+	pop	eax
+	pop	ebx
+	add	eax,	ebx
+	push	eax
+	pop	eax
+	pop	ebx
+	imul	ebx
+	push	eax
+	push	c10
+	pop	eax
+	pop	ebx
+	imul	ebx
+	push	eax
+	pop	eax
+	pop	ebx
+	add	eax,	ebx
+	push	eax
+	pop	danik
+
+	push	c11	; // this is return of function: main
+	call ExitProcess
 start:
 	jmp cea2020

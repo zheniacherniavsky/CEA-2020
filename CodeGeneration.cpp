@@ -10,7 +10,7 @@ namespace CG
 		if (!codeAsm.is_open())
 			return false;
 
-		const char* header = ".686\n.MODEL FLAT, C\nExitProcess PROTO, :DWORD\n";
+		const char* header = ".686\n.MODEL FLAT, STDCALL\nincludelib kernel32.lib\nExitProcess PROTO, :DWORD\n";
 		codeAsm << header;
 
 		
@@ -68,11 +68,84 @@ namespace CG
 	void CreateCodeSegment(IT::IdTable& it, LT::LexTable lt, std::ofstream& codeAsm)
 	{
 		codeAsm << ".CODE\n";
-		// FUNCTIONS ...
 		codeAsm << "\t; // ----------- codefunctions declaration -----------\n\n\n";
-		codeAsm << "cea2020:\n"; // when we found enter point
-		// CODE GENERATION
-		codeAsm << "\t; // this special place for code\n\tINVOKE ExitProcess, 0\n";
+
+		IT::Entry* itElement = new IT::Entry();
+		LT::Entry* element = lt.head;
+		
+		while (element->lexema[0] != 'm')
+		{
+			// functionsssss, idk how it do now lol
+			element = element->next;
+		}
+
+		codeAsm << "cea2020:\n";	// when we found enter point !!!
+									// we start making expressions !!!
+
+		
+
+		while (element->next)
+		// this cycle is lined cycle, it mean we get line and think that line is expression.
+		// by this way we can remember our variables, and it is simple to understand... for me.
+		// this algorythm like at SemAnalyzer.h 
+		{
+			char* id_of_first_var = NULL;
+			while (element)
+			{
+
+
+				switch (element->lexema[0])
+				{
+				case(LEX_RETURN): // r i ; return exception
+					element = element->next; // r -> i
+					itElement = IT::GetEntry(it, element->idxTI);
+					CODE_PUSH // push i
+					codeAsm << "\t; // this is return of function: " << itElement->visibility.functionName << '\n';
+					element = element->next; // i -> ; (then this semicolon go to next lexem)
+					break;
+
+				case(LEX_ID):
+				case(LEX_LITERAL):
+					itElement = IT::GetEntry(it, element->idxTI);
+					if (id_of_first_var == NULL)
+					{
+						codeAsm << "\n\n\t; // this is " << itElement->id << " exsseption!";
+						id_of_first_var = new char();
+						for (int i = 0; i < strlen(itElement->id); i++)
+							id_of_first_var[i] = itElement->id[i];
+						id_of_first_var[strlen(itElement->id)] = 0x00;
+						break;
+					}
+					else
+					{
+						CODE_PUSH
+						break;
+					}
+
+				case(LEX_PLUS):
+					CODE_PLUS
+					break;
+
+				case(LEX_STAR):
+					CODE_MUL
+					break;
+
+				case(LEX_SEMICOLON):
+					if (id_of_first_var != NULL)
+					{
+						CODE_POP
+					}
+					else break;
+
+				}
+				if (element->next && element->sn == element->next->sn) element = element->next;
+				else break;
+			}
+			id_of_first_var = NULL;
+			element = element->next;
+		}
+
+		codeAsm << "\tcall ExitProcess\n";
 
 		codeAsm << "start:\n\tjmp cea2020\n"; // enter point to assembly
 	}
