@@ -10,7 +10,7 @@ namespace CG
 		if (!codeAsm.is_open())
 			return false;
 
-		const char* header = ".686\n.MODEL FLAT, STDCALL\nincludelib kernel32.lib\nExitProcess PROTO, :DWORD\n";
+		const char* header = ".486\n.MODEL FLAT, STDCALL\nincludelib kernel32.lib\nExitProcess PROTO, :DWORD\n";
 		codeAsm << header;
 
 		
@@ -79,8 +79,8 @@ namespace CG
 			element = element->next;
 		}
 
-		codeAsm << "cea2020:\n";	// when we found enter point !!!
-									// we start making expressions !!!
+		codeAsm << "cea2020 PROC\n";	// when we found enter point !!!
+										// we start making expressions !!!
 
 		
 
@@ -109,7 +109,7 @@ namespace CG
 					itElement = IT::GetEntry(it, element->idxTI);
 					if (id_of_first_var == NULL)
 					{
-						codeAsm << "\n\n\t; // this is " << itElement->id << " exsseption!";
+						codeAsm << "\n\n\t; // this is " << itElement->id << " expression!";
 						id_of_first_var = new char();
 						for (int i = 0; i < strlen(itElement->id); i++)
 							id_of_first_var[i] = itElement->id[i];
@@ -145,8 +145,8 @@ namespace CG
 			element = element->next;
 		}
 
-		codeAsm << "\tcall ExitProcess\n";
+		codeAsm << "\tcall ExitProcess\ncea2020 ENDP\n";
 
-		codeAsm << "start:\n\tjmp cea2020\n"; // enter point to assembly
+		codeAsm << "\nstart:\n\tcall cea2020\nend start"; // enter point to assembly
 	}
 }

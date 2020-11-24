@@ -1,4 +1,4 @@
-.686
+.486
 .MODEL FLAT, STDCALL
 includelib kernel32.lib
 ExitProcess PROTO, :DWORD
@@ -27,10 +27,10 @@ ExitProcess PROTO, :DWORD
 	; // ----------- codefunctions declaration -----------
 
 
-cea2020:
+cea2020 PROC
 
 
-	; // this is examp exsseption!
+	; // this is examp expression!
 	push	c1
 	push	c2
 	pop	eax
@@ -40,7 +40,7 @@ cea2020:
 	pop	examp
 
 
-	; // this is b exsseption!
+	; // this is b expression!
 	push	c3
 	push	c4
 	push	c5
@@ -55,7 +55,7 @@ cea2020:
 	pop	b
 
 
-	; // this is danik exsseption!
+	; // this is danik expression!
 	push	c6
 	push	c7
 	push	c8
@@ -81,5 +81,8 @@ cea2020:
 
 	push	c11	; // this is return of function: main
 	call ExitProcess
+cea2020 ENDP
+
 start:
-	jmp cea2020
+	call cea2020
+end start
