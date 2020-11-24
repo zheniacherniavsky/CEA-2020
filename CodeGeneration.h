@@ -6,7 +6,7 @@
 #include "LT.h"
 
 #define DATA_WRITE_INT {codeAsm << '\t' << std::setw(5) << element->id << '\t' << "DD\t" << element->value.vint << '\n'; }
-#define DATA_WRITE_STR {codeAsm << '\t' << std::setw(5) << element->id << '\t' << "DD\t\"" << element->value.vint << "\",0\n"; }
+#define DATA_WRITE_STR {codeAsm << '\t' << std::setw(5) << element->id << '\t' << "DB\t\"" << element->value.vint << "\",0\n"; }
 
 namespace CG
 {

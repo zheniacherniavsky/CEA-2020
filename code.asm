@@ -2,7 +2,11 @@
 .MODEL FLAT, C
 .STACK 4096
 ExitProcess PROTO, :DWORD
+; // ----------- EXTRN functions declarations -----------
 
+
+
+.STACK 4096
 .DATA
 	 name	DD	"0",0
 	  age	DD	0
@@ -54,10 +58,7 @@ ExitProcess PROTO, :DWORD
 	  c41	DD	5
 	  c42	DD	69
 	  c43	DD	0
-.CONST
-	; // ----------- EXTRN functions declarations -----------
-
-
+.CODE
 	; // ----------- codefunctions declaration -----------
 
 

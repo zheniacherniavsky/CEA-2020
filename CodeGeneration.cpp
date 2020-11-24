@@ -10,8 +10,20 @@ namespace CG
 		if (!codeAsm.is_open())
 			return false;
 
-		const char* header = ".686\n.MODEL FLAT, C\n.STACK 4096\nExitProcess PROTO, :DWORD\n\n";
+		const char* header = ".686\n.MODEL FLAT, C\nExitProcess PROTO, :DWORD\n";
 		codeAsm << header;
+
+		
+		codeAsm << "; // ----------- EXTRN functions declarations -----------\n\n\n";
+		// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+		// EXTRN FUNCTIONS -- they are will be located in special file or lib file.		  |
+		//																				  |
+		// it be realized on c++ language with extern 'C' flag, to use it on assebmly	  |
+		//																				  |
+		// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+		
+		codeAsm << "\n.STACK 4096\n"; // stack
+
 
 		CreateDataSegment(it, codeAsm);
 		CreateConstSegment(it, codeAsm);
@@ -55,14 +67,12 @@ namespace CG
 
 	void CreateCodeSegment(IT::IdTable& it, LT::LexTable lt, std::ofstream& codeAsm)
 	{
-		codeAsm << ".CONST\n";
-		// EXTRN FUNCTIONS
-		codeAsm << "\t; // ----------- EXTRN functions declarations -----------\n\n\n";
+		codeAsm << ".CODE\n";
 		// FUNCTIONS ...
 		codeAsm << "\t; // ----------- codefunctions declaration -----------\n\n\n";
 		codeAsm << "cea2020:\n"; // when we found enter point
 		// CODE GENERATION
-		codeAsm << "\t; // this special plase for code\n\tINVOKE ExitProcess, 0\n";
+		codeAsm << "\t; // this special place for code\n\tINVOKE ExitProcess, 0\n";
 
 		codeAsm << "start:\n\tjmp cea2020\n"; // enter point to assembly
 	}
