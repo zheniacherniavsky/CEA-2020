@@ -16,11 +16,15 @@ namespace GRB
 			Rule::Chain(9, TS('t'), TS('f'), TS('i'), TS('('), TS(')'), TS('{'), NS('N'), TS('}'), TS(';'))
 		),
 		Rule(NS('N'), GRB_ERROR_SERIES + 1, // ошибка в операторах
-			7, // N -> dti; | rE; | i=E; | dti;N | i=E;N | dti=E; | dti=E;N
+			11, // N -> dti; | rE; | i=E; | dti;N | i=E;N | dti=E; | dti=E;N
 			Rule::Chain(7, TS('d'), TS('t'), TS('i'), TS('='), NS('E'), TS(';'), NS('N')),
 			Rule::Chain(6, TS('d'), TS('t'), TS('i'), TS('='), NS('E'), TS(';')),
 			Rule::Chain(4, TS('d'), TS('t'), TS('i'), TS(';')),
 			Rule::Chain(3, TS('r'), NS('E'), TS(';')),
+			Rule::Chain(4, TS('p'), TS('i'), TS(';'), NS('N')),
+			Rule::Chain(3, TS('p'), TS('i'), TS(';')),
+			Rule::Chain(4, TS('s'), TS('i'), TS(';'), NS('N')),
+			Rule::Chain(3, TS('s'), TS('i'), TS(';')),
 			Rule::Chain(4, TS('i'), TS('='), NS('E'), TS(';')),
 			Rule::Chain(5, TS('d'), TS('t'), TS('i'), TS(';'), NS('N')),
 			Rule::Chain(5, TS('i'), TS('='), NS('E'), TS(';'), NS('N'))

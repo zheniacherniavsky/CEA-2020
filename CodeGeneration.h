@@ -11,6 +11,7 @@
 #define CODE_PUSH {codeAsm << "\n\tpush\t" << itElement->id;}
 #define CODE_PLUS {codeAsm << "\n\tpop\teax\n\tpop\tebx\n\tadd\teax,\tebx\n\tpush\teax";}
 #define CODE_MUL {codeAsm << "\n\tpop\teax\n\tpop\tebx\n\timul\tebx\n\tpush\teax";}
+#define CODE_DIV {codeAsm << "\n\tpop ebx\n\tpop eax\n\ttest ebx,ebx\n\tjz EXIT_DIV_ON_NULL\n\tcdq\n\tidiv ebx\n\tpush eax";}
 #define CODE_POP {codeAsm << "\n\tpop\t" << id_of_first_var << '\n';}
 
 namespace CG

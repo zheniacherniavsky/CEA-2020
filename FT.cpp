@@ -401,12 +401,11 @@ namespace FT
 			FST::NODE()
 		);
 
-		FST::FST fst6(lexem, 6,		//print
-			FST::NODE(1, FST::RELATION('p', 1)),
-			FST::NODE(1, FST::RELATION('r', 2)),
-			FST::NODE(1, FST::RELATION('i', 3)),
-			FST::NODE(1, FST::RELATION('n', 4)),
-			FST::NODE(1, FST::RELATION('t', 5)),
+		FST::FST fst6(lexem, 5,		//print
+			FST::NODE(1, FST::RELATION('i', 1)),
+			FST::NODE(1, FST::RELATION('o', 2)),
+			FST::NODE(1, FST::RELATION('u', 3)),
+			FST::NODE(1, FST::RELATION('t', 4)),
 			FST::NODE()
 		);
 
@@ -455,12 +454,20 @@ namespace FT
 			FST::NODE()
 		);
 
+		FST::FST fst20(lexem, 5,		// enter point
+			FST::NODE(1, FST::RELATION('s', 1)),
+			FST::NODE(1, FST::RELATION('o', 2)),
+			FST::NODE(1, FST::RELATION('u', 3)),
+			FST::NODE(1, FST::RELATION('t', 4)),
+			FST::NODE()
+		);
+
 		if (FST::execute(fst1) == -1) return LEX_INTEGER; // integer
 		else if (FST::execute(fst2) == -1) return LEX_STRING; // string
 		else if (FST::execute(fst3) == -1) return LEX_FUNCTION;
 		else if (FST::execute(fst4) == -1) return LEX_DECLARE;
 		else if (FST::execute(fst5) == -1) return LEX_RETURN;
-		else if (FST::execute(fst6) == -1) return LEX_PRINT;
+		else if (FST::execute(fst6) == -1) return LEX_PRINT_INT;
 		else if (FST::execute(fst7) == -1) return LEX_SEMICOLON;
 		else if (FST::execute(fst8) == -1) return LEX_COMMA;
 		else if (FST::execute(fst9) == -1) return LEX_LEFTBRACE;
@@ -498,6 +505,7 @@ namespace FT
 		else if (FST::execute(fst17) == -1) return LEX_IS;
 		else if (FST::execute(fst18) == -1) return LEX_NUMBER; // number
 		else if (FST::execute(fst19) == -1) return LEX_MAIN; // main
+		else if (FST::execute(fst20) == -1) return LEX_PRINT_STR; // main
 		else return LEX_ID;
 	}
 

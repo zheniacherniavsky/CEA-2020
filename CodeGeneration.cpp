@@ -10,17 +10,10 @@ namespace CG
 		if (!codeAsm.is_open())
 			return false;
 
-		const char* header = ".486\n.MODEL FLAT, STDCALL\nincludelib kernel32.lib\nExitProcess PROTO, :DWORD\n";
-		codeAsm << header;
+		const char* header = ".486\n.MODEL FLAT, STDCALL\nincludelib kernel32.lib\nincludelib userlib.lib\n\nExitProcess PROTO, :DWORD\n";
 
-		
-		codeAsm << "; // ----------- EXTRN functions declarations -----------\n\n\n";
-		// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-		// EXTRN FUNCTIONS -- they are will be located in special file or lib file.		  |
-		//																				  |
-		// it be realized on c++ language with extern 'C' flag, to use it on assebmly	  |
-		//																				  |
-		// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+		codeAsm << header;
+		codeAsm << "outint PROTO, :DWORD ; 1 arg [int] // out int on console\n";
 		
 		codeAsm << "\n.STACK 4096\n"; // stack
 
@@ -68,7 +61,7 @@ namespace CG
 	void CreateCodeSegment(IT::IdTable& it, LT::LexTable lt, std::ofstream& codeAsm)
 	{
 		codeAsm << ".CODE\n";
-		codeAsm << "\t; // ----------- codefunctions declaration -----------\n\n\n";
+		codeAsm << "; ---------- - Function definitions--------------------\n\n\n";
 
 		IT::Entry* itElement = new IT::Entry();
 		LT::Entry* element = lt.head;
@@ -130,6 +123,17 @@ namespace CG
 					CODE_MUL
 					break;
 
+				case(LEX_PRINT_INT):
+					element = element->next; // p -> i
+					itElement = IT::GetEntry(it, element->idxTI);
+					CODE_PUSH // push i
+					codeAsm << "\n\tcall\toutint ; // at console\n";
+					element = element->next; // i -> ; (then this semicolon go to next lexem)
+					break;
+				case(LEX_DIRSLASH):
+					CODE_DIV
+					break;
+
 				case(LEX_SEMICOLON):
 					if (id_of_first_var != NULL)
 					{
@@ -145,7 +149,7 @@ namespace CG
 			element = element->next;
 		}
 
-		codeAsm << "\tcall ExitProcess\ncea2020 ENDP\n";
+		codeAsm << "\tcall ExitProcess\n\nEXIT_DIV_ON_NULL:\n; // here is console output with error\ncea2020 ENDP\n";
 
 		codeAsm << "\nstart:\n\tcall cea2020\nend start"; // enter point to assembly
 	}

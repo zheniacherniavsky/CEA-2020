@@ -13,7 +13,8 @@
 #define LEX_FUNCTION 'f' // лексема для функции
 #define LEX_DECLARE 'd' // лексема для declare
 #define LEX_RETURN 'r' // лексема для return
-#define LEX_PRINT 'p' // лексема для print
+#define LEX_PRINT_INT 'p' // лексема для print
+#define LEX_PRINT_STR 's' // лексема для print
 #define LEX_MAIN 'm' // main
 #define LEX_SEMICOLON ';' // лексема для ;
 #define LEX_COMMA ',' // ,
