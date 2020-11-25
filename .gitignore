@@ -1,6 +1,7 @@
 '#' IGNORE DEBUG FOLDER
 x64/
 Debug/
+userlib/Debug
 .vs/
 log.txt
 null

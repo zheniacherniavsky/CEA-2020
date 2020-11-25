@@ -1,7 +1,7 @@
 .486
 .MODEL FLAT, STDCALL
 includelib kernel32.lib
-includelib userlib.lib
+includelib E:\lib\userlib.lib
 
 ExitProcess PROTO, :DWORD
 outint PROTO, :DWORD ; 1 arg [int] // out int on console
@@ -143,6 +143,18 @@ cea2020 PROC
 	push eax
 	pop	div4
 
+	push	div1
+	call	outint ; // at console
+
+	push	div2
+	call	outint ; // at console
+
+	push	div3
+	call	outint ; // at console
+
+	push	div4
+	call	outint ; // at console
+
 	push	c19	; // this is return of function: main
 	call ExitProcess
 
@@ -150,6 +162,9 @@ EXIT_DIV_ON_NULL:
 ; // here is console output with error
 cea2020 ENDP
 
-start:
+main PROC
 	call cea2020
-end start
+
+main ENDP
+
+end main

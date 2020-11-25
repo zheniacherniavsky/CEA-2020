@@ -10,7 +10,7 @@ namespace CG
 		if (!codeAsm.is_open())
 			return false;
 
-		const char* header = ".486\n.MODEL FLAT, STDCALL\nincludelib kernel32.lib\nincludelib userlib.lib\n\nExitProcess PROTO, :DWORD\n";
+		const char* header = ".486\n.MODEL FLAT, STDCALL\nincludelib kernel32.lib\nincludelib E:\\lib\\userlib.lib\n\nExitProcess PROTO, :DWORD\n";
 
 		codeAsm << header;
 		codeAsm << "outint PROTO, :DWORD ; 1 arg [int] // out int on console\n";
@@ -151,6 +151,6 @@ namespace CG
 
 		codeAsm << "\tcall ExitProcess\n\nEXIT_DIV_ON_NULL:\n; // here is console output with error\ncea2020 ENDP\n";
 
-		codeAsm << "\nstart:\n\tcall cea2020\nend start"; // enter point to assembly
+		codeAsm << "\nmain PROC\n\tcall cea2020\nmain ENDP\n\nend main"; // enter point to assembly
 	}
 }
