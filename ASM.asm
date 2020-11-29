@@ -11,19 +11,14 @@ EXTRN copystr : PROC
 
 .STACK 4096
 .DATA
-	     _name1	BYTE 255 DUP(0)
-	     _age	SDWORD	0
-	     _name2	BYTE 255 DUP(0)
+	     _a	SDWORD	0
+	     _b	SDWORD	0
 .CONST
 	overflow db 'ERROR: VARIABLE OVERFLOW', 0
 	null_division db 'ERROR: DIVISION BY ZERO', 0
-	     _c1	BYTE	"Zheka",0
-	     _c2	SDWORD	18
-	     _c3	SDWORD	1
-	     _c4	BYTE	"NAME:",0
-	     _c5	BYTE	"AGE:",0
-	     _c6	SDWORD	0
-	     _c7	SDWORD	0
+	     _c1	SDWORD	10
+	     _c2	SDWORD	20
+	     _c3	SDWORD	0
 .CODE
 
 start:
@@ -37,55 +32,41 @@ main ENDP
 cea2020 PROC
 
 
-	; // this is _name1 expression! str
-	push 	offset _c1
-	push	offset _name1
-	call copystr
-	
-
-	; // this is _age expression! int
+	; // this is _a expression! int
 	push 0
-	pop	_age
+	pop	_a
 
-REPEAT 18
 
-	; // this is _age expression! int
-	push	_age
-	push	_c3
-	pop	eax
-	pop	ebx
-	add	eax,	ebx
-	push	eax
-	pop	_age
+	; // this is _b expression! int
+	push 0
+	pop	_b
 
-ENDM
 
-	push 	offset _c4
-	call	outstr ; // at console
+	; // this is _a expression! int
+	push	_c1
+	pop	_a
 
-	push 	offset _name1
-	call	outstr ; // at console
 
-	push 	offset _c5
-	call	outstr ; // at console
+	; // this is _b expression! int
+	push	_c2
+	pop	_b
 
-	push	_age
+
+	; // this is _b expression! int
+	push	_b
+	push	_a
+	pop eax
+	neg eax
+	pop ebx
+	add eax, ebx
+	jo EXIT_OVERFLOW
+	push eax
+	pop	_b
+
+	push	_b
 	call	outint ; // at console
 
-
-	; // this is _age expression! int
-	push	_age
-	push	_c6
-	pop ebx
-	pop eax
-	test ebx,ebx
-	jz EXIT_DIV_ON_NULL
-	cdq
-	idiv ebx
-	push eax
-	pop	_age
-
-	push	_c7	; // this is return of function: main
+	push	_c3	; // this is return of function: main
 
 	jmp EXIT
 

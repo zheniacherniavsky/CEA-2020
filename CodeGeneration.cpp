@@ -152,7 +152,9 @@ namespace CG
 				case(LEX_PLUS):
 					if (first_var_type == IT::INT) CODE_PLUS
 					break;
-
+				case(LEX_MINUS):
+					if (first_var_type == IT::INT) CODE_DIFF
+					break;
 				case(LEX_STAR):
 					if(first_var_type == IT::INT) CODE_MUL
 					break;
