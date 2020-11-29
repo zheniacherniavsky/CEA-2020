@@ -36,6 +36,7 @@ namespace IT
 			}
 
 			// дальше просто заполняем данными
+
 			for (int i = 0; i < ID_MAXSIZE; i++)
 			{
 				idtable.table->id[i] = entry.id[i];
@@ -53,9 +54,14 @@ namespace IT
 			for (int i = 0; i < strlen(entry.visibility.functionName); i++)
 				idtable.table->visibility.functionName[i] = entry.visibility.functionName[i];
 
-			if(entry.value.vstr->len < 256)
+			if (entry.value.vstr->len < 256)
+			{
 				for (int i = 0; i < entry.value.vstr->len; i++)
-					idtable.table->value.vstr->str[i] = entry.value.vstr->str[i];
+				{
+					if (entry.value.vstr->str[i] == '_') idtable.table->value.vstr->str[i] = ' ';
+					else idtable.table->value.vstr->str[i] = entry.value.vstr->str[i];
+				}
+			}	
 
 			idtable.size++;
 		}

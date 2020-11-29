@@ -12,6 +12,7 @@ namespace SemAnalyzer
 		bool expression = false;
 		bool returnExpression = false;
 		bool main = false;
+		bool repeat = false;
 	};
 
 	bool semAnalyzer(LT::LexTable lt, IT::IdTable it)
@@ -82,11 +83,17 @@ namespace SemAnalyzer
 					f.returnExpression = true;
 					break;
 				case LEX_BRACELET:
-					f.returnExpression = false;
-					f.expression = false;
-					functionType = IT::EMPTY;
-					expressionType = IT::EMPTY;
-					f.main = false;
+					if (f.repeat) f.repeat = false;
+					else {
+						f.returnExpression = false;
+						f.expression = false;
+						functionType = IT::EMPTY;
+						expressionType = IT::EMPTY;
+						f.main = false;
+					}
+					break;
+				case('w'):
+					f.repeat = true;
 					break;
 				}
 

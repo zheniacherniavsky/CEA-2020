@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 
 				// *-*-*-*-*-*-*-*-*-* get assembly result:
 				std::ifstream assemblerFile;
-				assemblerFile.open("code.asm");
+				assemblerFile.open("ASM.asm");
 				if (assemblerFile.is_open())
 				{
 					char* line = new char();

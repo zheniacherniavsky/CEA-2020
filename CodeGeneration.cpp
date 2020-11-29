@@ -4,16 +4,18 @@ namespace CG
 {
 	bool CodeGeneration(IT::IdTable& it, LT::LexTable& lt)
 	{
-		const char* asmFile_path = "code.asm";
+		const char* asmFile_path = "ASM.asm";
 		std::ofstream codeAsm;
 		codeAsm.open(asmFile_path);
 		if (!codeAsm.is_open())
 			return false;
 
-		const char* header = ".486\n.MODEL FLAT, STDCALL\nincludelib kernel32.lib\nincludelib E:\\lib\\userlib.lib\n\nExitProcess PROTO, :DWORD\n";
+		const char* header = ".486\n.MODEL FLAT, STDCALL\nincludelib kernel32.lib\nincludelib libucrt.lib\nincludelib E:\\lib\\userlib.lib\n\nExitProcess PROTO, :DWORD\n";
 
 		codeAsm << header;
-		codeAsm << "outint PROTO, :DWORD ; 1 arg [int] // out int on console\n";
+		codeAsm << "EXTRN outint : PROC\n";
+		codeAsm << "EXTRN outstr : PROC\n";
+		codeAsm << "EXTRN copystr : PROC\n";
 		
 		codeAsm << "\n.STACK 4096\n"; // stack
 
@@ -45,22 +47,35 @@ namespace CG
 	void CreateConstSegment(IT::IdTable& it, std::ofstream& codeAsm)
 	{
 		codeAsm << ".CONST\n";
+		codeAsm << "\toverflow db 'ERROR: VARIABLE OVERFLOW', 0\n";
+		codeAsm << "\tnull_division db 'ERROR: DIVISION BY ZERO', 0\n";
+
 		IT::Entry* element = it.head;
 		while (element)
 		{
 			if (element->idtype == IT::L)
 				switch (element->iddatatype)
 				{
-				case(IT::INT): DATA_WRITE_INT; break;
-				case(IT::STR): DATA_WRITE_STR; break;
+				case(IT::INT): CONST_WRITE_INT; break;
+				case(IT::STR): CONST_WRITE_STR; break;
 				}
 			element = element->next;
 		}
 	}
 
+	struct flags
+	{
+		bool repeat = false;
+	};
+
 	void CreateCodeSegment(IT::IdTable& it, LT::LexTable lt, std::ofstream& codeAsm)
 	{
+		flags f;
+
 		codeAsm << ".CODE\n";
+
+		codeAsm << "\nstart:\nmain PROC\n\tcall cea2020\nmain ENDP\n\n"; // enter point to assembly
+
 		codeAsm << "; ---------- - Function definitions--------------------\n\n\n";
 
 		IT::Entry* itElement = new IT::Entry();
@@ -83,12 +98,20 @@ namespace CG
 		// this algorythm like at SemAnalyzer.h 
 		{
 			char* id_of_first_var = NULL;
+			IT::IDDATATYPE first_var_type = IT::EMPTY;
 			while (element)
 			{
 
 
 				switch (element->lexema[0])
 				{
+				case('w'):
+					f.repeat = true;
+					element = element->next; // repeat -> (
+					element = element->next; // ( -> CYCLE COUNT
+					itElement = IT::GetEntry(it, element->idxTI);
+					codeAsm << "\nREPEAT " << itElement->value.vint;
+					break;
 				case(LEX_RETURN): // r i ; return exception
 					element = element->next; // r -> i
 					itElement = IT::GetEntry(it, element->idxTI);
@@ -102,32 +125,56 @@ namespace CG
 					itElement = IT::GetEntry(it, element->idxTI);
 					if (id_of_first_var == NULL)
 					{
-						codeAsm << "\n\n\t; // this is " << itElement->id << " expression!";
+						if (element->next->lexema[0] == ';' && itElement->iddatatype == IT::STR) break;
+
+						codeAsm << "\n\n\t; // this is _" << itElement->id << " expression!";
+						if (itElement->iddatatype == IT::INT)
+							codeAsm << " int";
+						else if (itElement->iddatatype == IT::STR) codeAsm << " str";
+
 						id_of_first_var = new char();
 						for (int i = 0; i < strlen(itElement->id); i++)
 							id_of_first_var[i] = itElement->id[i];
 						id_of_first_var[strlen(itElement->id)] = 0x00;
+
+						first_var_type = itElement->iddatatype;
+
+						if (element->next->lexema[0] == LEX_SEMICOLON) codeAsm << "\n\tpush 0";
 						break;
 					}
 					else
 					{
-						CODE_PUSH
+						if (first_var_type == IT::INT) CODE_PUSH
+						else if (first_var_type == IT::STR) CODE_PUSH_OFFSET
 						break;
 					}
 
 				case(LEX_PLUS):
-					CODE_PLUS
+					if (first_var_type == IT::INT) CODE_PLUS
 					break;
 
 				case(LEX_STAR):
-					CODE_MUL
+					if(first_var_type == IT::INT) CODE_MUL
 					break;
 
 				case(LEX_PRINT_INT):
 					element = element->next; // p -> i
 					itElement = IT::GetEntry(it, element->idxTI);
-					CODE_PUSH // push i
-					codeAsm << "\n\tcall\toutint ; // at console\n";
+					if (itElement->iddatatype == IT::INT)
+					{
+						CODE_PUSH // push i
+							codeAsm << "\n\tcall\toutint ; // at console\n";
+					}
+					element = element->next; // i -> ; (then this semicolon go to next lexem)
+					break;
+				case(LEX_PRINT_STR):
+					element = element->next; // p -> i
+					itElement = IT::GetEntry(it, element->idxTI);
+					if (itElement->iddatatype == IT::STR)
+					{
+						CODE_PUSH_OFFSET // push i
+							codeAsm << "\n\tcall\toutstr ; // at console\n";
+					}
 					element = element->next; // i -> ; (then this semicolon go to next lexem)
 					break;
 				case(LEX_DIRSLASH):
@@ -137,20 +184,29 @@ namespace CG
 				case(LEX_SEMICOLON):
 					if (id_of_first_var != NULL)
 					{
-						CODE_POP
+						if (first_var_type == IT::INT) CODE_POP
+						else if (first_var_type == IT::STR) CODE_POP_STR
 					}
 					else break;
-
+				case(LEX_BRACELET):
+					if (f.repeat)
+					{
+						f.repeat = false;
+						codeAsm << "\nENDM\n";
+					}
+					break;
 				}
 				if (element->next && element->sn == element->next->sn) element = element->next;
 				else break;
 			}
+
 			id_of_first_var = NULL;
+			first_var_type = IT::EMPTY;
 			element = element->next;
 		}
 
-		codeAsm << "\tcall ExitProcess\n\nEXIT_DIV_ON_NULL:\n; // here is console output with error\ncea2020 ENDP\n";
-
-		codeAsm << "\nmain PROC\n\tcall cea2020\nmain ENDP\n\nend main"; // enter point to assembly
+		codeAsm << "\n\tjmp EXIT\n\nEXIT_DIV_ON_NULL:\n\tpush offset null_division\n\tcall outstr\n\tpush - 1\n\tcall ExitProcess";
+		codeAsm << "\n\nEXIT_OVERFLOW:\n\tpush offset overflow\n\tcall outstr\n\tpush - 2\n\tcall ExitProcess\n\n\tEXIT:";
+		codeAsm << "\tcall ExitProcess\ncea2020 ENDP\nEND start";
 	}
 }

@@ -23,6 +23,7 @@ namespace FT
 		bool _hesisIsOpen	= false; // открытие закрытие скобок для отличения параметров от функции
 		bool _functionParms = false;
 		bool _return		= false;
+		bool _repeat		= false;
 
 		void toFalse()	// занулить все флажки
 		{
@@ -33,18 +34,19 @@ namespace FT
 			_string = false;
 			_hesisIsOpen = false;
 			_return = false;
-
 			// flag._function я контролирую сам в switch !!!!
 		}
 	};
 
-	void createLexArr(char* code, char *lexArr[4096])
+	void fillTables(char* code, LT::LexTable &lt, IT::IdTable &it) // заполнение таблицы лексем и идентификаторов
 	{
+		int* posArray = getLineNums(code);			// массив позиций строк обработанного кода
+
+		char lexArr[512][256];
 		int pos = 0;
 		int spos = 0;
 		while (*code)
 		{
-			lexArr[pos] = new char();
 			while (*code != ' ' && *code != '\n')
 			{
 				lexArr[pos][spos++] = *code;
@@ -54,21 +56,14 @@ namespace FT
 			pos++; spos = 0;
 			while (*code == ' ' || *code == '\n')
 				*code++;
-			
+
 		}
-		lexArr[pos] = NULL;
-	}
+		lexArr[pos][0] = 0x00;
 
-	void fillTables(char* code, LT::LexTable &lt, IT::IdTable &it) // заполнение таблицы лексем и идентификаторов
-	{
-		int* posArray = getLineNums(code);			// массив позиций строк обработанного кода
-
-		char *lexArr[4096];
-		createLexArr(&code[0], lexArr);
 		int lexPos = 0;								// номер лексемы
 		char *lexem = lexArr[lexPos++];
 
-		int pos = 0;								// номер обрабатываемой лексемы
+		pos = 0;								// номер обрабатываемой лексемы
 		int idx = 0;								// id идентификатора
 		short visibArea = 0;						// область видимости
 		flags flag;									// флажки
@@ -78,9 +73,9 @@ namespace FT
 		int linePos = 0;	// позиция лексемы в строке
 
 		// добавление в таблицу лексем
-		while (lexem != NULL)
+		while (lexem[0] != 0x00)
 		{
-			if (posArray[pos] != posArray[pos - 1]) flag.toFalse();
+			if (posArray[pos] != posArray[pos - 1] && !flag._repeat) flag.toFalse();
 			
 			char lexemID[ID_MAXSIZE]; // айди лексемы
 			for (int i = 0; i < ID_MAXSIZE; i++)
@@ -104,6 +99,9 @@ namespace FT
 
 			switch (lexemSymbol)
 			{
+			case('w'): // repeat
+				flag._repeat = true;
+				break;
 			case(LEX_DECLARE):
 				flag._declare = true;
 				break;
@@ -152,19 +150,26 @@ namespace FT
 				flag.toFalse();
 				break;
 			case(LEX_LEFTBRACE):
-				visibArea++;
-				flag._body = true;
-				flag.toFalse();
+				if (!flag._repeat)
+				{
+					visibArea++;
+					flag._body = true;
+					flag.toFalse();
+				}
 				break;
 			case(LEX_BRACELET):
-				visibArea--;
-				flag._body = false;
-				flag.toFalse();
-				if (flag._function)
+				if (!flag._repeat)
 				{
-					if(!stkFunc.empty()) stkFunc.pop();
-					flag._function = false; // отслеживаю закрытие блока функции
+					visibArea--;
+					flag._body = false;
+					flag.toFalse();
+					if (flag._function)
+					{
+						if (!stkFunc.empty()) stkFunc.pop();
+						flag._function = false; // отслеживаю закрытие блока функции
+					}
 				}
+				else flag._repeat = false;
 				break;
 			case(LEX_RETURN):
 				flag._return = true;
@@ -462,6 +467,16 @@ namespace FT
 			FST::NODE()
 		);
 
+		FST::FST fst21(lexem, 7,		// repeat cycle
+			FST::NODE(1, FST::RELATION('r', 1)),
+			FST::NODE(1, FST::RELATION('e', 2)),
+			FST::NODE(1, FST::RELATION('p', 3)),
+			FST::NODE(1, FST::RELATION('e', 4)),
+			FST::NODE(1, FST::RELATION('a', 5)),
+			FST::NODE(1, FST::RELATION('t', 6)),
+			FST::NODE()
+		);
+
 		if (FST::execute(fst1) == -1) return LEX_INTEGER; // integer
 		else if (FST::execute(fst2) == -1) return LEX_STRING; // string
 		else if (FST::execute(fst3) == -1) return LEX_FUNCTION;
@@ -506,6 +521,7 @@ namespace FT
 		else if (FST::execute(fst18) == -1) return LEX_NUMBER; // number
 		else if (FST::execute(fst19) == -1) return LEX_MAIN; // main
 		else if (FST::execute(fst20) == -1) return LEX_PRINT_STR; // main
+		else if (FST::execute(fst21) == -1) return 'w'; // repeat cycle
 		else return LEX_ID;
 	}
 
