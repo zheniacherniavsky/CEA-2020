@@ -25,7 +25,7 @@ EXTRN ConvertToChar : PROC
 	     _c2	BYTE	"is ",0
 	     _c3	BYTE	"Zhenia!",0
 	     _c4	SDWORD	10
-	     _c5	SDWORD	3
+	     _c5	SDWORD	123
 	     _c6	BYTE	" Age is: ",0
 	     _c7	SDWORD	0
 .CODE

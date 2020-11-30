@@ -40,6 +40,12 @@ namespace SemAnalyzer
 				case LEX_ID:
 					element = IT::GetEntry(it, lexem->idxTI);
 					std::cout << getType(element);
+
+					if (!element->declared && !f.declare && element->idtype == IT::V)
+					{
+						errorCount++;
+						errorMessage = "ВЫЗОВ НЕОБЪЯВЛЕННОЙ ПЕРЕМЕННОЙ";
+					}
 					
 					if (expressionType == IT::EMPTY) expressionType = element->iddatatype;
 					if (f.returnExpression)
