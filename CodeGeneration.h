@@ -13,6 +13,7 @@
 #define CODE_PUSH {codeAsm << "\n\tpush\t" << '_' << itElement->id;}
 #define CODE_PUSH_OFFSET {codeAsm << "\n\tpush \toffset " << '_' << itElement->id;}
 #define CODE_PLUS {codeAsm << "\n\tpop\teax\n\tpop\tebx\n\tadd\teax,\tebx\n\tpush\teax";}
+#define CODE_PLUS_STR {codeAsm << "\n\tcall strcon\n\tjo EXIT_OVERFLOW\n\tpush\teax";}
 #define CODE_MUL {codeAsm << "\n\tpop\teax\n\tpop\tebx\n\timul\tebx\n\tpush\teax";}
 #define CODE_DIV {codeAsm << "\n\tpop ebx\n\tpop eax\n\ttest ebx,ebx\n\tjz EXIT_DIV_ON_NULL\n\tcdq\n\tidiv ebx\n\tpush eax";}
 #define CODE_DIFF {codeAsm << "\n\tpop eax\n\tneg eax\n\tpop ebx\n\tadd eax, ebx\n\tjo EXIT_OVERFLOW\n\tpush eax";}

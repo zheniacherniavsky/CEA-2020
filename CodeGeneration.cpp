@@ -16,6 +16,7 @@ namespace CG
 		codeAsm << "EXTRN outint : PROC\n";
 		codeAsm << "EXTRN outstr : PROC\n";
 		codeAsm << "EXTRN copystr : PROC\n";
+		codeAsm << "EXTRN strcon : PROC\n";
 		
 		codeAsm << "\n.STACK 4096\n"; // stack
 
@@ -90,8 +91,6 @@ namespace CG
 		codeAsm << "cea2020 PROC\n";	// when we found enter point !!!
 										// we start making expressions !!!
 
-		
-
 		while (element->next)
 		// this cycle is lined cycle, it mean we get line and think that line is expression.
 		// by this way we can remember our variables, and it is simple to understand... for me.
@@ -151,6 +150,7 @@ namespace CG
 
 				case(LEX_PLUS):
 					if (first_var_type == IT::INT) CODE_PLUS
+					else if (first_var_type == IT::STR) CODE_PLUS_STR
 					break;
 				case(LEX_MINUS):
 					if (first_var_type == IT::INT) CODE_DIFF

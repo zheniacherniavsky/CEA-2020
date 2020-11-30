@@ -8,17 +8,21 @@ ExitProcess PROTO, :DWORD
 EXTRN outint : PROC
 EXTRN outstr : PROC
 EXTRN copystr : PROC
+EXTRN strcon : PROC
 
 .STACK 4096
 .DATA
-	     _a	SDWORD	0
-	     _b	SDWORD	0
+	     _a	BYTE 255 DUP(0)
+	     _b	BYTE 255 DUP(0)
+	     _c	BYTE 255 DUP(0)
 .CONST
 	overflow db 'ERROR: VARIABLE OVERFLOW', 0
 	null_division db 'ERROR: DIVISION BY ZERO', 0
-	     _c1	SDWORD	10
-	     _c2	SDWORD	20
-	     _c3	SDWORD	0
+	     _c1	BYTE	"this ",0
+	     _c2	BYTE	"is ",0
+	     _c3	BYTE	"Zhenia!",0
+	     _c4	BYTE	"",0
+	     _c5	SDWORD	0
 .CODE
 
 start:
@@ -32,41 +36,39 @@ main ENDP
 cea2020 PROC
 
 
-	; // this is _a expression! int
-	push 0
-	pop	_a
+	; // this is _a expression! str
+	push 	offset _c1
+	push	offset _a
+	call copystr
+	
 
+	; // this is _b expression! str
+	push 	offset _c2
+	push	offset _b
+	call copystr
+	
 
-	; // this is _b expression! int
-	push 0
-	pop	_b
-
-
-	; // this is _a expression! int
-	push	_c1
-	pop	_a
-
-
-	; // this is _b expression! int
-	push	_c2
-	pop	_b
-
-
-	; // this is _b expression! int
-	push	_b
-	push	_a
-	pop eax
-	neg eax
-	pop ebx
-	add eax, ebx
+	; // this is _c expression! str
+	push 	offset _a
+	push 	offset _b
+	call strcon
 	jo EXIT_OVERFLOW
-	push eax
-	pop	_b
+	push	eax
+	push 	offset _c3
+	call strcon
+	jo EXIT_OVERFLOW
+	push	eax
+	push 	offset _c4
+	call strcon
+	jo EXIT_OVERFLOW
+	push	eax
+	push	offset _c
+	call copystr
+	
+	push 	offset _c
+	call	outstr ; // at console
 
-	push	_b
-	call	outint ; // at console
-
-	push	_c3	; // this is return of function: main
+	push	_c5	; // this is return of function: main
 
 	jmp EXIT
 
