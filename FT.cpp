@@ -127,7 +127,7 @@ namespace FT
 				}
 			case(LEX_NUMBER):
 				lexemSymbol = LEX_ID;
-				if(!flag._string) flag._number = true;
+				flag._number = true;
 				flag._literal = true;
 				break;
 			case(LEX_MAIN): // точка входа main, соотв. область видимости повышаем на единицу
