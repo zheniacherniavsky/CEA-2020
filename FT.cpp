@@ -22,6 +22,7 @@ namespace FT
 		bool _string		= false; // string
 		bool _hesisIsOpen	= false; // открытие закрытие скобок для отличения параметров от функции
 		bool _functionParms = false;
+		bool _getFuncIdx	= false;
 		bool _return		= false;
 		bool _repeat		= false;
 
@@ -68,6 +69,7 @@ namespace FT
 		short visibArea = 0;						// область видимости
 		flags flag;									// флажки
 		int literalCount = 1;						// отслеживание количества литералов
+		int functionIdxMemory = -1;
 
 		
 		int linePos = 0;	// позиция лексемы в строке
@@ -80,6 +82,7 @@ namespace FT
 			char lexemID[ID_MAXSIZE]; // айди лексемы
 			for (int i = 0; i < ID_MAXSIZE; i++)
 				lexemID[i] = lexem[i];
+			lexemID[ID_MAXSIZE - 1] = 0x00;
 
 			IT::Entry itElement; // создаю элемент таблицы идентификаторов
 			itElement.idxTI = IT_NULL_IDX;
@@ -95,6 +98,7 @@ namespace FT
 				lexem[5] = 0x00;
 				stkFunc.push(lexem);
 				flag._functionName = false;
+				flag._getFuncIdx = true;
 			}
 
 			switch (lexemSymbol)
@@ -144,6 +148,7 @@ namespace FT
 				{
 					visibArea--;
 					flag._functionParms = false;
+					functionIdxMemory = -1;
 				}
 				break;
 			case(LEX_SEMICOLON):
@@ -174,6 +179,13 @@ namespace FT
 			case(LEX_RETURN):
 				flag._return = true;
 				break;
+			case(LEX_COMMA):
+				if (flag._functionParms)
+				{
+					flag._integer = false;
+					flag._string = false;
+				}
+				break;
 			}
 
 			if (lexemSymbol == LEX_ID)
@@ -195,8 +207,6 @@ namespace FT
 				}
 				else if (!flag._literal) _idtype = IT::V; // переменная
 				else _idtype = IT::L; // литерал
-
-
 
 				// проверка на наличие в табллице
 				int checkIdx = NULL;
@@ -295,6 +305,7 @@ namespace FT
 						else if (flag._string) itElement.iddatatype = IT::STR;
 					}
 
+
 					IT::Add(it, itElement);
 					flag._declare = false;
 				}
@@ -302,6 +313,19 @@ namespace FT
 
 			// заполнение таблицы лексем
 			ltElement.sn = posArray[pos++];
+
+			if (flag._functionParms && lexemSymbol == LEX_ID && functionIdxMemory != -1)
+			{
+				LT::Entry* ptrFunc = LT::GetEntryByIdx(lt, functionIdxMemory);
+				ptrFunc->func.memoryType[ptrFunc->func.memoryCount] = itElement.iddatatype;
+				ptrFunc->func.memoryCount++;
+			}
+
+			if (flag._getFuncIdx)
+			{
+				functionIdxMemory = ltElement.idxTI;
+				flag._getFuncIdx = false;
+			}
 
 			ltElement.lexema[0] = lexemSymbol;
 			LT::Add(lt, ltElement);
@@ -551,6 +575,15 @@ namespace FT
 				std::cout << element->lexema[0];
 				if (element->idxTI != IT_NULL_IDX)
 					std::cout << '<' << element->idxTI << '>';
+				if (element->func.memoryCount != 0)
+				{
+					std::cout << '[' << element->func.memoryCount << ']';
+					for (int i = 0; i < element->func.memoryCount; i++)
+					{
+						if (element->func.memoryType[i] == IT::STR) std::cout << " STR ";
+						else if (element->func.memoryType[i] == IT::INT) std::cout << " INT ";
+					}
+				}
 				element = element->next;
 			}
 			std::cout << '\n';

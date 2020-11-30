@@ -28,4 +28,5 @@ namespace SemAnalyzer
 {
 	bool semAnalyzer(LT::LexTable lt, IT::IdTable it);
 	const char* getType(IT::Entry* element);
+	const char* getType(IT::IDDATATYPE type);
 }

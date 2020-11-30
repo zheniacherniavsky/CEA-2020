@@ -103,8 +103,12 @@ namespace IT
 
 	bool equal(char a[ID_MAXSIZE], char b[ID_MAXSIZE])
 	{
-		for (int i = 0; i < ID_MAXSIZE; i++)
-			if (a[i] != b[i]) return false;
-		return true;
+		if (strlen(a) != strlen(b)) return false;
+		else
+		{
+			for (int i = 0; i < strlen(b); i++)
+				if (a[i] != b[i]) return false;
+			return true;
+		}
 	}
 }

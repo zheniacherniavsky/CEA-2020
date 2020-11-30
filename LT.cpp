@@ -51,6 +51,10 @@ namespace LT
 			if (LT.size <= LT.maxsize) LT.size++;
 			// else throw "ЖЕКА НЕ ЗАБУДЬ ОШИБКУ ДОПИСАТЬ"
 
+			LT.table->func.memoryCount = 0;
+			for(int i = 0; i < 4; i++)
+				LT.table->func.memoryType[i] = IT::EMPTY;
+
 			LT.table->idxTI = entry.idxTI;
 			LT.table->sn = entry.sn;
 			LT.table->priority = entry.priority;
@@ -94,6 +98,19 @@ namespace LT
 		}
 		if (element) return element->sn;
 		else return 0;
+	}
+
+	Entry* GetEntryByIdx(LexTable& lextable, int idx)
+	{
+		Entry* element = new Entry();
+
+		element = lextable.head;
+		while (element)
+		{
+			if (element->idxTI == idx) return element;
+			else element = element->next;
+		}
+		return NULL;
 	}
 
 	void Delete(LexTable& LT)

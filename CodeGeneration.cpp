@@ -18,9 +18,8 @@ namespace CG
 		codeAsm << "EXTRN copystr : PROC\n";
 		codeAsm << "EXTRN strcon : PROC\n";
 		codeAsm << "EXTRN ConvertToChar : PROC\n";
-		
-		codeAsm << "\n.STACK 4096\n"; // stack
 
+		codeAsm << "\n.STACK 4096\n"; // stack
 
 		CreateDataSegment(it, codeAsm);
 		CreateConstSegment(it, codeAsm);
@@ -36,7 +35,7 @@ namespace CG
 		IT::Entry* element = it.head;
 		while (element)
 		{
-			if (element->idtype == IT::V || element->idtype == IT::P)
+			if (element->idtype == IT::V)
 				switch (element->iddatatype)
 				{
 				case(IT::INT): DATA_WRITE_INT; break;
@@ -68,6 +67,8 @@ namespace CG
 	struct flags
 	{
 		bool repeat = false;
+		bool enterPoint = false;
+		bool function = false;
 	};
 
 	void CreateCodeSegment(IT::IdTable& it, LT::LexTable lt, std::ofstream& codeAsm)
@@ -82,29 +83,52 @@ namespace CG
 
 		IT::Entry* itElement = new IT::Entry();
 		LT::Entry* element = lt.head;
-		
-		while (element->lexema[0] != 'm')
-		{
-			// functionsssss, idk how it do now lol
-			element = element->next;
-		}
 
-		codeAsm << "cea2020 PROC\n";	// when we found enter point !!!
-										// we start making expressions !!!
+		char* functionName = NULL;
 
 		while (element->next)
 		// this cycle is lined cycle, it mean we get line and think that line is expression.
 		// by this way we can remember our variables, and it is simple to understand... for me.
 		// this algorythm like at SemAnalyzer.h 
 		{
+			if (element->lexema[0] == 'm')
+			{
+				f.enterPoint = true;
+				codeAsm << "\n\ncea2020 PROC\n";
+			}
+
 			char* id_of_first_var = NULL;
+
 			IT::IDDATATYPE first_var_type = IT::EMPTY;
 			while (element)
 			{
-
-
 				switch (element->lexema[0])
 				{
+				case('f'):
+					element = element->next; // function -> i
+					itElement = IT::GetEntry(it, element->idxTI);
+
+					functionName = new char();
+					for (int i = 0; i < strlen(itElement->visibility.functionName); i++)
+						functionName[i] = itElement->visibility.functionName[i];
+					functionName[strlen(itElement->visibility.functionName)] = 0x00;
+					element = element->next; // i -> (
+					f.function = true;
+					codeAsm << functionName << " PROC ";
+					while (element->lexema[0] != ')')
+					{
+						if (element->lexema[0] == LEX_ID)
+						{
+							itElement = IT::GetEntry(it, element->idxTI);
+							codeAsm << itElement->visibility.functionName << "_" << itElement->id << " :";
+							if (itElement->iddatatype == IT::INT) codeAsm << "SDWORD";
+							else if (itElement->iddatatype == IT::STR) codeAsm << "DWORD";
+							if (element->next->lexema[0] != ')') codeAsm << ", ";
+						}
+						element = element->next;
+					}
+					codeAsm << "\n";
+					break;
 				case('c'):
 					element = element->next; // itos -> (
 					element = element->next; // ( -> INT var
@@ -121,21 +145,32 @@ namespace CG
 					codeAsm << "\nREPEAT " << itElement->value.vint;
 					break;
 				case(LEX_RETURN): // r i ; return exception
-					element = element->next; // r -> i
-					itElement = IT::GetEntry(it, element->idxTI);
-					CODE_PUSH // push i
+					if (f.function)
+					{
+						element = element->next; // r -> i
+						itElement = IT::GetEntry(it, element->idxTI);
+						if (itElement->iddatatype == IT::INT) codeAsm << "\n\tpush " << itElement->visibility.functionName << '_' << itElement->id;
+						else if (itElement->iddatatype == IT::STR) codeAsm << "\n\tmov eax, offset " << itElement->visibility.functionName << '_' << itElement->id << "\n\tpush\teax";
+						codeAsm << "\n\tret";
+					}
+					else if (f.enterPoint)
+					{
+						element = element->next; // r -> i
+						itElement = IT::GetEntry(it, element->idxTI);
+						if (itElement->iddatatype == IT::INT) CODE_PUSH // push i
+						else if (itElement->iddatatype == IT::STR) CODE_PUSH_OFFSET // push i
+					}
 					codeAsm << "\t; // this is return of function: " << itElement->visibility.functionName << '\n';
-					element = element->next; // i -> ; (then this semicolon go to next lexem)
 					break;
-
 				case(LEX_ID):
 				case(LEX_LITERAL):
+				case('@'):
 					itElement = IT::GetEntry(it, element->idxTI);
 					if (id_of_first_var == NULL)
 					{
 						if (element->next->lexema[0] == ';' && itElement->iddatatype == IT::STR) break;
 
-						codeAsm << "\n\n\t; // this is _" << itElement->id << " expression!";
+						codeAsm << "\n\n\t; // this is " << itElement->visibility.functionName << '_' << itElement->id << " expression!";
 						if (itElement->iddatatype == IT::INT)
 							codeAsm << " int";
 						else if (itElement->iddatatype == IT::STR) codeAsm << " str";
@@ -147,16 +182,35 @@ namespace CG
 
 						first_var_type = itElement->iddatatype;
 
-						if (element->next->lexema[0] == LEX_SEMICOLON) codeAsm << "\n\tpush 0";
+						// if (element->next->lexema[0] == LEX_SEMICOLON) codeAsm << "\n\tpush 0";
 						break;
 					}
-					else
+					else if (element->lexema[0] != '@')
 					{
 						if (first_var_type == IT::INT) CODE_PUSH
+						else if (f.function && first_var_type == IT::STR) CODE_PUSH_OFFSET_FUNC
 						else if (first_var_type == IT::STR) CODE_PUSH_OFFSET
 						break;
 					}
+					else if (element->lexema[0] == '@')
+					{
+						char* fname = new char();
+						itElement = IT::GetEntry(it, element->idxTI);
+						for (int i = 0; i < strlen(itElement->visibility.functionName); i++)
+							fname[i] = itElement->visibility.functionName[i];
+						fname[strlen(itElement->visibility.functionName)] = 0x00;
 
+						for (int i = element->func.count - 1; i >= 0; i--)
+						{
+							itElement = IT::GetEntry(it, element->func.idx[i]);
+							if (first_var_type == IT::INT) CODE_PUSH
+							else if (first_var_type == IT::STR) CODE_PUSH_OFFSET
+						}
+
+						codeAsm << "\n\tcall\t" << fname;
+						codeAsm << "\n\tpush\teax";
+						break;
+					}
 				case(LEX_PLUS):
 					if (first_var_type == IT::INT) CODE_PLUS
 					else if (first_var_type == IT::STR) CODE_PLUS_STR
@@ -197,6 +251,7 @@ namespace CG
 					{
 						if (first_var_type == IT::INT) CODE_POP
 						else if (first_var_type == IT::STR) CODE_POP_STR
+						break;
 					}
 					else break;
 				case(LEX_BRACELET):
@@ -204,6 +259,12 @@ namespace CG
 					{
 						f.repeat = false;
 						codeAsm << "\nENDM\n";
+					}
+					else if (f.function)
+					{
+						f.function = false;
+						codeAsm << functionName << " ENDP\n\n";
+						functionName = NULL;
 					}
 					break;
 				}
@@ -216,8 +277,8 @@ namespace CG
 			element = element->next;
 		}
 
-		codeAsm << "\n\tjmp EXIT\n\nEXIT_DIV_ON_NULL:\n\tpush offset null_division\n\tcall outstr\n\tpush - 1\n\tcall ExitProcess";
-		codeAsm << "\n\nEXIT_OVERFLOW:\n\tpush offset overflow\n\tcall outstr\n\tpush - 2\n\tcall ExitProcess\n\n\tEXIT:";
-		codeAsm << "\tcall ExitProcess\ncea2020 ENDP\nEND start";
+		codeAsm << "\n\tjmp EXIT\ncea2020 ENDP\n\nEXIT_DIV_ON_NULL:\n\tpush offset null_division\n\tcall outstr\n\tpush - 1\n\tcall ExitProcess";
+		codeAsm << "\n\nEXIT_OVERFLOW:\n\tpush offset overflow\n\tcall outstr\n\tpush - 2\n\tcall ExitProcess\n\nEXIT:";
+		codeAsm << "\tcall ExitProcess\n\nEND start";
 	}
 }

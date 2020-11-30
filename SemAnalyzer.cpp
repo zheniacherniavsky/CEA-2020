@@ -16,6 +16,7 @@ namespace SemAnalyzer
 		bool itos = false;
 	};
 
+
 	bool semAnalyzer(LT::LexTable lt, IT::IdTable it)
 	{
 		LT::Entry *lexem = lt.head; // таблица лексем
@@ -38,8 +39,10 @@ namespace SemAnalyzer
 				{
 				case LEX_LITERAL:
 				case LEX_ID:
+				case('@'):
 					element = IT::GetEntry(it, lexem->idxTI);
 					std::cout << getType(element);
+
 
 					if (!element->declared && !f.declare && element->idtype == IT::V)
 					{
@@ -64,6 +67,28 @@ namespace SemAnalyzer
 					}
 					else if (f.expression)
 					{
+						if (lexem->lexema[0] == '@') // function check types
+						{
+							std::cout << "[";
+							for (int i = 0; i < lexem->func.memoryCount; i++)
+							{
+								IT::Entry* checkType = IT::GetEntry(it, lexem->func.idx[i]);
+								if (lexem->func.count != lexem->func.memoryCount)
+								{
+									errorCount++;
+									errorMessage = "НЕДОСТАТОЧНО ВЫЗЫВАЕМЫХ ПАРАМЕТРОВ";
+								}
+								std::cout << getType(lexem->func.memoryType[i]) << "=" << getType(checkType) << " ";
+
+								if (lexem->func.memoryType[i] != checkType->iddatatype)
+								{
+									errorCount++;
+									errorMessage = "ОШИБКА В ПАРАМЕТРАХ ВЫЗЫВАЕМОЙ ФУНКЦИИ. НЕ СОВПАДАЮТ ТИПЫ";
+								}
+							}
+							std::cout << ']';
+						}
+
 						if(element->iddatatype != expressionType && !f.itos)
 						{
 							errorCount++;
@@ -108,6 +133,7 @@ namespace SemAnalyzer
 				}
 
 				std::cout << lexem->lexema[0];
+
 				if (lexem->next && lexem->sn == lexem->next->sn) lexem = lexem->next;
 				else break;
 			} 
@@ -128,6 +154,15 @@ namespace SemAnalyzer
 	const char* getType(IT::Entry* element)
 	{
 		switch (element->iddatatype)
+		{
+		case IT::INT: return " INT:"; break;
+		case IT::STR: return " STR:"; break;
+		}
+	}
+
+	const char* getType(IT::IDDATATYPE type)
+	{
+		switch (type)
 		{
 		case IT::INT: return " INT:"; break;
 		case IT::STR: return " STR:"; break;

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "IT.h"
+
 #define LEXEMA_FIXSIZE 1 // фиксированный размер лексемы
 #define LT_MAXSIZE 4096 // максимальное кол-во строк в таблице лексем
 #define LT_FUNCTION_MAX_PARMS 8 // максимальное кол-во параметров в функции
@@ -42,8 +44,10 @@ namespace LT // таблица лексем
 
 		struct funcParms
 		{
-			int count;
+			int count = 0;
 			int idx[LT_FUNCTION_MAX_PARMS];
+			int memoryCount = 0;
+			IT::IDDATATYPE memoryType[4] = {IT::EMPTY, IT::EMPTY, IT::EMPTY, IT::EMPTY };
 		} func;
 
 		int updateIndex(int i); // обновление индекса идентификатора
@@ -70,6 +74,8 @@ namespace LT // таблица лексем
 		LexTable& lextable, // откуда , т.е. табл. лексем
 		int n // номер получаемой строки
 	);
+
+	Entry* GetEntryByIdx(LexTable& lextable, int idx);
 
 	int getSnByPos(LexTable& lex, int pos); // получить номер строки по ноеру элемента в таблице
 

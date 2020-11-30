@@ -7,7 +7,7 @@
 
 namespace PN
 {
-	void addResult(LT::Entry& result, LT::Entry& lentaElement, IT::IdTable& idTable);
+	void addResult(LT::Entry& result, LT::Entry& lentaElement, IT::IdTable& idTable, LT::LexTable& ltTable);
 	void addResult(LT::Entry& result, LT::Entry& lentaElement, bool memory = false);
 	void addToStack(std::stack<LT::Entry*>& stack, LT::Entry* result, LT::Entry* element);
 
@@ -42,7 +42,7 @@ namespace PN
 					{
 					case LEX_ID:
 					case LEX_LITERAL:
-						addResult(*result, *lenta, idTable);
+						addResult(*result, *lenta, idTable, lexTable);
 						if (!saved)
 						{
 							resultHead = result;	// сохраняю начало цепочки
@@ -69,13 +69,14 @@ namespace PN
 		}
 	}
 
-	void addResult(LT::Entry& result, LT::Entry& lentaElement, IT::IdTable& idTable)
+	void addResult(LT::Entry& result, LT::Entry& lentaElement, IT::IdTable& idTable, LT::LexTable& ltTable)
 	{
 		switch (lentaElement.lexema[0])
 		{
 		case(LEX_ID):
 			if (IT::GetEntry(idTable, lentaElement.idxTI)->idtype == IT::F)
 			{
+				LT::Entry* function = LT::GetEntryByIdx(ltTable, lentaElement.idxTI);
 				int parms = 0;
 				result.idxTI = lentaElement.idxTI;
 				result.sn = lentaElement.sn;
@@ -90,6 +91,9 @@ namespace PN
 				}
 				result.func.count = parms;
 				result.lexema[0] = '@';
+				result.func.memoryCount = function->func.memoryCount;
+				for (int i = 0; i < function->func.memoryCount; i++)
+					result.func.memoryType[i] = function->func.memoryType[i];
 				result.next = new LT::Entry();
 				result.priority = 0;
 				break;
