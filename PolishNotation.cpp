@@ -22,7 +22,7 @@ namespace PN
 
 		while (lenta->next != NULL)
 		{
-			if (lenta->lexema[0] == LEX_IS || lenta->lexema[0] == LEX_RETURN)
+			if (lenta->lexema[0] == LEX_IS && lenta->next->lexema[0] != 'c' || lenta->lexema[0] == LEX_RETURN)
 			{
 				// обработка польской записи
 				LT::Entry* result = new LT::Entry();

@@ -13,6 +13,7 @@ namespace SemAnalyzer
 		bool returnExpression = false;
 		bool main = false;
 		bool repeat = false;
+		bool itos = false;
 	};
 
 	bool semAnalyzer(LT::LexTable lt, IT::IdTable it)
@@ -57,7 +58,7 @@ namespace SemAnalyzer
 					}
 					else if (f.expression)
 					{
-						if(element->iddatatype != expressionType)
+						if(element->iddatatype != expressionType && !f.itos)
 						{
 							errorCount++;
 							errorMessage = "НЕ СОВПАДАЮТ ТИПЫ ВЫРАЖЕНИЯ";
@@ -94,6 +95,9 @@ namespace SemAnalyzer
 					break;
 				case('w'):
 					f.repeat = true;
+					break;
+				case('c'):
+					f.itos = true;
 					break;
 				}
 

@@ -34,12 +34,14 @@ namespace GRB
 			Rule::Chain(5, TS('i'), TS('='), NS('E'), TS(';'), NS('N'))
 		),
 		Rule(NS('E'), GRB_ERROR_SERIES + 2, // ошибка в выражении 
-			9,
+			11,
 			Rule::Chain(1, TS('i')),
 			Rule::Chain(1, TS('l')),
 			Rule::Chain(3, TS('('), NS('E'), TS(')')),
 			Rule::Chain(3, TS('i'), TS('('), TS(')')),
 			Rule::Chain(4, TS('i'), TS('('), NS('W'), TS(')')),
+			Rule::Chain(4, TS('c'), TS('('), TS('i'), TS(')')),
+			Rule::Chain(5, TS('c'), TS('('), TS('i'), TS(')'), NS('N')),
 			Rule::Chain(2, TS('i'), NS('M')),
 			Rule::Chain(2, TS('l'), NS('M')),
 			Rule::Chain(4, TS('('), NS('E'), TS(')'), NS('M')),

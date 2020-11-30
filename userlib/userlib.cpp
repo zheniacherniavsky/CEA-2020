@@ -25,31 +25,27 @@ extern "C"
 			return strcpy(str1, str2);
 	}
 
-	char* ConvertToChar(int number) { // ty KBroomy, ily
-		if (number == 0)
-			return (char*)"0";
-		char* temp = (char*)calloc(255, sizeof(char));
-		char* buffer = (char*)calloc(255, sizeof(char));
-		if (temp == NULL)
-			return NULL;
-		if (buffer == NULL)
-			return NULL;
+	char* ConvertToChar(int number) {
 
-		int bin = 0, i = 1;
-		while (number) {
-			bin += (number % 2) * i;
-			i *= 10;
-			number /= 2;
+		char* buffer = (char*)calloc(5, sizeof(char));
+		int pos = 100; // max num value is 255
+		for (int i = 0; pos != 0; i++, pos /= 10)
+		{
+			if (number / pos == 0) { i--; continue; };
+			switch ((number / pos) % 10)
+			{
+			case(0): buffer[i] = '0'; break;
+			case(1): buffer[i] = '1'; break;
+			case(2): buffer[i] = '2'; break;
+			case(3): buffer[i] = '3'; break;
+			case(4): buffer[i] = '4'; break;
+			case(5): buffer[i] = '5'; break;
+			case(6): buffer[i] = '6'; break;
+			case(7): buffer[i] = '7'; break;
+			case(8): buffer[i] = '8'; break;
+			case(9): buffer[i] = '9'; break;
+			}
 		}
-		i = 0;
-		while (bin) {
-			temp[i++] = (bin % 10) + '0';
-			bin /= 10;
-		}
-		temp[i] = '\0';
-
-		for (size_t i = 0, j = strlen(temp) - 1; i < strlen(temp); i++, j--)
-			buffer[i] = temp[j];
 		return buffer;
 	}
 
@@ -73,7 +69,7 @@ extern "C"
 
 	char* strcon(char* str1, char* str2)
 	{
-		char* buf = new char[255];
+		char* buf = (char*)calloc(255, sizeof(char));
 		if (!str1 || !str2)
 		{
 			std::cout << "ERROR: Null string in strcon function!!!" << std::endl;

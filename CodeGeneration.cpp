@@ -17,6 +17,7 @@ namespace CG
 		codeAsm << "EXTRN outstr : PROC\n";
 		codeAsm << "EXTRN copystr : PROC\n";
 		codeAsm << "EXTRN strcon : PROC\n";
+		codeAsm << "EXTRN ConvertToChar : PROC\n";
 		
 		codeAsm << "\n.STACK 4096\n"; // stack
 
@@ -104,6 +105,14 @@ namespace CG
 
 				switch (element->lexema[0])
 				{
+				case('c'):
+					element = element->next; // itos -> (
+					element = element->next; // ( -> INT var
+					itElement = IT::GetEntry(it, element->idxTI);
+					CODE_PUSH // push INT
+					codeAsm << "\n\tcall\tConvertToChar\n\tpush\teax";
+					element = element->next; // INT -> )
+					break;
 				case('w'):
 					f.repeat = true;
 					element = element->next; // repeat -> (

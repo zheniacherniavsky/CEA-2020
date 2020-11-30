@@ -196,6 +196,8 @@ namespace FT
 				else if (!flag._literal) _idtype = IT::V; // переменная
 				else _idtype = IT::L; // литерал
 
+
+
 				// проверка на наличие в табллице
 				int checkIdx = NULL;
 
@@ -477,6 +479,14 @@ namespace FT
 			FST::NODE()
 		);
 
+		FST::FST fst22(lexem, 5,		// convert into to string
+			FST::NODE(1, FST::RELATION('i', 1)),
+			FST::NODE(1, FST::RELATION('t', 2)),
+			FST::NODE(1, FST::RELATION('o', 3)),
+			FST::NODE(1, FST::RELATION('s', 4)),
+			FST::NODE()
+		);
+
 		if (FST::execute(fst1) == -1) return LEX_INTEGER; // integer
 		else if (FST::execute(fst2) == -1) return LEX_STRING; // string
 		else if (FST::execute(fst3) == -1) return LEX_FUNCTION;
@@ -522,6 +532,7 @@ namespace FT
 		else if (FST::execute(fst19) == -1) return LEX_MAIN; // main
 		else if (FST::execute(fst20) == -1) return LEX_PRINT_STR; // main
 		else if (FST::execute(fst21) == -1) return 'w'; // repeat cycle
+		else if (FST::execute(fst22) == -1) return 'c'; // convert int to string
 		else return LEX_ID;
 	}
 
