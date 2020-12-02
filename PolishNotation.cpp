@@ -22,7 +22,7 @@ namespace PN
 
 		while (lenta->next != NULL)
 		{
-			if (lenta->lexema[0] == LEX_IS && lenta->next->lexema[0] != 'c' || lenta->lexema[0] == LEX_RETURN)
+			if (lenta->lexema[0] == LEX_IS)
 			{
 				// обработка польской записи
 				LT::Entry* result = new LT::Entry();
@@ -31,13 +31,21 @@ namespace PN
 														// чтобы сцепить цепочки
 
 				bool saved = false;
+				bool specialFunction = false;
 
 				while(lenta->lexema[0] != LEX_SEMICOLON)
 				{
 					if (result->lexema[0] != NULL && saved) result = result->next;
-					
+					lenta = lenta->next; // = -> expression
 
-					lenta = lenta->next;
+					if (lenta->lexema[0] == 'q' ||
+						lenta->lexema[0] == '^' ||
+						lenta->lexema[0] == 'c' )
+					{
+						specialFunction = true;
+						break;
+					}
+
 					switch (lenta->lexema[0])
 					{
 					case LEX_ID:
@@ -57,13 +65,17 @@ namespace PN
 					case LEX_STAR:
 					case LEX_DIRSLASH:
 					case LEX_SEMICOLON:
+					case('%'):
 						addToStack(stack, result, lenta);
 						if (result->lexema[0] != NULL) result = result->next;
 						break;
 					}
 				}
-				*unionChain = *resultHead;
-				*lenta = *unionChain;
+				if (!specialFunction)
+				{
+					*unionChain = *resultHead;
+					*lenta = *unionChain;
+				}
 			}
 			lenta = lenta->next; // следующее выражение
 		}
@@ -154,6 +166,7 @@ namespace PN
 			break;
 		case LEX_STAR:
 		case LEX_DIRSLASH:
+		case('%'):
 			if (stack.empty() || element->priority > stack.top()->priority)
 				stack.push(element);
 			else

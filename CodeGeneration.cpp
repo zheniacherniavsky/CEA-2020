@@ -17,6 +17,8 @@ namespace CG
 		codeAsm << "EXTRN outstr : PROC\n";
 		codeAsm << "EXTRN copystr : PROC\n";
 		codeAsm << "EXTRN strcon : PROC\n";
+		codeAsm << "EXTRN powN : PROC\n";
+		codeAsm << "EXTRN rootN : PROC\n";
 		codeAsm << "EXTRN ConvertToChar : PROC\n";
 
 		codeAsm << "\n.STACK 4096\n"; // stack
@@ -82,6 +84,8 @@ namespace CG
 		codeAsm << "; ---------- - Function definitions--------------------\n\n\n";
 
 		IT::Entry* itElement = new IT::Entry();
+		IT::Entry* firstArg = new IT::Entry();
+		IT::Entry* secondArg = new IT::Entry();
 		LT::Entry* element = lt.head;
 
 		char* functionName = NULL;
@@ -104,6 +108,38 @@ namespace CG
 			{
 				switch (element->lexema[0])
 				{
+				case('^'):	// pow(Q, Q) function with 2 agrs
+					element = element->next; // ^ -> (
+					element = element->next; // ( -> Q
+					firstArg = IT::GetEntry(it, element->idxTI);
+					element = element->next; // i -> ,
+					element = element->next; // , -> i
+					secondArg = IT::GetEntry(it, element->idxTI);
+					// stdcall -> we push second arg, then first arg!!
+					codeAsm << "\n\tpush\t" << secondArg->visibility.functionName
+						<< '_' << secondArg->id;
+					codeAsm << "\n\tpush\t" << firstArg->visibility.functionName
+						<< '_' << firstArg->id;
+					codeAsm << "\n\tcall\tpowN";
+					codeAsm << "\n\tpush\teax";
+					element = element->next; // i -> )
+					break;
+				case('q'):	// root(Q, Q) function with 2 agrs
+					element = element->next; // q -> (
+					element = element->next; // ( -> Q
+					firstArg = IT::GetEntry(it, element->idxTI);
+					element = element->next; // i -> ,
+					element = element->next; // , -> i
+					secondArg = IT::GetEntry(it, element->idxTI);
+					// stdcall -> we push second arg, then first arg!!
+					codeAsm << "\n\tpush\t" << secondArg->visibility.functionName
+						<< '_' << secondArg->id;
+					codeAsm << "\n\tpush\t" << firstArg->visibility.functionName
+						<< '_' << firstArg->id;
+					codeAsm << "\n\tcall\trootN";
+					codeAsm << "\n\tpush\teax";
+					element = element->next; // i -> )
+					break;
 				case('f'):
 					element = element->next; // function -> i
 					itElement = IT::GetEntry(it, element->idxTI);
@@ -245,7 +281,9 @@ namespace CG
 				case(LEX_DIRSLASH):
 					CODE_DIV
 					break;
-
+				case('%'):
+					CODE_RDIV
+					break;
 				case(LEX_SEMICOLON):
 					if (id_of_first_var != NULL)
 					{

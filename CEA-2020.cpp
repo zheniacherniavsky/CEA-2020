@@ -87,7 +87,9 @@ int main(int argc, char* argv[])
 						std::cout << "\t\t" << line << std::endl;
 					assemblerFile.close();
 				}
-				
+
+				system("pause");
+				return 0;
 			}
 		}
 	}
@@ -99,9 +101,8 @@ int main(int argc, char* argv[])
 			Log::WriteError(log, e);
 			Log::Close(log);
 		}
+		return -1;
 	}
-	system("pause");
-	return 0;
 }
 
 void makeOutWithLT(LT::LexTable& table, IT::IdTable& it, bool showIDX, bool functionINFO)

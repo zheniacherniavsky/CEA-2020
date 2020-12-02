@@ -5,7 +5,7 @@
 namespace GRB
 {
 	Greibach greibach(NS('S'), TS('$'),
-		6,
+		7,
 		Rule(NS('S'), GRB_ERROR_SERIES + 0, // ошибка в структуре
 			6, // S -> m{NrE;}; | tfi(F){NrE;};S | tfi(F){NrE;}; | m{NrE;};S
 			Rule::Chain(5, TS('m'), TS('{'), NS('N'), TS('}'), TS(';')),
@@ -34,7 +34,7 @@ namespace GRB
 			Rule::Chain(5, TS('i'), TS('='), NS('E'), TS(';'), NS('N'))
 		),
 		Rule(NS('E'), GRB_ERROR_SERIES + 2, // ошибка в выражении 
-			11,
+			15,
 			Rule::Chain(1, TS('i')),
 			Rule::Chain(1, TS('l')),
 			Rule::Chain(3, TS('('), NS('E'), TS(')')),
@@ -45,14 +45,20 @@ namespace GRB
 			Rule::Chain(2, TS('i'), NS('M')),
 			Rule::Chain(2, TS('l'), NS('M')),
 			Rule::Chain(4, TS('('), NS('E'), TS(')'), NS('M')),
-			Rule::Chain(5, TS('i'), TS('('), NS('W'), TS(')'), NS('M'))
+			Rule::Chain(5, TS('i'), TS('('), NS('W'), TS(')'), NS('M')),
+
+			Rule::Chain(6, TS('^'), TS('('), NS('Q'), TS(','), NS('Q'), TS(')')),
+			Rule::Chain(6, TS('^'), TS('('), NS('Q'), TS(','), NS('Q'), TS(')')),
+			Rule::Chain(6, TS('q'), TS('('), NS('Q'), TS(','), NS('Q'), TS(')')),
+			Rule::Chain(6, TS('q'), TS('('), NS('Q'), TS(','), NS('Q'), TS(')'))
 		),
 		Rule(NS('M'), GRB_ERROR_SERIES + 3, // ошибка в выражении
-			4,
+			5,
 			Rule::Chain(2, TS('+'), NS('E')),
 			Rule::Chain(2, TS('-'), NS('E')),
 			Rule::Chain(2, TS('*'), NS('E')),
-			Rule::Chain(2, TS('/'), NS('E'))
+			Rule::Chain(2, TS('/'), NS('E')),
+			Rule::Chain(2, TS('%'), NS('E'))
 		),
 		Rule(NS('F'), GRB_ERROR_SERIES + 4, // ошибка в параметрах функции
 			2,		//F -> ti | ti,F
@@ -65,6 +71,11 @@ namespace GRB
 			Rule::Chain(1, TS('l')),
 			Rule::Chain(3, TS('i'), TS(','), NS('W')),
 			Rule::Chain(3, TS('l'), TS(','), NS('W'))
+		),
+		Rule(NS('Q'), GRB_ERROR_SERIES + 5, // ошибка в параметрах вызываемой функции
+			2,		//Q -> i | l 
+			Rule::Chain(1, TS('i')),
+			Rule::Chain(1, TS('l'))
 		)
 	);
 }

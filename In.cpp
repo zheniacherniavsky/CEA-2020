@@ -22,7 +22,7 @@ namespace In {
 
 	bool checkSeparators(string &code, char symbol) // функция проверки на лексемы отдельных символов
 	{
-		const char* separators = ";,()+-*/{}=";
+		const char* separators = ";,()+-*/{}=%";
 		for (int i = 0; i < strlen(separators); i++) {
 			if (separators[i] == symbol) 
 			{
@@ -73,8 +73,6 @@ namespace In {
 			bool _literal = false;
 			for (int i = 0, spaceControl = 0; i <= line.length(); i++)
 			{
-				if (checkSeparators(code, line[i])) continue; // добавление пробелов для разделения между лексемами
-
 				// проверка на литерал
 				if (line[i] == '\"' || line[i] == '\'')
 					_literal ? _literal = false : _literal = true;
@@ -83,7 +81,12 @@ namespace In {
 					code += '_';
 					continue;
 				}
-
+				
+				if (!_literal)
+				{
+					if (checkSeparators(code, line[i])) continue; // добавление пробелов для разделения между лексемами
+				}
+				
 				// Проверка символа на допустимость
 				int a = IN_CODE_TABLE[getAscii(line[i])];
 
