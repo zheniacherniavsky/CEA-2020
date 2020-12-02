@@ -39,8 +39,9 @@ namespace PN
 					lenta = lenta->next; // = -> expression
 
 					if (lenta->lexema[0] == 'q' ||
-						lenta->lexema[0] == '^' ||
-						lenta->lexema[0] == 'c' )
+						lenta->lexema[0] == '$' ||
+						lenta->lexema[0] == 'c' ||
+						lenta->lexema[0] == '~')
 					{
 						specialFunction = true;
 						break;
@@ -66,6 +67,8 @@ namespace PN
 					case LEX_DIRSLASH:
 					case LEX_SEMICOLON:
 					case('%'):
+					case('^'):
+					case('|'):
 						addToStack(stack, result, lenta);
 						if (result->lexema[0] != NULL) result = result->next;
 						break;
@@ -167,6 +170,8 @@ namespace PN
 		case LEX_STAR:
 		case LEX_DIRSLASH:
 		case('%'):
+		case('^'):
+		case('|'):
 			if (stack.empty() || element->priority > stack.top()->priority)
 				stack.push(element);
 			else

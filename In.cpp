@@ -22,7 +22,7 @@ namespace In {
 
 	bool checkSeparators(string &code, char symbol) // функция проверки на лексемы отдельных символов
 	{
-		const char* separators = ";,()+-*/{}=%";
+		const char* separators = ";,()+-*/{}=%^|~";
 		for (int i = 0; i < strlen(separators); i++) {
 			if (separators[i] == symbol) 
 			{

@@ -527,6 +527,9 @@ namespace FT
 		);
 
 		FST::FST fst25(lexem, 2, FST::NODE(1, FST::RELATION('%', 1)), FST::NODE());
+		FST::FST fst26(lexem, 2, FST::NODE(1, FST::RELATION('^', 1)), FST::NODE());
+		FST::FST fst27(lexem, 2, FST::NODE(1, FST::RELATION('|', 1)), FST::NODE());
+		FST::FST fst28(lexem, 2, FST::NODE(1, FST::RELATION('~', 1)), FST::NODE());
 
 		if (FST::execute(fst1) == -1) return LEX_INTEGER; // integer
 		else if (FST::execute(fst2) == -1) return LEX_STRING; // string
@@ -574,12 +577,27 @@ namespace FT
 		else if (FST::execute(fst20) == -1) return LEX_PRINT_STR; // main
 		else if (FST::execute(fst21) == -1) return 'w'; // repeat cycle
 		else if (FST::execute(fst22) == -1) return 'c'; // convert int to string
-		else if (FST::execute(fst23) == -1) return '^'; // pow function
+		else if (FST::execute(fst23) == -1) return '$'; // pow function
 		else if (FST::execute(fst24) == -1) return 'q'; // root function
 		else if (FST::execute(fst25) == -1)
 		{
 			ltElement->priority = 3;
 			return '%';
+		}
+		else if (FST::execute(fst26) == -1)
+		{
+			ltElement->priority = 3;
+			return '^';
+		}
+		else if (FST::execute(fst27) == -1)
+		{
+			ltElement->priority = 3;
+			return '|';
+		}
+		else if (FST::execute(fst28) == -1)
+		{
+			ltElement->priority = 3;
+			return '~';
 		}
 		else return LEX_ID;
 	}

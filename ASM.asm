@@ -11,16 +11,20 @@ EXTRN copystr : PROC
 EXTRN strcon : PROC
 EXTRN powN : PROC
 EXTRN rootN : PROC
-EXTRN ConvertToChar : PROC
+EXTRN _AND : PROC
+EXTRN _OR : PROC
+EXTRN _NOT : PROC
+EXTRN tostr : PROC
 
 .STACK 4096
 .DATA
 	       main_a	SDWORD	0
+	       main_b	SDWORD	0
 .CONST
 	overflow db 'ERROR: VARIABLE OVERFLOW', 0
 	null_division db 'ERROR: DIVISION BY ZERO', 0
-	       main_c1	SDWORD	7
-	       main_c2	SDWORD	4
+	       main_c1	SDWORD	5
+	       main_c2	SDWORD	6
 	       main_c3	SDWORD	0
 .CODE
 
@@ -31,22 +35,36 @@ main ENDP
 
 ; ---------- - Function definitions--------------------
 
+
+
+
 cea2020 PROC
+
 
 	; // this is main_a expression! int
 	push	main_c1
-	push	main_c2
-	pop ebx
-	pop eax
-	test ebx,ebx
-	jz EXIT_DIV_ON_NULL
-	cdq
-	mov	edx,	0
-	idiv ebx
-	push edx
 	pop	main_a
 
+
+	; // this is main_a expression! int
 	push	main_a
+	call _NOT
+	pop	main_a
+
+
+	; // this is main_b expression! int
+	push	main_c2
+	pop	main_b
+
+
+	; // this is main_b expression! int
+	push	main_a
+	push	main_b
+	call _OR
+	push	eax
+	pop	main_b
+
+	push	main_b
 	call	outint ; // at console
 
 	push	main_c3	; // this is return of function: main

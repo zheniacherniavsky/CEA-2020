@@ -19,7 +19,10 @@ namespace CG
 		codeAsm << "EXTRN strcon : PROC\n";
 		codeAsm << "EXTRN powN : PROC\n";
 		codeAsm << "EXTRN rootN : PROC\n";
-		codeAsm << "EXTRN ConvertToChar : PROC\n";
+		codeAsm << "EXTRN _AND : PROC\n";
+		codeAsm << "EXTRN _OR : PROC\n";
+		codeAsm << "EXTRN _NOT : PROC\n";
+		codeAsm << "EXTRN tostr : PROC\n";
 
 		codeAsm << "\n.STACK 4096\n"; // stack
 
@@ -108,7 +111,23 @@ namespace CG
 			{
 				switch (element->lexema[0])
 				{
-				case('^'):	// pow(Q, Q) function with 2 agrs
+
+				case('&'):
+					codeAsm << "\n\tcall _AND\n\tpush\teax";
+					break;
+
+				case('|'):
+					codeAsm << "\n\tcall _OR\n\tpush\teax";
+					break;
+
+				case('~'):
+					element = element->next; // ~ -> i
+					itElement = IT::GetEntry(it, element->idxTI);
+					CODE_PUSH
+					codeAsm << "\n\tcall _NOT";
+					break;
+
+				case('$'):	// pow(Q, Q) function with 2 agrs
 					element = element->next; // ^ -> (
 					element = element->next; // ( -> Q
 					firstArg = IT::GetEntry(it, element->idxTI);
@@ -170,7 +189,7 @@ namespace CG
 					element = element->next; // ( -> INT var
 					itElement = IT::GetEntry(it, element->idxTI);
 					CODE_PUSH // push INT
-					codeAsm << "\n\tcall\tConvertToChar\n\tpush\teax";
+					codeAsm << "\n\tcall\ttostr\n\tpush\teax";
 					element = element->next; // INT -> )
 					break;
 				case('w'):

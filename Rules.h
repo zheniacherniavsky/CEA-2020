@@ -34,7 +34,7 @@ namespace GRB
 			Rule::Chain(5, TS('i'), TS('='), NS('E'), TS(';'), NS('N'))
 		),
 		Rule(NS('E'), GRB_ERROR_SERIES + 2, // ошибка в выражении 
-			15,
+			16,
 			Rule::Chain(1, TS('i')),
 			Rule::Chain(1, TS('l')),
 			Rule::Chain(3, TS('('), NS('E'), TS(')')),
@@ -46,19 +46,21 @@ namespace GRB
 			Rule::Chain(2, TS('l'), NS('M')),
 			Rule::Chain(4, TS('('), NS('E'), TS(')'), NS('M')),
 			Rule::Chain(5, TS('i'), TS('('), NS('W'), TS(')'), NS('M')),
-
 			Rule::Chain(6, TS('^'), TS('('), NS('Q'), TS(','), NS('Q'), TS(')')),
 			Rule::Chain(6, TS('^'), TS('('), NS('Q'), TS(','), NS('Q'), TS(')')),
 			Rule::Chain(6, TS('q'), TS('('), NS('Q'), TS(','), NS('Q'), TS(')')),
-			Rule::Chain(6, TS('q'), TS('('), NS('Q'), TS(','), NS('Q'), TS(')'))
+			Rule::Chain(6, TS('q'), TS('('), NS('Q'), TS(','), NS('Q'), TS(')')),
+			Rule::Chain(2, TS('~'), TS('i'))
 		),
 		Rule(NS('M'), GRB_ERROR_SERIES + 3, // ошибка в выражении
-			5,
+			7,
 			Rule::Chain(2, TS('+'), NS('E')),
 			Rule::Chain(2, TS('-'), NS('E')),
 			Rule::Chain(2, TS('*'), NS('E')),
 			Rule::Chain(2, TS('/'), NS('E')),
-			Rule::Chain(2, TS('%'), NS('E'))
+			Rule::Chain(2, TS('%'), NS('E')),
+			Rule::Chain(2, TS('^'), NS('E')),
+			Rule::Chain(2, TS('|'), NS('E'))
 		),
 		Rule(NS('F'), GRB_ERROR_SERIES + 4, // ошибка в параметрах функции
 			2,		//F -> ti | ti,F
