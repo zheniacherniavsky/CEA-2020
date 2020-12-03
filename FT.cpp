@@ -46,7 +46,7 @@ namespace FT
 		char lexArr[512][256];
 		int pos = 0;
 		int spos = 0;
-		while (*code)
+		while (*code) // разбитие кода на отдельные компоненты
 		{
 			while (*code != ' ' && *code != '\n')
 			{
@@ -527,7 +527,7 @@ namespace FT
 		);
 
 		FST::FST fst25(lexem, 2, FST::NODE(1, FST::RELATION('%', 1)), FST::NODE());
-		FST::FST fst26(lexem, 2, FST::NODE(1, FST::RELATION('^', 1)), FST::NODE());
+		FST::FST fst26(lexem, 2, FST::NODE(1, FST::RELATION('&', 1)), FST::NODE());
 		FST::FST fst27(lexem, 2, FST::NODE(1, FST::RELATION('|', 1)), FST::NODE());
 		FST::FST fst28(lexem, 2, FST::NODE(1, FST::RELATION('~', 1)), FST::NODE());
 
@@ -587,7 +587,7 @@ namespace FT
 		else if (FST::execute(fst26) == -1)
 		{
 			ltElement->priority = 3;
-			return '^';
+			return '&';
 		}
 		else if (FST::execute(fst27) == -1)
 		{

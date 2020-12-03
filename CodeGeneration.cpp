@@ -208,6 +208,7 @@ namespace CG
 						element = element->next; // r -> i
 						itElement = IT::GetEntry(it, element->idxTI);
 						if (itElement->iddatatype == IT::INT) codeAsm << "\n\tpush " << itElement->visibility.functionName << '_' << itElement->id;
+						else if (itElement->iddatatype == IT::STR && itElement->idtype == IT::P) codeAsm << "\n\tmov eax, [" << itElement->visibility.functionName << '_' << itElement->id << "]\n\tpush\teax";
 						else if (itElement->iddatatype == IT::STR) codeAsm << "\n\tmov eax, offset " << itElement->visibility.functionName << '_' << itElement->id << "\n\tpush\teax";
 						codeAsm << "\n\tret";
 					}
