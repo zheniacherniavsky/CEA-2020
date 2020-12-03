@@ -32,17 +32,20 @@ namespace Error {
 		ERROR_ENTRY_NODEF10(140),ERROR_ENTRY_NODEF10(150),ERROR_ENTRY_NODEF10(160),
 		ERROR_ENTRY_NODEF10(170),ERROR_ENTRY_NODEF10(180),ERROR_ENTRY_NODEF10(190),
 		// 200-230 лексический анализатор
-		ERROR_ENTRY(200, (char*)"Превышен максимальный размер лексической таблицы!"),
-		ERROR_ENTRY(201, (char*)"Данной таблицы не существует или её компоненты не проинициализированы!"),
-		ERROR_ENTRY(202, (char*)"Не обнаружена лексема в данной строке!"),
-		ERROR_ENTRY(203, (char*)"Открыта или не закрыта лишняя скобка!"),
-		ERROR_ENTRY(204, (char*)"Точка входа main не была найдена!"),
-		ERROR_ENTRY(205, (char*)"Точка входа main может быть только одна!"),
-		ERROR_ENTRY(206, (char*)"Перед инициализацией переменной должно быть слово declare"),
-		ERROR_ENTRY(207, (char*)"Для типа данных integer допустимое значение 0 - 256!\nДля того, чтобы убрать ограничения и брать число постоянно по модулю, нужно написать в самом начале кода unchecked."),
-		ERROR_ENTRY(208, (char*)"На языке CEA-2020 не предусмотрены глобальные переменные!"),
+		ERROR_ENTRY(200, (char*)"[Lex]: Превышен максимальный размер лексической таблицы!"),
+		ERROR_ENTRY(201, (char*)"[Lex]: Данной таблицы не существует или её компоненты не проинициализированы!"),
+		ERROR_ENTRY(202, (char*)"[Lex]: Не обнаружена лексема в данной строке!"),
+		ERROR_ENTRY_NODEF(203),
+		ERROR_ENTRY_NODEF(204),
+		ERROR_ENTRY_NODEF(205),
+		ERROR_ENTRY_NODEF(206),
+		ERROR_ENTRY(207, (char*)"[Lex]: Для типа данных integer допустимое значение 0 - 255!"),
+		ERROR_ENTRY(208, (char*)"[Lex]: На языке CEA-2020 не предусмотрены глобальные переменные!"),
 		ERROR_ENTRY_NODEF(209),
-		ERROR_ENTRY_NODEF10(210),ERROR_ENTRY_NODEF10(220),ERROR_ENTRY_NODEF10(230),
+		ERROR_ENTRY_NODEF10(210),ERROR_ENTRY_NODEF10(220),
+		// lex analyz end
+		
+		ERROR_ENTRY_NODEF10(230),
 		ERROR_ENTRY_NODEF10(240),ERROR_ENTRY_NODEF10(250),ERROR_ENTRY_NODEF10(260),
 		ERROR_ENTRY_NODEF10(270),ERROR_ENTRY_NODEF10(280),ERROR_ENTRY_NODEF10(290),
 		ERROR_ENTRY_NODEF100(300),
@@ -60,7 +63,9 @@ namespace Error {
 		ERROR_ENTRY_NODEF10(610),ERROR_ENTRY_NODEF10(620),ERROR_ENTRY_NODEF10(630),
 		ERROR_ENTRY_NODEF10(640),ERROR_ENTRY_NODEF10(650),ERROR_ENTRY_NODEF10(660),
 		ERROR_ENTRY_NODEF10(670),ERROR_ENTRY_NODEF10(680),ERROR_ENTRY_NODEF10(690),
-		ERROR_ENTRY_NODEF100(700),ERROR_ENTRY_NODEF100(800),ERROR_ENTRY_NODEF100(900)
+		ERROR_ENTRY_NODEF100(700), // do sem errors
+		
+		ERROR_ENTRY_NODEF100(800),ERROR_ENTRY_NODEF100(900)
 	};
 	ERROR_ geterror(int id) {
 		if (id >= 0 && id < ERRORS_MAX_SIZE) return errors[id];
