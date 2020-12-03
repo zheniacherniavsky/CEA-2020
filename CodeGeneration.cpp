@@ -91,6 +91,9 @@ namespace CG
 		IT::Entry* secondArg = new IT::Entry();
 		LT::Entry* element = lt.head;
 
+		IT::IDTYPE var_type = IT::F;
+		IT::IDTYPE first_var_type = IT::F;
+
 		char* functionName = NULL;
 
 		while (element->next)
@@ -106,7 +109,7 @@ namespace CG
 
 			char* id_of_first_var = NULL;
 
-			IT::IDDATATYPE first_var_type = IT::EMPTY;
+			IT::IDDATATYPE first_var_dtype = IT::EMPTY;
 			while (element)
 			{
 				switch (element->lexema[0])
@@ -221,6 +224,7 @@ namespace CG
 				case(LEX_LITERAL):
 				case('@'):
 					itElement = IT::GetEntry(it, element->idxTI);
+					var_type = itElement->idtype;
 					if (id_of_first_var == NULL)
 					{
 						if (element->next->lexema[0] == ';' && itElement->iddatatype == IT::STR) break;
@@ -235,16 +239,17 @@ namespace CG
 							id_of_first_var[i] = itElement->id[i];
 						id_of_first_var[strlen(itElement->id)] = 0x00;
 
-						first_var_type = itElement->iddatatype;
+						first_var_dtype = itElement->iddatatype;
+						first_var_type = itElement->idtype;
 
 						// if (element->next->lexema[0] == LEX_SEMICOLON) codeAsm << "\n\tpush 0";
 						break;
 					}
 					else if (element->lexema[0] != '@')
 					{
-						if (first_var_type == IT::INT) CODE_PUSH
-						else if (f.function && first_var_type == IT::STR) CODE_PUSH_OFFSET_FUNC
-						else if (first_var_type == IT::STR) CODE_PUSH_OFFSET
+						if (first_var_dtype == IT::INT) CODE_PUSH
+						else if (var_type == IT::P && f.function && first_var_dtype == IT::STR) CODE_PUSH_OFFSET_FUNC
+						else if (first_var_dtype == IT::STR) CODE_PUSH_OFFSET
 						break;
 					}
 					else if (element->lexema[0] == '@')
@@ -258,8 +263,8 @@ namespace CG
 						for (int i = element->func.count - 1; i >= 0; i--)
 						{
 							itElement = IT::GetEntry(it, element->func.idx[i]);
-							if (first_var_type == IT::INT) CODE_PUSH
-							else if (first_var_type == IT::STR) CODE_PUSH_OFFSET
+							if (itElement->iddatatype == IT::INT) CODE_PUSH
+							else if (itElement->iddatatype == IT::STR) CODE_PUSH_OFFSET
 						}
 
 						codeAsm << "\n\tcall\t" << fname;
@@ -267,14 +272,14 @@ namespace CG
 						break;
 					}
 				case(LEX_PLUS):
-					if (first_var_type == IT::INT) CODE_PLUS
-					else if (first_var_type == IT::STR) CODE_PLUS_STR
+					if (first_var_dtype == IT::INT) CODE_PLUS
+					else if (first_var_dtype == IT::STR) CODE_PLUS_STR
 					break;
 				case(LEX_MINUS):
-					if (first_var_type == IT::INT) CODE_DIFF
+					if (first_var_dtype == IT::INT) CODE_DIFF
 					break;
 				case(LEX_STAR):
-					if(first_var_type == IT::INT) CODE_MUL
+					if(first_var_dtype == IT::INT) CODE_MUL
 					break;
 
 				case(LEX_PRINT_INT):
@@ -292,8 +297,16 @@ namespace CG
 					itElement = IT::GetEntry(it, element->idxTI);
 					if (itElement->iddatatype == IT::STR)
 					{
-						CODE_PUSH_OFFSET // push i
-							codeAsm << "\n\tcall\toutstr ; // at console\n";
+						if (f.function && itElement->idtype == IT::P)
+						{
+							CODE_PUSH_OFFSET_FUNC
+								codeAsm << "\n\tcall\toutstr ; // at console\n";
+						}
+						else
+						{
+							CODE_PUSH_OFFSET // push i
+								codeAsm << "\n\tcall\toutstr ; // at console\n";
+						}
 					}
 					element = element->next; // i -> ; (then this semicolon go to next lexem)
 					break;
@@ -306,8 +319,16 @@ namespace CG
 				case(LEX_SEMICOLON):
 					if (id_of_first_var != NULL)
 					{
-						if (first_var_type == IT::INT) CODE_POP
-						else if (first_var_type == IT::STR) CODE_POP_STR
+						if (first_var_dtype == IT::INT) CODE_POP
+						else if (first_var_dtype == IT::STR)
+						{
+							if (first_var_type == IT::P)
+								CODE_POP_STR_FUNC
+							else
+							{
+								CODE_POP_STR
+							}
+						}
 						break;
 					}
 					else break;
@@ -330,7 +351,7 @@ namespace CG
 			}
 
 			id_of_first_var = NULL;
-			first_var_type = IT::EMPTY;
+			first_var_dtype = IT::EMPTY;
 			element = element->next;
 		}
 

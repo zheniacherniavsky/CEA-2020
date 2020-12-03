@@ -12,7 +12,7 @@
 
 #define CODE_PUSH {codeAsm << "\n\tpush\t" << itElement->visibility.functionName << '_' << itElement->id;}
 #define CODE_PUSH_OFFSET {codeAsm << "\n\tpush \toffset " << itElement->visibility.functionName << '_' << itElement->id;}
-#define CODE_PUSH_OFFSET_FUNC {codeAsm << "\n\tmov\teax, " << itElement->visibility.functionName << '_' << itElement->id << "\n\tpush\teax";}
+#define CODE_PUSH_OFFSET_FUNC {codeAsm << "\n\tpush\t[" << itElement->visibility.functionName << '_' << itElement->id << "]";}
 #define CODE_PLUS {codeAsm << "\n\tpop\teax\n\tpop\tebx\n\tadd\teax,\tebx\n\tpush\teax";}
 #define CODE_PLUS_STR {codeAsm << "\n\tcall strcon\n\tjo EXIT_OVERFLOW\n\tpush\teax";}
 #define CODE_MUL {codeAsm << "\n\tpop\teax\n\tpop\tebx\n\timul\tebx\n\tpush\teax";}
@@ -22,6 +22,7 @@
 
 #define CODE_POP {codeAsm << "\n\tpop\t" << itElement->visibility.functionName << '_' << id_of_first_var << '\n';}
 #define CODE_POP_STR {codeAsm << "\n\tpush\toffset " << itElement->visibility.functionName << '_' << id_of_first_var << "\n\tcall copystr" << "\n\t"; }
+#define CODE_POP_STR_FUNC {codeAsm << "\n\tpush\t[" << itElement->visibility.functionName << '_' << id_of_first_var << "]\n\tcall copystr" << "\n\t"; }
 
 namespace CG
 {
