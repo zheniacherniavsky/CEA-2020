@@ -18,6 +18,9 @@ namespace Parm {
 		char in[PARM_MAX_SIZE];
 		char out[PARM_MAX_SIZE];
 		char log[PARM_MAX_SIZE];
+		bool id = false;
+		bool lex = false;
+		bool tree = false;
 	};
 
 	PARM getparm(int argc, char* argv[]);
