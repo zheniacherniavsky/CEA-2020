@@ -50,11 +50,6 @@ namespace Parm {
 			}
 		}
 
-		std::cout << parms.in << std::endl;
-		std::cout << parms.log << std::endl;
-		std::cout << parms.out << std::endl;
-		std::cout << parms.id << std::endl;
-		std::cout << parms.lex << std::endl;
-		std::cout << parms.tree << std::endl;
+		return parms;
 	}
 }
