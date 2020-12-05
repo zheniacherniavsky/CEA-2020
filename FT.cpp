@@ -219,8 +219,7 @@ namespace FT
 				if (checkIdx == IT_NULL_IDX) // следовательно это новый элемент
 				{
 					newElement = true;
-					if (flag._declare ||
-						_idtype == IT::P ||
+					if (_idtype == IT::P ||
 						(_idtype == IT::F && !flag._body))
 					{
 						itElement.declared = true;
