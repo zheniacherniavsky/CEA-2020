@@ -43,12 +43,18 @@ namespace SemAnalyzer
 					element = IT::GetEntry(it, lexem->idxTI);
 					std::cout << getType(element);
 
-
-					if (!element->declared && !f.declare && element->idtype == IT::V)
+					if (element->declared && f.declare && element->idtype == IT::V)
+					{
+						errorCount++;
+						errorMessage = "ЭТА ПЕРЕМЕННА УЖЕ БЫЛА ОБЪЯВЛЕНА";
+					}
+					else if (!element->declared && !f.declare && element->idtype == IT::V)
 					{
 						errorCount++;
 						errorMessage = "ВЫЗОВ НЕОБЪЯВЛЕННОЙ ПЕРЕМЕННОЙ";
 					}
+					else if (!element->declared && f.declare && element->idtype == IT::V)
+						element->declared = true;
 					
 					if (expressionType == IT::EMPTY) expressionType = element->iddatatype;
 					if (f.returnExpression)
