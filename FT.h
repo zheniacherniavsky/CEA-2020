@@ -13,8 +13,6 @@
 
 namespace FT
 {
-	void makeOutWithLT(LT::LexTable& lt, IT::IdTable &id);
-	void makeOutWithIT(IT::IdTable& id);
 	char compareLexems(char* lexem, LT::Entry* ltElement); // автомат для лексем
 	int* getLineNums(std::string code);
 	void fillTables(char* code, LT::LexTable& lt, IT::IdTable& it);

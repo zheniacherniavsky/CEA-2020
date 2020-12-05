@@ -330,8 +330,6 @@ namespace FT
 			LT::Add(lt, ltElement);
 			lexem = lexArr[lexPos++];
 		}
-		makeOutWithLT(lt, it);
-		makeOutWithIT(it);
 	}
 
 	int* getLineNums(std::string code) // функция вычисления номера строки исходного кода для его лексем
@@ -599,102 +597,5 @@ namespace FT
 			return '~';
 		}
 		else return LEX_ID;
-	}
-
-	// debug
-	void makeOutWithLT(LT::LexTable& table, IT::IdTable &it)
-	{
-		LT::Entry* element = table.head;
-
-		int i = 0;
-		std::cout << "\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ:" << std::endl;
-		while (element && element->next != nullptr)
-		{
-			std::cout << std::setw(4) << std::right << i << '\t';
-			int memory = element->sn;
-			while (element && element->lexema[0] != NULL && memory == element->sn) {
-				std::cout << element->lexema[0];
-				if (element->idxTI != IT_NULL_IDX)
-					std::cout << '<' << element->idxTI << '>';
-				if (element->func.memoryCount != 0)
-				{
-					std::cout << '[' << element->func.memoryCount << ']';
-					for (int i = 0; i < element->func.memoryCount; i++)
-					{
-						if (element->func.memoryType[i] == IT::STR) std::cout << " STR ";
-						else if (element->func.memoryType[i] == IT::INT) std::cout << " INT ";
-					}
-				}
-				element = element->next;
-			}
-			std::cout << '\n';
-			i++;
-		}
-		std::cout << "\nTABLE SIZE: " << table.size << std::endl;
-	}
-
-	void makeOutWithIT(IT::IdTable& idTable)
-	{
-		std::cout << "\n\t\t\tIT TABLE DEBUG" << std::endl;
-		IT::Entry* showTable = idTable.head;
-		std::cout << std::setfill('_') << std::setw(101) << '_' << std::endl;
-		std::cout << std::setfill(' ')
-			<< std::setw(8) << "номер"
-			<< std::setw(6) << "id"
-			<< std::setw(6) << "тип"
-			<< std::setw(10) << "DATA"
-			<< std::setw(20) << "обл. видимости"
-			<< std::setw(12) << "функция"
-			<< std::setw(10) << "declared"
-			<< std::setw(20) << "содержимое"
-			<< std::setw(10) << '|' << std::endl;
-		std::cout << std::setfill('_') << std::setw(101) << '_' << std::endl;
-		while (showTable)
-		{
-			std::cout << std::setfill(' ')
-				<< std::setw(6) << showTable->idxTI
-				<< std::setw(8) << showTable->id;
-			if (showTable->iddatatype == IT::INT)
-				std::cout << std::setw(6) << "INT";
-			else if (showTable->iddatatype == IT::STR)
-				std::cout << std::setw(6) << "STR";
-			if(showTable->idtype == IT::F)
-				std::cout << std::setw(12) << "функция";
-			else if (showTable->idtype == IT::P)
-				std::cout << std::setw(12) << "параметр";
-			else if (showTable->idtype == IT::L)
-				std::cout << std::setw(12) << "литерал";
-			else if (showTable->idtype == IT::V)
-				std::cout << std::setw(12) << "переменная";
-			std::cout << std::setw(10) << showTable->visibility.area;
-			std::cout << std::setw(19) << showTable->visibility.functionName;
-
-			if (showTable->declared == true) std::cout << std::setw(10) << "YES";
-			else std::cout << std::setw(10) << "NO";
-
-			if (showTable->iddatatype == IT::INT)
-				std::cout << std::setw(17) << showTable->value.vint;
-			else if (showTable->iddatatype == IT::STR)
-				if(showTable->value.vstr->len == NULL) std::cout << std::setw(19) << "NULL";
-				else
-				{
-					std::cout << std::setw(10);
-					for (int i = 0; i < showTable->value.vstr->len; i++)
-					{
-						std::cout << showTable->value.vstr->str[i];
-						if (i == 8)
-						{
-							std::cout << "...";
-							break;
-						}
-					}
-					std::cout << "[len: " << showTable->value.vstr->len << ']';
-				}
-
-			
-			std::cout << std::setfill(' ') << std::endl;
-			showTable = showTable->next;
-		}
-		std::cout << std::setfill('_') << std::setw(101) << '_' << std::endl;
 	}
 }

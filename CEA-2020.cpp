@@ -38,7 +38,8 @@
 
 #define TBL_LENGTH 2048 // размеры создаваемых таблиц лексем и идентификаторов
 
-void makeOutWithLT(LT::LexTable& table, IT::IdTable& it, bool showIDX, bool functionINFO);
+void makeOutWithLT(LT::LexTable& table, IT::IdTable& it, bool showIDX, bool functionINFO, Log::LOG_ log);
+void makeOutWithIT(IT::IdTable& idTable, Log::LOG_ log);
 
 int main(int argc, char* argv[])
 {
@@ -57,19 +58,23 @@ int main(int argc, char* argv[])
 		IT::IdTable idTable = IT::Create(TBL_LENGTH); // создаю таблицу идентификаторов размеров 2048
 
 		In::_IN_ in = In::getin(lexTable, idTable, parms.in, parms.out);	// получение in структуры
+		makeOutWithLT(lexTable, idTable, true, true, log);
+		makeOutWithIT(idTable, log);
 
+		*log.stream << "\n\n\tСинтаксический анализатор\n";
 		MFST_TRACE_START;								// оладка
 		MFST::Mfst mfst(lexTable, GRB::getGreibach()); 	// автомат
 		
-		if (mfst.start()) // синтаксическийй анализ
+		if (mfst.start(log)) // синтаксическийй анализ
 		{
 			mfst.savededucation();
-			mfst.printrules();
+			mfst.printrules(log);
 
 			system("pause");
 
 			PN::PolishNotation(lexTable, idTable, true); // last arg is debug
-			makeOutWithLT(lexTable, idTable, false, false);
+			*log.stream << "\n\tПольская запись:\n";
+			makeOutWithLT(lexTable, idTable, false, false, log);
 
 			if (SemAnalyzer::semAnalyzer(lexTable, idTable)) // семантический анализ
 			{
@@ -105,36 +110,101 @@ int main(int argc, char* argv[])
 	}
 }
 
-void makeOutWithLT(LT::LexTable& table, IT::IdTable& it, bool showIDX, bool functionINFO)
+void makeOutWithLT(LT::LexTable& table, IT::IdTable& it, bool showIDX, bool functionINFO, Log::LOG_ log)
 {
 	LT::Entry* element = table.head;
 
 	int i = 0;
-	std::cout << "\n\t\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ (ПОЛЬСКАЯ ЗАПИСЬ):" << std::endl;
-	if (showIDX) std::cout << "<idx> - в треугольник скобках содержится id таблицы идентификаторов." << std::endl;
-	if (functionINFO) std::cout << "@<idx>[ n1 n2 ... nn ] - вызов функции c id <idx>, которая имеет параметры [ p1 p2 ... pn ]\n\n";
+	*log.stream << "\n\t\tВЫВОД ТАБЛИЦЫ ЛЕКСЕМ:" << std::endl;
+	if (showIDX) *log.stream << "<idx> - в треугольник скобках содержится id таблицы идентификаторов." << std::endl;
+	if (functionINFO) *log.stream << "@<idx>[ n1 n2 ... nn ] - вызов функции c id <idx>, которая имеет параметры [ p1 p2 ... pn ]\n\n";
 	while (element->next != nullptr)
 	{
-		std::cout << std::setfill(' ') << std::setw(4) << std::right << i << ": ";
+		*log.stream << std::setfill(' ') << std::setw(4) << std::right << i << ": ";
 		int memory = element->sn;
 		while (memory == element->sn && element->lexema[0] != NULL) {
-			std::cout << element->lexema[0];
+			*log.stream << element->lexema[0];
 			if (showIDX && element->idxTI != IT_NULL_IDX)
-				std::cout << '<' << element->idxTI << '>';
+				*log.stream << '<' << element->idxTI << '>';
 			if (functionINFO && element->lexema[0] == '@')
 			{
-				std::cout << "[ ";
+				*log.stream << "[ ";
 				for (int i = 0; i < element->func.count; i++)
 				{
-					std::cout << element->func.idx[i] << ' ';
+					*log.stream << element->func.idx[i] << ' ';
 				}
-				std::cout << ']';
+				*log.stream << ']';
 			}
 
 			element = element->next;
 		}
-		std::cout << '\n';
+		*log.stream << '\n';
 		i++;
 	}
-	std::cout << "\nTABLE SIZE: " << table.size << std::endl;
+	*log.stream << "\nTABLE SIZE: " << table.size << std::endl;
+}
+
+void makeOutWithIT(IT::IdTable& idTable, Log::LOG_ log)
+{
+	*log.stream << "\n\t\t\tIT TABLE DEBUG" << std::endl;
+	IT::Entry* showTable = idTable.head;
+	*log.stream << std::setfill('_') << std::setw(101) << '_' << std::endl;
+	*log.stream << std::setfill(' ')
+		<< std::setw(8) << "номер"
+		<< std::setw(6) << "id"
+		<< std::setw(6) << "тип"
+		<< std::setw(10) << "DATA"
+		<< std::setw(20) << "обл. видимости"
+		<< std::setw(12) << "функция"
+		<< std::setw(10) << "declared"
+		<< std::setw(20) << "содержимое"
+		<< std::setw(10) << '|' << std::endl;
+	*log.stream << std::setfill('_') << std::setw(101) << '_' << std::endl;
+	while (showTable)
+	{
+		*log.stream << std::setfill(' ')
+			<< std::setw(6) << showTable->idxTI
+			<< std::setw(8) << showTable->id;
+		if (showTable->iddatatype == IT::INT)
+			*log.stream << std::setw(6) << "INT";
+		else if (showTable->iddatatype == IT::STR)
+			*log.stream << std::setw(6) << "STR";
+		if (showTable->idtype == IT::F)
+			*log.stream << std::setw(12) << "функция";
+		else if (showTable->idtype == IT::P)
+			*log.stream << std::setw(12) << "параметр";
+		else if (showTable->idtype == IT::L)
+			*log.stream << std::setw(12) << "литерал";
+		else if (showTable->idtype == IT::V)
+			*log.stream << std::setw(12) << "переменная";
+		*log.stream << std::setw(10) << showTable->visibility.area;
+		*log.stream << std::setw(19) << showTable->visibility.functionName;
+
+		if (showTable->declared == true) *log.stream << std::setw(10) << "YES";
+		else *log.stream << std::setw(10) << "NO";
+
+		if (showTable->iddatatype == IT::INT)
+			*log.stream << std::setw(17) << showTable->value.vint;
+		else if (showTable->iddatatype == IT::STR)
+			if (showTable->value.vstr->len == NULL) *log.stream << std::setw(19) << "NULL";
+			else
+			{
+				*log.stream << std::setw(10);
+				for (int i = 0; i < showTable->value.vstr->len; i++)
+				{
+					*log.stream << showTable->value.vstr->str[i];
+					if (i == 8)
+					{
+						*log.stream << "...";
+						break;
+					}
+				}
+				*log.stream << "[len: " << showTable->value.vstr->len << ']';
+			}
+
+
+		*log.stream << std::setfill(' ') << std::endl;
+		showTable = showTable->next;
+	}
+	*log.stream << std::setfill('_') << std::setw(101) << '_' << std::endl;
 }
