@@ -179,7 +179,6 @@
     <ClInclude Include="SemAnalyzer.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="code.asm" />
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
