@@ -2,11 +2,10 @@
 
 namespace CG
 {
-	bool CodeGeneration(IT::IdTable& it, LT::LexTable& lt)
+	bool CodeGeneration(IT::IdTable& it, LT::LexTable& lt, char* outPath)
 	{
-		const char* asmFile_path = "ASM.asm";
 		std::ofstream codeAsm;
-		codeAsm.open(asmFile_path);
+		codeAsm.open(outPath);
 		if (!codeAsm.is_open())
 			return false;
 

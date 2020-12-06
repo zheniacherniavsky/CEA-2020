@@ -3,8 +3,6 @@
 namespace SemAnalyzer
 {
 
-	// ++ non declared variables should be tracked!
-
 	struct Flag
 	{
 		bool declare = false;
@@ -16,13 +14,13 @@ namespace SemAnalyzer
 		bool itos = false;
 	};
 
-
-	bool semAnalyzer(LT::LexTable lt, IT::IdTable it)
+	bool semAnalyzer(LT::LexTable lt, IT::IdTable it, Log::LOG_ log)
 	{
 		LT::Entry *lexem = lt.head; // таблица лексем
 		int line = 0;				// для вывода анализа	
 		int errorCount = 0;
 		std::string errorMessage = "";
+		Error::ERROR_ errors[3];
 
 		Flag f;		// флажки
 
@@ -41,16 +39,16 @@ namespace SemAnalyzer
 				case LEX_ID:
 				case('@'):
 					element = IT::GetEntry(it, lexem->idxTI);
-					std::cout << getType(element);
+					*log.stream << getType(element);
 
 					if (element->declared && f.declare && element->idtype == IT::V)
 					{
-						errorCount++;
+						errors[errorCount++] = Error::geterrorin(700, lexem->sn, 0);
 						errorMessage = "ЭТА ПЕРЕМЕННА УЖЕ БЫЛА ОБЪЯВЛЕНА";
 					}
 					else if (!element->declared && !f.declare && element->idtype == IT::V)
 					{
-						errorCount++;
+						errors[errorCount++] = Error::geterrorin(701, lexem->sn, 0);
 						errorMessage = "ВЫЗОВ НЕОБЪЯВЛЕННОЙ ПЕРЕМЕННОЙ";
 					}
 					else if (!element->declared && f.declare && element->idtype == IT::V)
@@ -61,9 +59,16 @@ namespace SemAnalyzer
 					{
 						if (element->iddatatype != functionType)
 						{
-							errorCount++;
-							if (!f.main) errorMessage = "ВОЗРАЩАЕМОЕ ЗНАЧЕНИЕ НЕ СОВПАДАЕТ С ТИПОМ ФУНКЦИИ";
-							else errorMessage = "ВОЗРАЩАЕМОЕ ЗНАЧЕНИЕ НЕ СОВПАДАЕТ С ТИПОМ ФУНКЦИИ (ТИП ФУНКЦИИ MAIN -> INT)";
+							if (!f.main)
+							{
+								errors[errorCount++] = Error::geterrorin(702, lexem->sn, 0);
+								errorMessage = "ВОЗРАЩАЕМОЕ ЗНАЧЕНИЕ НЕ СОВПАДАЕТ С ТИПОМ ФУНКЦИИ";
+							}
+							else
+							{
+								errors[errorCount++] = Error::geterrorin(703, lexem->sn, 0);
+								errorMessage = "ВОЗРАЩАЕМОЕ ЗНАЧЕНИЕ НЕ СОВПАДАЕТ С ТИПОМ ФУНКЦИИ (ТИП ФУНКЦИИ MAIN -> INT)";
+							}
 						}
 					}
 					else if (f.function)
@@ -75,29 +80,29 @@ namespace SemAnalyzer
 					{
 						if (lexem->lexema[0] == '@') // function check types
 						{
-							std::cout << "[";
+							*log.stream << "[";
 							for (int i = 0; i < lexem->func.memoryCount; i++)
 							{
 								IT::Entry* checkType = IT::GetEntry(it, lexem->func.idx[i]);
 								if (lexem->func.count != lexem->func.memoryCount)
 								{
-									errorCount++;
+									errors[errorCount++] = Error::geterrorin(704, lexem->sn, 0);
 									errorMessage = "НЕДОСТАТОЧНО ВЫЗЫВАЕМЫХ ПАРАМЕТРОВ";
 								}
-								std::cout << getType(lexem->func.memoryType[i]) << "=" << getType(checkType) << " ";
+								*log.stream << getType(lexem->func.memoryType[i]) << "=" << getType(checkType) << " ";
 
 								if (lexem->func.memoryType[i] != checkType->iddatatype)
 								{
-									errorCount++;
+									errors[errorCount++] = Error::geterrorin(705, lexem->sn, 0);
 									errorMessage = "ОШИБКА В ПАРАМЕТРАХ ВЫЗЫВАЕМОЙ ФУНКЦИИ. НЕ СОВПАДАЮТ ТИПЫ";
 								}
 							}
-							std::cout << ']';
+							*log.stream << ']';
 						}
 
 						if(element->iddatatype != expressionType && !f.itos)
 						{
-							errorCount++;
+							errors[errorCount++] = Error::geterrorin(706, lexem->sn, 0);
 							errorMessage = "НЕ СОВПАДАЮТ ТИПЫ ВЫРАЖЕНИЯ";
 						}
 					}
@@ -138,7 +143,7 @@ namespace SemAnalyzer
 					break;
 				}
 
-				std::cout << lexem->lexema[0];
+				*log.stream << lexem->lexema[0];
 
 				if (lexem->next && lexem->sn == lexem->next->sn) lexem = lexem->next;
 				else break;
@@ -147,8 +152,20 @@ namespace SemAnalyzer
 			{
 				SEM_ERROR(errorMessage)
 				errorMessage = "";
+				if (errorCount == 3)
+				{
+					*log.stream << "\n\t\tОшибки семантики:";
+					for (int i = 0; i < 3; i++)
+					{
+						*log.stream << "\n - Ошибка " << errors[i].id 
+							<< ": " << errors[i].message 
+							<< " Строка в исходном коде: " 
+							<< errors[i].inHandler.line;
+					}
+					throw errors[0];
+				}
 			}
-				
+
 			expressionType = IT::EMPTY;
 			line++;
 			lexem = lexem->next;

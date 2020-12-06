@@ -59,7 +59,7 @@ namespace Log {
 	}
 
 	void WriteError(LOG_ log, Error::ERROR_ e) {
-		*log.stream << "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-" << "\n";
+		*log.stream << "\n\n*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-" << "\n";
 		*log.stream << "Ошибка " << e.id << "\n";
 		*log.stream << "Причина: " << e.message << "\n";
 		if (e.inHandler.col > 0) {

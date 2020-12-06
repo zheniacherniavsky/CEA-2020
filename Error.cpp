@@ -63,7 +63,19 @@ namespace Error {
 		ERROR_ENTRY_NODEF10(610),ERROR_ENTRY_NODEF10(620),ERROR_ENTRY_NODEF10(630),
 		ERROR_ENTRY_NODEF10(640),ERROR_ENTRY_NODEF10(650),ERROR_ENTRY_NODEF10(660),
 		ERROR_ENTRY_NODEF10(670),ERROR_ENTRY_NODEF10(680),ERROR_ENTRY_NODEF10(690),
-		ERROR_ENTRY_NODEF100(700), // do sem errors
+		ERROR_ENTRY(700, (char*)"[Sem]: Объявлять переменную можно только один раз!"),
+		ERROR_ENTRY(701, (char*)"[Sem]: Попытка вызвать необъявленную переменную!"),
+		ERROR_ENTRY(702, (char*)"[Sem]: Возращаемое значение не совпадает с типом функции!"),
+		ERROR_ENTRY(703, (char*)"[Sem]: Возращаемое значение не совпадает с типом функции! (Тип функции main - integer)"),
+		ERROR_ENTRY(704, (char*)"[Sem]: Недостаточно параметров для вызова функции!"),
+		ERROR_ENTRY(705, (char*)"[Sem]: Ошибка в параметрах вызываемой функции - не совпадают типы данных!"),
+		ERROR_ENTRY(706, (char*)"[Sem]: В выражении не совпадают типы данных!"),
+		ERROR_ENTRY_NODEF(707),
+		ERROR_ENTRY_NODEF(708),
+		ERROR_ENTRY_NODEF(709),
+		ERROR_ENTRY_NODEF10(710),ERROR_ENTRY_NODEF10(720),ERROR_ENTRY_NODEF10(730),
+		ERROR_ENTRY_NODEF10(740),ERROR_ENTRY_NODEF10(750),ERROR_ENTRY_NODEF10(760),
+		ERROR_ENTRY_NODEF10(770),ERROR_ENTRY_NODEF10(780),ERROR_ENTRY_NODEF10(790),
 		
 		ERROR_ENTRY_NODEF100(800),ERROR_ENTRY_NODEF100(900)
 	};

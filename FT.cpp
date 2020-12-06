@@ -311,7 +311,7 @@ namespace FT
 			}
 
 			// заполнение таблицы лексем
-			ltElement.sn = posArray[pos++];
+			ltElement.sn = posArray[pos++] + 1;
 
 			if (flag._functionParms && lexemSymbol == LEX_ID && functionIdxMemory != -1)
 			{

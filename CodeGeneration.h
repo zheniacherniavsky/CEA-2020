@@ -26,7 +26,7 @@
 
 namespace CG
 {
-	bool CodeGeneration(IT::IdTable& it, LT::LexTable& lt);
+	bool CodeGeneration(IT::IdTable& it, LT::LexTable& lt, char* outAsm);
 	void CreateDataSegment(IT::IdTable& it, std::ofstream& codeAsm);
 	void CreateConstSegment(IT::IdTable& it, std::ofstream& codeAsm);
 	void CreateCodeSegment(IT::IdTable& it, LT::LexTable lt, std::ofstream& codeAsm);

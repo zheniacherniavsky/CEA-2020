@@ -70,39 +70,30 @@ int main(int argc, char* argv[])
 			mfst.savededucation();
 			mfst.printrules(log);
 
-			system("pause");
-
 			PN::PolishNotation(lexTable, idTable, true); // last arg is debug
 			*log.stream << "\n\tПольская запись:\n";
 			makeOutWithLT(lexTable, idTable, false, false, log);
 
-			if (SemAnalyzer::semAnalyzer(lexTable, idTable)) // семантический анализ
+			if (SemAnalyzer::semAnalyzer(lexTable, idTable, log)) // семантический анализ
 			{
 				Log::WriteIn(log, in);
 				Log::Close(log);
-				if(CG::CodeGeneration(idTable, lexTable)) std::cout << "\n\n-*-*-*-*-*-*-* A S S E M B L E R _ C O D E *-*-*-*-*-*-*-*-\n\n\n" << std::endl;
-
-				// *-*-*-*-*-*-*-*-*-* get assembly result:
-				std::ifstream assemblerFile;
-				assemblerFile.open("ASM.asm");
-				if (assemblerFile.is_open())
+				if (CG::CodeGeneration(idTable, lexTable, parms.out))
 				{
-					char* line = new char();
-					while (assemblerFile.getline(line, 1024))
-						std::cout << "\t\t" << line << std::endl;
-					assemblerFile.close();
+					std::cout << "\tCEA-2020: Компиляция завершена."
+						<< "\nСгенерированный ассемблерный код: " << parms.out
+						<< "\nПодробная информация находится в протоколе: " << parms.log << "\n\n";
+					system("pause");
+					return 0;
 				}
-
-				system("pause");
-				return 0;
 			}
 		}
 	}
 	catch (Error::ERROR_ e) {
 		std::cout << "\nОшибка " << e.id << ": " << e.message << "\n";
-		if (e.inHandler.col >= 0) {
-			std::cout << "строка: " << e.inHandler.line << std::endl;
-			std::cout << "позиция: " << e.inHandler.col << std::endl;
+		if (e.inHandler.line >= 0) {
+			if(e.inHandler.col > 0) std::cout << "позиция: " << e.inHandler.col << std::endl;
+			std::cout << "строка: " << e.inHandler.line  << std::endl;
 			Log::WriteError(log, e);
 			Log::Close(log);
 		}

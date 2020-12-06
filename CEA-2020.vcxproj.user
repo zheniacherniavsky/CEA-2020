@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>-in:C:\Users\geshka\Desktop\SOURCECODE\sourcecode.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-in:C:\Users\geshka\Desktop\SOURCECODE\sourcecode.txt -out:C:\Users\geshka\Desktop\SOURCECODE\asmcode.asm -log:C:\Users\geshka\Desktop\SOURCECODE\logfile.txt -id -lex -tree</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

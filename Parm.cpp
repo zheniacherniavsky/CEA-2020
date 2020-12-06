@@ -11,6 +11,7 @@ namespace Parm {
 
 		for (int i = 1; i < argc; i++)
 		{
+			buf[0] = 0x00;
 			for (int pos = 0; pos <= strlen(argv[i]); pos++)
 			{
 				buf[pos] = argv[i][pos];
@@ -26,7 +27,7 @@ namespace Parm {
 					}
 					else if (strcmp(buf, PARM_LOG) == 0)
 					{
-						for (int j = 0;;)
+						for (int j = 0;; j++)
 						{
 							parms.log[j] = argv[i][++pos];
 							if (parms.log[j] == '\0') break;
@@ -34,7 +35,7 @@ namespace Parm {
 					}
 					else if (strcmp(buf, PARM_OUT) == 0)
 					{
-						for (int j = 0;;)
+						for (int j = 0;; j++)
 						{
 							parms.out[j] = argv[i][++pos];
 							if (parms.out[j] == '\0') break;

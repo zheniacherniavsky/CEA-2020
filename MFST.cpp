@@ -214,6 +214,7 @@ namespace MFST
 
 	void Mfst::printrules(Log::LOG_ log)
 	{
+		*log.stream << "\n\tДерево разбора синтаксического анализатора:\n";
 		MfstState state;
 		GRB::Rule rule;
 		for (unsigned short k = 0; k < storestate.size(); k++)
