@@ -5,7 +5,7 @@
 namespace Parm {
 
 	PARM getparm(int argc, char* argv[]) {
-		PARM parms = { "", "code.asm", "log.txt", false, false, false };
+		PARM parms = { "", "ASM.asm", "log.txt", false, false, false };
 		if (argc > 7) throw ERROR_THROW(100);
 		char* buf = (char*)calloc(255, sizeof(char));
 
