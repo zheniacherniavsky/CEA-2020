@@ -106,5 +106,8 @@
     <Text Include="C:\Users\geshka\Desktop\SOURCECODE\sourcecode.txt">
       <Filter>Файлы ресурсов</Filter>
     </Text>
+    <Text Include="C:\Users\geshka\Desktop\SOURCECODE\logfile.txt">
+      <Filter>Файлы ресурсов</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -22,6 +22,7 @@ namespace CG
 		codeAsm << "EXTRN _OR : PROC\n";
 		codeAsm << "EXTRN _NOT : PROC\n";
 		codeAsm << "EXTRN tostr : PROC\n";
+		codeAsm << "EXTRN strequal : PROC\n";
 
 		codeAsm << "\n.STACK 4096\n"; // stack
 
@@ -74,6 +75,7 @@ namespace CG
 		bool repeat = false;
 		bool enterPoint = false;
 		bool function = false;
+		bool condition = false;
 	};
 
 	void CreateCodeSegment(IT::IdTable& it, LT::LexTable lt, std::ofstream& codeAsm)
@@ -90,6 +92,9 @@ namespace CG
 		IT::Entry* firstArg = new IT::Entry();
 		IT::Entry* secondArg = new IT::Entry();
 		LT::Entry* element = lt.head;
+
+		char cond;			// запоминать условие
+		int conditionsCount = 0;
 
 		IT::IDTYPE var_type = IT::F;
 		IT::IDTYPE first_var_type = IT::F;
@@ -114,7 +119,50 @@ namespace CG
 			{
 				switch (element->lexema[0])
 				{
+				case(':'):
+					conditionsCount++;
 
+					codeAsm << "\n; // condition\n";
+					f.condition = true;
+					element = element->next; // : -> (
+					element = element->next; // ( -> Q
+					firstArg = IT::GetEntry(it, element->idxTI);
+					if (firstArg->iddatatype == IT::INT)
+					{
+						element = element->next; // Q -> C
+						cond = element->lexema[0];
+						element = element->next; // C -> Q
+						secondArg = IT::GetEntry(it, element->idxTI);
+						codeAsm << "\n\tmov eax, " << firstArg->visibility.functionName << '_' << firstArg->id;
+						codeAsm << "\n\tcmp eax, ";
+						codeAsm << secondArg->visibility.functionName << '_' << secondArg->id;
+						switch (cond)
+						{
+						case('<'):
+							codeAsm << "\n\tjg EXIT_CONDITION" << conditionsCount;
+							break;
+						case('>'):
+							codeAsm << "\n\tjl EXIT_CONDITION" << conditionsCount;
+							break;
+						case('e'):
+							codeAsm << "\n\tjne EXIT_CONDITION" << conditionsCount;
+							break;
+						}
+					}
+					// else if STR, it's mean we want check equal 
+					// (because we have only one rule in semAnalyz for str)
+					else if (firstArg->iddatatype == IT::STR)
+					{
+						element = element->next; // Q -> C
+						element = element->next; // C -> Q
+						secondArg = IT::GetEntry(it, element->idxTI);
+						codeAsm << "\n\tpush offset " << firstArg->visibility.functionName << '_' << firstArg->id;
+						codeAsm << "\n\tpush offset " << secondArg->visibility.functionName << '_' << secondArg->id;
+						codeAsm << "\n\tcall strequal";
+						codeAsm << "\n\tcmp eax, 0";
+						codeAsm << "\n\tje EXIT_CONDITION" << conditionsCount;
+					}
+					break;
 				case('&'):
 					codeAsm << "\n\tcall _AND\n\tpush\teax";
 					break;
@@ -334,7 +382,12 @@ namespace CG
 					}
 					else break;
 				case(LEX_BRACELET):
-					if (f.repeat)
+					if (f.condition && !f.repeat)
+					{
+						f.condition = false;
+						codeAsm << "EXIT_CONDITION" << conditionsCount << ":\n";
+					}
+					else if (f.repeat)
 					{
 						f.repeat = false;
 						codeAsm << "\nENDM\n";

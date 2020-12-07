@@ -179,6 +179,7 @@
     <ClInclude Include="SemAnalyzer.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="C:\Users\geshka\Desktop\SOURCECODE\logfile.txt" />
     <Text Include="C:\Users\geshka\Desktop\SOURCECODE\sourcecode.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

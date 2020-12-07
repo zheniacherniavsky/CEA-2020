@@ -11,16 +11,19 @@ namespace SemAnalyzer
 		bool returnExpression = false;
 		bool main = false;
 		bool repeat = false;
+		bool condition = false;
 		bool itos = false;
 	};
 
 	bool semAnalyzer(LT::LexTable lt, IT::IdTable it, Log::LOG_ log)
 	{
 		LT::Entry *lexem = lt.head; // таблица лексем
-		int line = 0;				// для вывода анализа	
+		int line = 0;				// для вывода анализа
+		char condition;				// для проверки условий
 		int errorCount = 0;
 		std::string errorMessage = "";
 		Error::ERROR_ errors[3];
+		short firstRepeatOrCondition = 0;  // Кто первый, цикл или условие (цикл == 1, условие == 2)
 
 		Flag f;		// флажки
 
@@ -107,6 +110,48 @@ namespace SemAnalyzer
 						}
 					}
 					break;
+				case(':'):
+					*log.stream << lexem->lexema[0];
+					f.condition = true;
+					if (firstRepeatOrCondition == 0) firstRepeatOrCondition = 2;
+					lexem = lexem->next; // : -> (
+					*log.stream << lexem->lexema[0];
+					lexem = lexem->next; // ( -> Q
+					
+					element = IT::GetEntry(it, lexem->idxTI);
+					*log.stream << getType(element);
+					*log.stream << lexem->lexema[0];
+
+					expressionType = element->iddatatype; // запоминаю первый член
+
+					lexem = lexem->next; // Q -> C
+					*log.stream << ' ' << lexem->lexema[0] << ' ';
+					condition = lexem->lexema[0]; // запоминаю условие
+
+					lexem = lexem->next; // C -> Q
+					element = IT::GetEntry(it, lexem->idxTI);
+					*log.stream << getType(element);
+
+					switch (condition)
+					{
+					case('<'):
+					case('>'):
+						if (expressionType == IT::STR || element->iddatatype == IT::STR)
+						{
+							errors[errorCount++] = Error::geterrorin(707, lexem->sn, 0);
+							errorMessage = "ДЛЯ СТРОК МОЖНО ПРОВЕРЯТЬ ТОЛЬКО ЭКВИВАЛЕНТНОСТЬ!";
+						}
+						break;
+					case('e'):
+						if ((expressionType == IT::STR && element->iddatatype == IT::INT) ||
+							(expressionType == IT::INT && element->iddatatype == IT::STR))
+						{
+							errors[errorCount++] = Error::geterrorin(708, lexem->sn, 0);
+							errorMessage = "НЕЛЬЗЯ СРАВНИВАТЬ СТРОКУ С ЧИСЛОМ!";
+						}
+						break;
+					}
+					break;
 				case LEX_DECLARE:
 					// flag declare for line
 					f.declare = true;
@@ -126,7 +171,21 @@ namespace SemAnalyzer
 					f.returnExpression = true;
 					break;
 				case LEX_BRACELET:
-					if (f.repeat) f.repeat = false;
+					if (f.repeat && !f.condition)
+					{
+						f.repeat = false;
+						firstRepeatOrCondition = 0;
+					}
+					else if (!f.repeat && f.condition)
+					{
+						f.condition = false;
+						firstRepeatOrCondition = 0;
+					}
+					else if (f.repeat && f.condition)
+					{
+						if (firstRepeatOrCondition == 1) f.condition = false;
+						else if (firstRepeatOrCondition == 2) f.repeat = false;
+					}
 					else {
 						f.returnExpression = false;
 						f.expression = false;
@@ -137,6 +196,7 @@ namespace SemAnalyzer
 					break;
 				case('w'):
 					f.repeat = true;
+					if (firstRepeatOrCondition == 0) firstRepeatOrCondition = 1;
 					break;
 				case('c'):
 					f.itos = true;

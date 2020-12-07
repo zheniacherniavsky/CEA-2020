@@ -25,6 +25,7 @@ namespace FT
 		bool _getFuncIdx	= false;
 		bool _return		= false;
 		bool _repeat		= false;
+		bool _condition		= false;
 
 		void toFalse()	// занулить все флажки
 		{
@@ -70,8 +71,8 @@ namespace FT
 		flags flag;									// флажки
 		int literalCount = 1;						// отслеживание количества литералов
 		int functionIdxMemory = -1;
+		short firstRepeatOrCondition = 0;		// Кто первый, цикл или условие (цикл == 1, условие == 2)
 
-		
 		int linePos = 0;	// позиция лексемы в строке
 
 		// добавление в таблицу лексем
@@ -103,8 +104,15 @@ namespace FT
 
 			switch (lexemSymbol)
 			{
+			case(':'):
+				if (flag._condition) throw Error::geterrorin(203, posArray[pos] + 1, 0);
+				else flag._condition = true;
+				if (firstRepeatOrCondition == 0) firstRepeatOrCondition = 2;
+				break;
 			case('w'): // repeat
-				flag._repeat = true;
+				if (flag._repeat) throw Error::geterrorin(204, posArray[pos] + 1, 0);
+				else flag._repeat = true;
+				if (firstRepeatOrCondition == 0) firstRepeatOrCondition = 1;
 				break;
 			case(LEX_DECLARE):
 				flag._declare = true;
@@ -163,7 +171,22 @@ namespace FT
 				}
 				break;
 			case(LEX_BRACELET):
-				if (!flag._repeat)
+				if (flag._repeat && !flag._condition)
+				{
+					flag._repeat = false;
+					firstRepeatOrCondition = 0;
+				}
+				else if (!flag._repeat && flag._condition)
+				{
+					flag._condition = false;
+					firstRepeatOrCondition = 0;
+				}
+				else if (flag._repeat && flag._condition)
+				{
+					if (firstRepeatOrCondition == 1) flag._condition = false;
+					else if (firstRepeatOrCondition == 2) flag._repeat = false;
+				}
+				else
 				{
 					visibArea--;
 					flag._body = false;
@@ -174,7 +197,6 @@ namespace FT
 						flag._function = false; // отслеживаю закрытие блока функции
 					}
 				}
-				else flag._repeat = false;
 				break;
 			case(LEX_RETURN):
 				flag._return = true;
@@ -211,8 +233,10 @@ namespace FT
 				// проверка на наличие в табллице
 				int checkIdx = NULL;
 
-				if (!stkFunc.empty()) 
+				if (!stkFunc.empty())
+				{
 					checkIdx = IT::IsId(it, lexemID, visibArea, stkFunc.top());
+				}
 				else throw ERROR_THROW(208);
 
 				bool newElement = false;
@@ -528,6 +552,37 @@ namespace FT
 		FST::FST fst27(lexem, 2, FST::NODE(1, FST::RELATION('|', 1)), FST::NODE());
 		FST::FST fst28(lexem, 2, FST::NODE(1, FST::RELATION('~', 1)), FST::NODE());
 
+		FST::FST fst29(lexem, 5,		// if condition (a less b)
+			FST::NODE(1, FST::RELATION('l', 1)),
+			FST::NODE(1, FST::RELATION('e', 2)),
+			FST::NODE(1, FST::RELATION('s', 3)),
+			FST::NODE(1, FST::RELATION('s', 4)),
+			FST::NODE()
+		);
+
+		FST::FST fst30(lexem, 5,		// if condition (a over b)
+			FST::NODE(1, FST::RELATION('o', 1)),
+			FST::NODE(1, FST::RELATION('v', 2)),
+			FST::NODE(1, FST::RELATION('e', 3)),
+			FST::NODE(1, FST::RELATION('r', 4)),
+			FST::NODE()
+		);
+
+		FST::FST fst31(lexem, 6,		// if condition (a equal b)
+			FST::NODE(1, FST::RELATION('e', 1)),
+			FST::NODE(1, FST::RELATION('q', 2)),
+			FST::NODE(1, FST::RELATION('u', 3)),
+			FST::NODE(1, FST::RELATION('a', 4)),
+			FST::NODE(1, FST::RELATION('l', 5)),
+			FST::NODE()
+		);
+
+		FST::FST fst32(lexem, 3,		// if condition
+			FST::NODE(1, FST::RELATION('i', 1)),
+			FST::NODE(1, FST::RELATION('f', 2)),
+			FST::NODE()
+		);
+
 		if (FST::execute(fst1) == -1) return LEX_INTEGER; // integer
 		else if (FST::execute(fst2) == -1) return LEX_STRING; // string
 		else if (FST::execute(fst3) == -1) return LEX_FUNCTION;
@@ -596,6 +651,10 @@ namespace FT
 			ltElement->priority = 3;
 			return '~';
 		}
+		else if (FST::execute(fst29) == -1) return '<'; // less
+		else if (FST::execute(fst30) == -1) return '>'; // over
+		else if (FST::execute(fst31) == -1) return 'e'; // equal
+		else if (FST::execute(fst32) == -1) return ':'; // if condition
 		else return LEX_ID;
 	}
 }
