@@ -7,7 +7,7 @@ namespace Error {
 	// 110 - 119 : ошибки открытия файла
 	ERROR_ errors[ERRORS_MAX_SIZE] =
 	{
-		ERROR_ENTRY(0, (char*)"Недопустимый код ошибки"),
+		ERROR_ENTRY(0, (char*)"Подробная ошибка описана в log файле."),
 		ERROR_ENTRY(1, (char*)"Системный сбой"),
 		ERROR_ENTRY_NODEF(2),ERROR_ENTRY_NODEF(3),ERROR_ENTRY_NODEF(4),
 		ERROR_ENTRY_NODEF(5),ERROR_ENTRY_NODEF(6),ERROR_ENTRY_NODEF(7),

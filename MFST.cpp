@@ -169,6 +169,8 @@ namespace MFST
 			*log.stream << getDiagnosis(1, buf) << std::endl;
 			*log.stream << getDiagnosis(2, buf) << std::endl;
 			*log.stream << getDiagnosis(3, buf) << std::endl;
+			std::cout << getDiagnosis(1, buf) << std::endl;
+			throw Error::geterror(0);
 			break;
 		case NS_NORULECHAIN:	MFST_TRACE4("------>NS_NORULECHAIN") break;
 		case NS_ERROR:			MFST_TRACE4("------>NS_ERROR") break;
