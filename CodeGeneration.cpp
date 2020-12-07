@@ -52,7 +52,8 @@ namespace CG
 	void CreateConstSegment(IT::IdTable& it, std::ofstream& codeAsm)
 	{
 		codeAsm << ".CONST\n";
-		codeAsm << "\toverflow db 'ERROR: VARIABLE OVERFLOW', 0\n";
+		codeAsm << "\toverflow_str db 'ERROR: STRING VARIABLE OVERFLOW', 0\n";
+		codeAsm << "\toverflow_int db 'ERROR: INTEGER VARIABLE OVERFLOW. INTEGER INTERVAL : [ 0 - 255 ]', 0\n";
 		codeAsm << "\tnull_division db 'ERROR: DIVISION BY ZERO', 0\n";
 
 		IT::Entry* element = it.head;
@@ -356,7 +357,8 @@ namespace CG
 		}
 
 		codeAsm << "\n\tjmp EXIT\ncea2020 ENDP\n\nEXIT_DIV_ON_NULL:\n\tpush offset null_division\n\tcall outstr\n\tpush - 1\n\tcall ExitProcess";
-		codeAsm << "\n\nEXIT_OVERFLOW:\n\tpush offset overflow\n\tcall outstr\n\tpush - 2\n\tcall ExitProcess\n\nEXIT:";
-		codeAsm << "\tcall ExitProcess\n\nEND start";
+		codeAsm << "\n\nEXIT_OVERFLOW_STR:\n\tpush offset overflow_str\n\tcall outstr\n\tpush - 2\n\tcall ExitProcess\n";
+		codeAsm << "\n\nEXIT_OVERFLOW_INT:\n\tpush offset overflow_int\n\tcall outstr\n\tpush - 2\n\tcall ExitProcess\n";
+		codeAsm << "\n\nEXIT:\n\tcall ExitProcess\n\nEND start";
 	}
 }
