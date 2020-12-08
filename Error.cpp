@@ -8,8 +8,9 @@ namespace Error {
 	ERROR_ errors[ERRORS_MAX_SIZE] =
 	{
 		ERROR_ENTRY(0, (char*)"Подробная ошибка описана в log файле."),
-		ERROR_ENTRY(1, (char*)"Системный сбой"),
-		ERROR_ENTRY_NODEF(2),ERROR_ENTRY_NODEF(3),ERROR_ENTRY_NODEF(4),
+		ERROR_ENTRY(1, (char*)"Системный сбой."),
+		ERROR_ENTRY(2, (char*)"Числа должны быть представлены в восьмеричной системе счисления."),
+		ERROR_ENTRY_NODEF(3),ERROR_ENTRY_NODEF(4),
 		ERROR_ENTRY_NODEF(5),ERROR_ENTRY_NODEF(6),ERROR_ENTRY_NODEF(7),
 		ERROR_ENTRY_NODEF(8),ERROR_ENTRY_NODEF(9),
 		ERROR_ENTRY_NODEF10(10),ERROR_ENTRY_NODEF10(20),ERROR_ENTRY_NODEF10(30),

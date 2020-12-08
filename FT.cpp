@@ -272,7 +272,7 @@ namespace FT
 						for (int i = 0; i < ID_MAXSIZE; i++)
 							itElement.id[i] = lexemID[i];
 
-						itElement.value.vint = NULL;
+						itElement.value.vint8 = NULL;
 						itElement.value.vstr->len = NULL;
 						itElement.value.vstr->str[0] = NULL;
 					}
@@ -299,7 +299,7 @@ namespace FT
 							b << lexem;
 							int number;
 							b >> number;
-							itElement.value.vint = number;
+							itElement.value.vint8 = number;
 						}
 						else if (itElement.iddatatype == IT::STR)
 						{

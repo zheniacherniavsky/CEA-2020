@@ -29,9 +29,10 @@ namespace IT						// таблица идентификаторов
 
 		Entry* next = nullptr;			// односвязный список (следующий элемент)
 
-		union
+		struct
 		{
 			int vint;					// значение integer
+			int vint8;					// значение в восьмеричной системе счисления
 			struct
 			{
 				int len;						// колво символов в string

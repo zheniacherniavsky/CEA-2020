@@ -1,6 +1,8 @@
 ﻿#include "IT.h"
+#include "LT.h"
 #include "Error.h"
 #include <iostream>
+#include <math.h>
 
 namespace IT
 {
@@ -19,6 +21,26 @@ namespace IT
 		newTable.head = nullptr; // голова пока пустая. Её буду заполнять при добавлении элементов
 		
 		return newTable;
+	}
+
+	int convertTo10(int num8)
+	{
+		int num10 = 0;
+		int a = 1;
+		int pos = 0;
+		while (true)
+		{
+			int check = (num8 / a) % 10;
+			if (check > 7) throw Error::geterror(2);
+			num10 += check * pow(8, pos);
+			if (num8 % a == num8) break;
+			else
+			{
+				a *= 10;
+				pos++;
+			}
+		}
+		return num10;
 	}
 
 	void Add(IdTable& idtable, Entry entry)
@@ -47,7 +69,10 @@ namespace IT
 			idtable.table->idxTI = entry.idxTI;
 			idtable.table->idxfirstLE = entry.idxfirstLE;
 			idtable.table->declared = entry.declared;
-			if(entry.value.vint != NULL) idtable.table->value.vint = entry.value.vint;
+			if (entry.value.vint8 != NULL)
+			{
+				idtable.table->value.vint = convertTo10(entry.value.vint8);
+			}
 			if(entry.value.vstr != NULL) idtable.table->value.vstr->len = entry.value.vstr->len;
 
 			idtable.table->visibility.area = entry.visibility.area;
@@ -62,11 +87,9 @@ namespace IT
 					else idtable.table->value.vstr->str[i] = entry.value.vstr->str[i];
 				}
 			}	
-
 			idtable.size++;
 		}
-		else throw ERROR_THROW(0) // допилить ошибку для переувеличения размера таблицы id
-		
+		else throw ERROR_THROW(0) // допилить ошибку для переувеличения размера таблицы id	
 	}
 
 	Entry* GetEntry(IdTable& idtable, int idx)
