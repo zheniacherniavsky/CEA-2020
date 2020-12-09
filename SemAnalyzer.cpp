@@ -40,7 +40,7 @@ namespace SemAnalyzer
 				{
 				case LEX_LITERAL:
 				case LEX_ID:
-				case('@'):
+				case LEX_DOG:
 					element = IT::GetEntry(it, lexem->idxTI);
 					*log.stream << getType(element);
 
@@ -81,7 +81,7 @@ namespace SemAnalyzer
 					}
 					else if (f.expression)
 					{
-						if (lexem->lexema[0] == '@') // function check types
+						if (lexem->lexema[0] == LEX_DOG) // function check types
 						{
 							*log.stream << "[";
 							for (int i = 0; i < lexem->func.memoryCount; i++)
@@ -110,7 +110,7 @@ namespace SemAnalyzer
 						}
 					}
 					break;
-				case(':'):
+				case(LEX_CONDITION):
 					*log.stream << lexem->lexema[0];
 					f.condition = true;
 					if (firstRepeatOrCondition == 0) firstRepeatOrCondition = 2;
@@ -134,15 +134,15 @@ namespace SemAnalyzer
 
 					switch (condition)
 					{
-					case('<'):
-					case('>'):
+					case(LEX_LESS):
+					case(LEX_OVER):
 						if (expressionType == IT::STR || element->iddatatype == IT::STR)
 						{
 							errors[errorCount++] = Error::geterrorin(707, lexem->sn, 0);
 							errorMessage = "ДЛЯ СТРОК МОЖНО ПРОВЕРЯТЬ ТОЛЬКО ЭКВИВАЛЕНТНОСТЬ!";
 						}
 						break;
-					case('e'):
+					case(LEX_EQUAL):
 						if ((expressionType == IT::STR && element->iddatatype == IT::INT) ||
 							(expressionType == IT::INT && element->iddatatype == IT::STR))
 						{
@@ -157,9 +157,11 @@ namespace SemAnalyzer
 					f.declare = true;
 					break;
 				case LEX_IS:
-					f.declare = false;
 					f.expression = true;
 					break; 
+				case LEX_SEMICOLON:
+					f.declare = false;
+					break;
 				case LEX_MAIN:
 					functionType = IT::INT;
 					f.main = true;
@@ -194,11 +196,11 @@ namespace SemAnalyzer
 						f.main = false;
 					}
 					break;
-				case('w'):
+				case(LEX_CYCLE):
 					f.repeat = true;
 					if (firstRepeatOrCondition == 0) firstRepeatOrCondition = 1;
 					break;
-				case('c'):
+				case(LEX_CONVERT):
 					f.itos = true;
 					break;
 				}

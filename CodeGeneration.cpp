@@ -76,6 +76,7 @@ namespace CG
 		bool enterPoint = false;
 		bool function = false;
 		bool condition = false;
+		bool is = false;
 	};
 
 	void CreateCodeSegment(IT::IdTable& it, LT::LexTable lt, std::ofstream& codeAsm)
@@ -98,183 +99,180 @@ namespace CG
 
 		IT::IDTYPE var_type = IT::F;
 		IT::IDTYPE first_var_type = IT::F;
+		IT::IDDATATYPE first_var_dtype = IT::EMPTY;
+		char* id_of_first_var = NULL;
 
 		char* functionName = NULL;
 
 		while (element->next)
-		// this cycle is lined cycle, it mean we get line and think that line is expression.
-		// by this way we can remember our variables, and it is simple to understand... for me.
-		// this algorythm like at SemAnalyzer.h 
 		{
-			if (element->lexema[0] == 'm')
+			switch (element->lexema[0])
 			{
+			case(LEX_IS):
+				f.is = true;
+				break;
+			case(LEX_MAIN):
 				f.enterPoint = true;
 				codeAsm << "\n\ncea2020 PROC\n";
-			}
+				break;
+			case(LEX_CONDITION):
+				conditionsCount++;
 
-			char* id_of_first_var = NULL;
-
-			IT::IDDATATYPE first_var_dtype = IT::EMPTY;
-			while (element)
-			{
-				switch (element->lexema[0])
+				codeAsm << "\n; // condition\n";
+				f.condition = true;
+				element = element->next; // : -> (
+				element = element->next; // ( -> Q
+				firstArg = IT::GetEntry(it, element->idxTI);
+				if (firstArg->iddatatype == IT::INT)
 				{
-				case(':'):
-					conditionsCount++;
-
-					codeAsm << "\n; // condition\n";
-					f.condition = true;
-					element = element->next; // : -> (
-					element = element->next; // ( -> Q
-					firstArg = IT::GetEntry(it, element->idxTI);
-					if (firstArg->iddatatype == IT::INT)
-					{
-						element = element->next; // Q -> C
-						cond = element->lexema[0];
-						element = element->next; // C -> Q
-						secondArg = IT::GetEntry(it, element->idxTI);
-						codeAsm << "\n\tmov eax, " << firstArg->visibility.functionName << '_' << firstArg->id;
-						codeAsm << "\n\tcmp eax, ";
-						codeAsm << secondArg->visibility.functionName << '_' << secondArg->id;
-						switch (cond)
-						{
-						case('<'):
-							codeAsm << "\n\tjg EXIT_CONDITION" << conditionsCount;
-							break;
-						case('>'):
-							codeAsm << "\n\tjl EXIT_CONDITION" << conditionsCount;
-							break;
-						case('e'):
-							codeAsm << "\n\tjne EXIT_CONDITION" << conditionsCount;
-							break;
-						}
-					}
-					// else if STR, it's mean we want check equal 
-					// (because we have only one rule in semAnalyz for str)
-					else if (firstArg->iddatatype == IT::STR)
-					{
-						element = element->next; // Q -> C
-						element = element->next; // C -> Q
-						secondArg = IT::GetEntry(it, element->idxTI);
-						codeAsm << "\n\tpush offset " << firstArg->visibility.functionName << '_' << firstArg->id;
-						codeAsm << "\n\tpush offset " << secondArg->visibility.functionName << '_' << secondArg->id;
-						codeAsm << "\n\tcall strequal";
-						codeAsm << "\n\tcmp eax, 0";
-						codeAsm << "\n\tje EXIT_CONDITION" << conditionsCount;
-					}
-					break;
-				case('&'):
-					codeAsm << "\n\tcall _AND\n\tpush\teax";
-					break;
-
-				case('|'):
-					codeAsm << "\n\tcall _OR\n\tpush\teax";
-					break;
-
-				case('~'):
-					element = element->next; // ~ -> i
-					itElement = IT::GetEntry(it, element->idxTI);
-					CODE_PUSH
-					codeAsm << "\n\tcall _NOT";
-					break;
-
-				case('$'):	// pow(Q, Q) function with 2 agrs
-					element = element->next; // ^ -> (
-					element = element->next; // ( -> Q
-					firstArg = IT::GetEntry(it, element->idxTI);
-					element = element->next; // i -> ,
-					element = element->next; // , -> i
+					element = element->next; // Q -> C
+					cond = element->lexema[0];
+					element = element->next; // C -> Q
 					secondArg = IT::GetEntry(it, element->idxTI);
-					// stdcall -> we push second arg, then first arg!!
-					codeAsm << "\n\tpush\t" << secondArg->visibility.functionName
-						<< '_' << secondArg->id;
-					codeAsm << "\n\tpush\t" << firstArg->visibility.functionName
-						<< '_' << firstArg->id;
-					codeAsm << "\n\tcall\tpowN";
-					codeAsm << "\n\tpush\teax";
-					element = element->next; // i -> )
-					break;
-				case('q'):	// root(Q, Q) function with 2 agrs
-					element = element->next; // q -> (
-					element = element->next; // ( -> Q
-					firstArg = IT::GetEntry(it, element->idxTI);
-					element = element->next; // i -> ,
-					element = element->next; // , -> i
+					codeAsm << "\n\tmov eax, " << firstArg->visibility.functionName << '_' << firstArg->id;
+					codeAsm << "\n\tcmp eax, ";
+					codeAsm << secondArg->visibility.functionName << '_' << secondArg->id;
+					switch (cond)
+					{
+					case(LEX_LESS):
+						codeAsm << "\n\tjg EXIT_CONDITION" << conditionsCount;
+						break;
+					case(LEX_OVER):
+						codeAsm << "\n\tjl EXIT_CONDITION" << conditionsCount;
+						break;
+					case(LEX_EQUAL):
+						codeAsm << "\n\tjne EXIT_CONDITION" << conditionsCount;
+						break;
+					}
+				}
+				// else if STR, it's mean we want check equal 
+				// (because we have only one rule in semAnalyz for str)
+				else if (firstArg->iddatatype == IT::STR)
+				{
+					element = element->next; // Q -> C
+					element = element->next; // C -> Q
 					secondArg = IT::GetEntry(it, element->idxTI);
-					// stdcall -> we push second arg, then first arg!!
-					codeAsm << "\n\tpush\t" << secondArg->visibility.functionName
-						<< '_' << secondArg->id;
-					codeAsm << "\n\tpush\t" << firstArg->visibility.functionName
-						<< '_' << firstArg->id;
-					codeAsm << "\n\tcall\trootN";
-					codeAsm << "\n\tpush\teax";
-					element = element->next; // i -> )
-					break;
-				case('f'):
-					element = element->next; // function -> i
-					itElement = IT::GetEntry(it, element->idxTI);
+					codeAsm << "\n\tpush offset " << firstArg->visibility.functionName << '_' << firstArg->id;
+					codeAsm << "\n\tpush offset " << secondArg->visibility.functionName << '_' << secondArg->id;
+					codeAsm << "\n\tcall strequal";
+					codeAsm << "\n\tcmp eax, 0";
+					codeAsm << "\n\tje EXIT_CONDITION" << conditionsCount;
+				}
+				break;
+			case(LEX_AND):
+				codeAsm << "\n\tcall _AND\n\tpush\teax";
+				break;
 
-					functionName = new char();
-					for (int i = 0; i < strlen(itElement->visibility.functionName); i++)
-						functionName[i] = itElement->visibility.functionName[i];
-					functionName[strlen(itElement->visibility.functionName)] = 0x00;
-					element = element->next; // i -> (
-					f.function = true;
-					codeAsm << functionName << " PROC ";
-					while (element->lexema[0] != ')')
+			case(LEX_OR):
+				codeAsm << "\n\tcall _OR\n\tpush\teax";
+				break;
+
+			case(LEX_INVERT):
+				element = element->next; // ~ -> i
+				itElement = IT::GetEntry(it, element->idxTI);
+				CODE_PUSH
+				codeAsm << "\n\tcall _NOT";
+				break;
+
+			case(LEX_POW):	// pow(Q, Q) function with 2 agrs
+				element = element->next; // ^ -> (
+				element = element->next; // ( -> Q
+				firstArg = IT::GetEntry(it, element->idxTI);
+				element = element->next; // i -> ,
+				element = element->next; // , -> i
+				secondArg = IT::GetEntry(it, element->idxTI);
+				// stdcall -> we push second arg, then first arg!!
+				codeAsm << "\n\tpush\t" << secondArg->visibility.functionName
+					<< '_' << secondArg->id;
+				codeAsm << "\n\tpush\t" << firstArg->visibility.functionName
+					<< '_' << firstArg->id;
+				codeAsm << "\n\tcall\tpowN";
+				codeAsm << "\n\tpush\teax";
+				element = element->next; // i -> )
+				break;
+			case(LEX_ROOT):	// root(Q, Q) function with 2 agrs
+				element = element->next; // q -> (
+				element = element->next; // ( -> Q
+				firstArg = IT::GetEntry(it, element->idxTI);
+				element = element->next; // i -> ,
+				element = element->next; // , -> i
+				secondArg = IT::GetEntry(it, element->idxTI);
+				// stdcall -> we push second arg, then first arg!!
+				codeAsm << "\n\tpush\t" << secondArg->visibility.functionName
+					<< '_' << secondArg->id;
+				codeAsm << "\n\tpush\t" << firstArg->visibility.functionName
+					<< '_' << firstArg->id;
+				codeAsm << "\n\tcall\trootN";
+				codeAsm << "\n\tpush\teax";
+				element = element->next; // i -> )
+				break;
+			case(LEX_FUNCTION):
+				element = element->next; // function -> i
+				itElement = IT::GetEntry(it, element->idxTI);
+
+				functionName = new char();
+				for (int i = 0; i < strlen(itElement->visibility.functionName); i++)
+					functionName[i] = itElement->visibility.functionName[i];
+				functionName[strlen(itElement->visibility.functionName)] = 0x00;
+				element = element->next; // i -> (
+				f.function = true;
+				codeAsm << functionName << " PROC ";
+				while (element->lexema[0] != ')')
+				{
+					if (element->lexema[0] == LEX_ID)
 					{
-						if (element->lexema[0] == LEX_ID)
-						{
-							itElement = IT::GetEntry(it, element->idxTI);
-							codeAsm << itElement->visibility.functionName << "_" << itElement->id << " :";
-							if (itElement->iddatatype == IT::INT) codeAsm << "SDWORD";
-							else if (itElement->iddatatype == IT::STR) codeAsm << "DWORD";
-							if (element->next->lexema[0] != ')') codeAsm << ", ";
-						}
-						element = element->next;
-					}
-					codeAsm << "\n";
-					break;
-				case('c'):
-					element = element->next; // itos -> (
-					element = element->next; // ( -> INT var
-					itElement = IT::GetEntry(it, element->idxTI);
-					CODE_PUSH // push INT
-					codeAsm << "\n\tcall\ttostr\n\tpush\teax";
-					element = element->next; // INT -> )
-					break;
-				case('w'):
-					f.repeat = true;
-					element = element->next; // repeat -> (
-					element = element->next; // ( -> CYCLE COUNT
-					itElement = IT::GetEntry(it, element->idxTI);
-					codeAsm << "\nREPEAT " << itElement->value.vint;
-					break;
-				case(LEX_RETURN): // r i ; return exception
-					if (f.function)
-					{
-						element = element->next; // r -> i
 						itElement = IT::GetEntry(it, element->idxTI);
-						if (itElement->iddatatype == IT::INT) codeAsm << "\n\tpush " << itElement->visibility.functionName << '_' << itElement->id;
-						else if (itElement->iddatatype == IT::STR && itElement->idtype == IT::P) codeAsm << "\n\tmov eax, [" << itElement->visibility.functionName << '_' << itElement->id << "]\n\tpush\teax";
-						else if (itElement->iddatatype == IT::STR) codeAsm << "\n\tmov eax, offset " << itElement->visibility.functionName << '_' << itElement->id << "\n\tpush\teax";
-						codeAsm << "\n\tret";
+						codeAsm << itElement->visibility.functionName << "_" << itElement->id << " :";
+						if (itElement->iddatatype == IT::INT) codeAsm << "SDWORD";
+						else if (itElement->iddatatype == IT::STR) codeAsm << "DWORD";
+						if (element->next->lexema[0] != ')') codeAsm << ", ";
 					}
-					else if (f.enterPoint)
-					{
-						element = element->next; // r -> i
-						itElement = IT::GetEntry(it, element->idxTI);
-						if (itElement->iddatatype == IT::INT) CODE_PUSH // push i
-						else if (itElement->iddatatype == IT::STR) CODE_PUSH_OFFSET // push i
-					}
-					codeAsm << "\t; // this is return of function: " << itElement->visibility.functionName << '\n';
-					break;
-				case(LEX_ID):
-				case(LEX_LITERAL):
-				case('@'):
+					element = element->next;
+				}
+				codeAsm << "\n";
+				break;
+			case(LEX_CONVERT):
+				element = element->next; // itos -> (
+				element = element->next; // ( -> INT var
+				itElement = IT::GetEntry(it, element->idxTI);
+				CODE_PUSH // push INT
+				codeAsm << "\n\tcall\ttostr\n\tpush\teax";
+				element = element->next; // INT -> )
+				break;
+			case(LEX_CYCLE):
+				f.repeat = true;
+				element = element->next; // repeat -> (
+				element = element->next; // ( -> CYCLE COUNT
+				itElement = IT::GetEntry(it, element->idxTI);
+				codeAsm << "\nREPEAT " << itElement->value.vint;
+				break;
+			case(LEX_RETURN): // r i ; return exception
+				if (f.function)
+				{
+					element = element->next; // r -> i
 					itElement = IT::GetEntry(it, element->idxTI);
-					var_type = itElement->idtype;
-					if (id_of_first_var == NULL)
+					if (itElement->iddatatype == IT::INT) codeAsm << "\n\tpush " << itElement->visibility.functionName << '_' << itElement->id;
+					else if (itElement->iddatatype == IT::STR && itElement->idtype == IT::P) codeAsm << "\n\tmov eax, [" << itElement->visibility.functionName << '_' << itElement->id << "]\n\tpush\teax";
+					else if (itElement->iddatatype == IT::STR) codeAsm << "\n\tmov eax, offset " << itElement->visibility.functionName << '_' << itElement->id << "\n\tpush\teax";
+					codeAsm << "\n\tret";
+				}
+				else if (f.enterPoint)
+				{
+					element = element->next; // r -> i
+					itElement = IT::GetEntry(it, element->idxTI);
+					if (itElement->iddatatype == IT::INT) CODE_PUSH // push i
+					else if (itElement->iddatatype == IT::STR) CODE_PUSH_OFFSET // push i
+				}
+				codeAsm << "\t; // this is return of function: " << itElement->visibility.functionName << '\n';
+				break;
+			case(LEX_ID):
+			case(LEX_LITERAL):
+			case(LEX_DOG):
+				itElement = IT::GetEntry(it, element->idxTI);
+				var_type = itElement->idtype;
+				if (id_of_first_var == NULL)
+				{
+					if (element->next->lexema[0] != LEX_SEMICOLON)
 					{
 						if (element->next->lexema[0] == ';' && itElement->iddatatype == IT::STR) break;
 
@@ -290,122 +288,117 @@ namespace CG
 
 						first_var_dtype = itElement->iddatatype;
 						first_var_type = itElement->idtype;
-
-						// if (element->next->lexema[0] == LEX_SEMICOLON) codeAsm << "\n\tpush 0";
-						break;
-					}
-					else if (element->lexema[0] != '@')
-					{
-						if (first_var_dtype == IT::INT) CODE_PUSH
-						else if (var_type == IT::P && f.function && first_var_dtype == IT::STR) CODE_PUSH_OFFSET_FUNC
-						else if (first_var_dtype == IT::STR) CODE_PUSH_OFFSET
-						break;
-					}
-					else if (element->lexema[0] == '@')
-					{
-						char* fname = new char();
-						itElement = IT::GetEntry(it, element->idxTI);
-						for (int i = 0; i < strlen(itElement->visibility.functionName); i++)
-							fname[i] = itElement->visibility.functionName[i];
-						fname[strlen(itElement->visibility.functionName)] = 0x00;
-
-						for (int i = element->func.count - 1; i >= 0; i--)
-						{
-							itElement = IT::GetEntry(it, element->func.idx[i]);
-							if (itElement->iddatatype == IT::INT) CODE_PUSH
-							else if (itElement->iddatatype == IT::STR) CODE_PUSH_OFFSET
-						}
-
-						codeAsm << "\n\tcall\t" << fname;
-						codeAsm << "\n\tpush\teax";
-						break;
-					}
-				case(LEX_PLUS):
-					if (first_var_dtype == IT::INT) CODE_PLUS
-					else if (first_var_dtype == IT::STR) CODE_PLUS_STR
-					break;
-				case(LEX_MINUS):
-					if (first_var_dtype == IT::INT) CODE_DIFF
-					break;
-				case(LEX_STAR):
-					if(first_var_dtype == IT::INT) CODE_MUL
-					break;
-
-				case(LEX_PRINT_INT):
-					element = element->next; // p -> i
-					itElement = IT::GetEntry(it, element->idxTI);
-					if (itElement->iddatatype == IT::INT)
-					{
-						CODE_PUSH // push i
-							codeAsm << "\n\tcall\toutint ; // at console\n";
-					}
-					element = element->next; // i -> ; (then this semicolon go to next lexem)
-					break;
-				case(LEX_PRINT_STR):
-					element = element->next; // p -> i
-					itElement = IT::GetEntry(it, element->idxTI);
-					if (itElement->iddatatype == IT::STR)
-					{
-						if (f.function && itElement->idtype == IT::P)
-						{
-							CODE_PUSH_OFFSET_FUNC
-								codeAsm << "\n\tcall\toutstr ; // at console\n";
-						}
-						else
-						{
-							CODE_PUSH_OFFSET // push i
-								codeAsm << "\n\tcall\toutstr ; // at console\n";
-						}
-					}
-					element = element->next; // i -> ; (then this semicolon go to next lexem)
-					break;
-				case(LEX_DIRSLASH):
-					CODE_DIV
-					break;
-				case('%'):
-					CODE_RDIV
-					break;
-				case(LEX_SEMICOLON):
-					if (id_of_first_var != NULL)
-					{
-						if (first_var_dtype == IT::INT) CODE_POP
-						else if (first_var_dtype == IT::STR)
-						{
-							if (first_var_type == IT::P)
-								CODE_POP_STR_FUNC
-							else
-							{
-								CODE_POP_STR
-							}
-						}
-						break;
-					}
-					else break;
-				case(LEX_BRACELET):
-					if (f.condition && !f.repeat)
-					{
-						f.condition = false;
-						codeAsm << "EXIT_CONDITION" << conditionsCount << ":\n";
-					}
-					else if (f.repeat)
-					{
-						f.repeat = false;
-						codeAsm << "\nENDM\n";
-					}
-					else if (f.function)
-					{
-						f.function = false;
-						codeAsm << functionName << " ENDP\n\n";
-						functionName = NULL;
 					}
 					break;
 				}
-				if (element->next && element->sn == element->next->sn) element = element->next;
-				else break;
-			}
+				else if (element->lexema[0] != LEX_DOG)
+				{
+					if (first_var_dtype == IT::INT) CODE_PUSH
+					else if (var_type == IT::P && f.function && first_var_dtype == IT::STR) CODE_PUSH_OFFSET_FUNC
+					else if (first_var_dtype == IT::STR) CODE_PUSH_OFFSET
+					break;
+				}
+				else if (element->lexema[0] == LEX_DOG)
+				{
+					char* fname = new char();
+					itElement = IT::GetEntry(it, element->idxTI);
+					for (int i = 0; i < strlen(itElement->visibility.functionName); i++)
+						fname[i] = itElement->visibility.functionName[i];
+					fname[strlen(itElement->visibility.functionName)] = 0x00;
 
-			id_of_first_var = NULL;
-			first_var_dtype = IT::EMPTY;
+					for (int i = element->func.count - 1; i >= 0; i--)
+					{
+						itElement = IT::GetEntry(it, element->func.idx[i]);
+						if (itElement->iddatatype == IT::INT) CODE_PUSH
+						else if (itElement->iddatatype == IT::STR) CODE_PUSH_OFFSET
+					}
+
+					codeAsm << "\n\tcall\t" << fname;
+					codeAsm << "\n\tpush\teax";
+					break;
+				}
+			case(LEX_PLUS):
+				if (first_var_dtype == IT::INT) CODE_PLUS
+				else if (first_var_dtype == IT::STR) CODE_PLUS_STR
+				break;
+			case(LEX_MINUS):
+				if (first_var_dtype == IT::INT) CODE_DIFF
+				break;
+			case(LEX_STAR):
+				if(first_var_dtype == IT::INT) CODE_MUL
+				break;
+
+			case(LEX_PRINT_INT):
+				element = element->next; // p -> i
+				itElement = IT::GetEntry(it, element->idxTI);
+				if (itElement->iddatatype == IT::INT)
+				{
+					CODE_PUSH // push i
+						codeAsm << "\n\tcall\toutint ; // at console\n";
+				}
+				element = element->next; // i -> ; (then this semicolon go to next lexem)
+				break;
+			case(LEX_PRINT_STR):
+				element = element->next; // p -> i
+				itElement = IT::GetEntry(it, element->idxTI);
+				if (itElement->iddatatype == IT::STR)
+				{
+					if (f.function && itElement->idtype == IT::P)
+					{
+						CODE_PUSH_OFFSET_FUNC
+							codeAsm << "\n\tcall\toutstr ; // at console\n";
+					}
+					else
+					{
+						CODE_PUSH_OFFSET // push i
+							codeAsm << "\n\tcall\toutstr ; // at console\n";
+					}
+				}
+				element = element->next; // i -> ; (then this semicolon go to next lexem)
+				break;
+			case(LEX_DIRSLASH):
+				CODE_DIV
+				break;
+			case(LEX_PERCENT):
+				CODE_RDIV
+				break;
+			case(LEX_SEMICOLON):
+				if (f.is && id_of_first_var != NULL)
+				{
+					f.is = false;
+					if (first_var_dtype == IT::INT) CODE_POP
+					else if (first_var_dtype == IT::STR)
+					{
+						if (first_var_type == IT::P)
+							CODE_POP_STR_FUNC
+						else
+						{
+							CODE_POP_STR
+						}
+					}
+				}
+				id_of_first_var = NULL;
+				first_var_dtype = IT::EMPTY;
+				break;
+			case(LEX_BRACELET):
+				if (f.condition && !f.repeat)
+				{
+					f.condition = false;
+					codeAsm << "EXIT_CONDITION" << conditionsCount << ":\n";
+				}
+				else if (f.repeat)
+				{
+					f.repeat = false;
+					codeAsm << "\nENDM\n";
+				}
+				else if (f.function)
+				{
+					f.function = false;
+					codeAsm << functionName << " ENDP\n\n";
+					functionName = NULL;
+				}
+				break;
+			}
 			element = element->next;
 		}
 

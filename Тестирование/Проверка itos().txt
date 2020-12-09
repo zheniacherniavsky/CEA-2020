@@ -1,0 +1,17 @@
+integer function sum(int a, int b)
+{
+	declare int c = a + b;
+	return c;
+};
+
+main
+{
+	declare int a = sum(2,3);
+
+	declare string ex1 = "sum(2,3) = ";
+	declare string sa = itos(a);
+	ex1 = ex1 + sa;
+	sout ex1;
+
+	return 0;
+};

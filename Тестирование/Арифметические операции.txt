@@ -1,0 +1,30 @@
+integer function sum(int a, int b)
+{
+	declare int c = a + b;
+	return c;
+};
+
+main
+{
+	declare int a;
+	
+	a = (2+3)*5/5%3;
+	iout a;
+
+	a = 7 & 2;
+	iout a;
+
+	a = 7 | 3;
+	iout a;
+
+	a = pow(2,3);
+	iout a;
+
+	a = root(4,2);
+	iout a;
+
+	a = 2 + sum(2,2) + 2;
+	iout a;
+
+	return 0;
+};

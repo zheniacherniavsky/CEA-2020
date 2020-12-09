@@ -38,10 +38,10 @@ namespace PN
 					if (result->lexema[0] != NULL && saved) result = result->next;
 					lenta = lenta->next; // = -> expression
 
-					if (lenta->lexema[0] == 'q' ||
-						lenta->lexema[0] == '$' ||
-						lenta->lexema[0] == 'c' ||
-						lenta->lexema[0] == '~')
+					if (lenta->lexema[0] == LEX_ROOT ||
+						lenta->lexema[0] == LEX_POW ||
+						lenta->lexema[0] == LEX_CONVERT ||
+						lenta->lexema[0] == LEX_INVERT)
 					{
 						specialFunction = true;
 						break;
@@ -66,9 +66,9 @@ namespace PN
 					case LEX_STAR:
 					case LEX_DIRSLASH:
 					case LEX_SEMICOLON:
-					case('%'):
-					case('&'):
-					case('|'):
+					case LEX_PERCENT:
+					case LEX_AND:
+					case LEX_OR:
 						addToStack(stack, result, lenta);
 						if (result->lexema[0] != NULL) result = result->next;
 						break;
@@ -105,7 +105,7 @@ namespace PN
 					}
 				}
 				result.func.count = parms;
-				result.lexema[0] = '@';
+				result.lexema[0] = LEX_DOG;
 				result.func.memoryCount = function->func.memoryCount;
 				for (int i = 0; i < function->func.memoryCount; i++)
 					result.func.memoryType[i] = function->func.memoryType[i];
@@ -169,9 +169,9 @@ namespace PN
 			break;
 		case LEX_STAR:
 		case LEX_DIRSLASH:
-		case('%'):
-		case('&'):
-		case('|'):
+		case LEX_PERCENT:
+		case LEX_AND:
+		case LEX_OR:
 			if (stack.empty() || element->priority > stack.top()->priority)
 				stack.push(element);
 			else

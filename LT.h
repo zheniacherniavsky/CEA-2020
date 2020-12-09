@@ -29,6 +29,19 @@
 #define LEX_STAR '*' // *
 #define LEX_DIRSLASH '/' // /
 #define LEX_IS '='
+#define LEX_CYCLE 'w' // repeat()
+#define LEX_CONDITION ':' // if()
+#define LEX_CONVERT 'c' // itos()
+#define LEX_POW '$' // pow()
+#define LEX_ROOT 'q' // root()
+#define LEX_PERCENT '%'
+#define LEX_AND '&'
+#define LEX_OR '|'
+#define LEX_INVERT '~'
+#define LEX_LESS '<'
+#define LEX_OVER '>'
+#define LEX_EQUAL 'e'
+#define LEX_DOG '@'
 
 namespace LT // таблица лексем
 {

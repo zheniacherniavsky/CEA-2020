@@ -1,0 +1,31 @@
+integer function sum(int a, int b)
+{
+	declare int c = a + b;
+	return c;
+};
+
+string function con1(string a, string b)
+{
+	declare string c = a + b;
+	return c;
+};
+
+string function con2(string a, int b)
+{
+	declare string sb = itos(b);
+	declare string c = a + sb;
+	return c;
+};
+
+main
+{
+	declare int a = sum(2,3);
+	declare string b = con1("Hello ", "World!");
+	declare string c = con2("My age is: ", 7);
+	
+	iout a;
+	sout b;
+	sout c;
+
+	return 0;
+};

@@ -78,7 +78,7 @@ namespace FT
 		// добавление в таблицу лексем
 		while (lexem[0] != 0x00)
 		{
-			if (posArray[pos] != posArray[pos - 1] && !flag._repeat) flag.toFalse();
+			// if (posArray[pos] != posArray[pos - 1] && !flag._repeat) flag.toFalse();
 			
 			char lexemID[ID_MAXSIZE]; // айди лексемы
 			for (int i = 0; i < ID_MAXSIZE; i++)
@@ -104,12 +104,12 @@ namespace FT
 
 			switch (lexemSymbol)
 			{
-			case(':'):
+			case(LEX_CONDITION):
 				if (flag._condition) throw Error::geterrorin(203, posArray[pos] + 1, 0);
 				else flag._condition = true;
 				if (firstRepeatOrCondition == 0) firstRepeatOrCondition = 2;
 				break;
-			case('w'): // repeat
+			case(LEX_CYCLE): // repeat
 				if (flag._repeat) throw Error::geterrorin(204, posArray[pos] + 1, 0);
 				else flag._repeat = true;
 				if (firstRepeatOrCondition == 0) firstRepeatOrCondition = 1;
@@ -360,40 +360,24 @@ namespace FT
 	{
 		int* array = new int[MAX_LEXEMS_LENGTH];
 		char* p = &code[0];
-		bool endLine;
-		bool emptyLine;
 		for (int line = 0, pos = 0; *p != '\0'; *p++)
 		{
-			endLine = false;
-			emptyLine = true;
-			int count = 0;
-			while (*p != '\n')
+			if (*p == '\n')
 			{
-				if (*p == ' ') while (*p == ' ') *p++; // пропускаем пробелы
-				while (*p != ' ') {
-					if (*p != '\n') {
-						*p++; // проходим лексему
-					}
-					else
-					{
-						endLine = true;
-						break;
-					}
-				}
-				if (!endLine)
+				line++;
+				continue;
+			}
+			if (*p != ' ')
+			{
+				array[pos++] = line;
+				while (*p != ' ')
 				{
-					count++;
-					array[pos] = line;
-					pos++;
-				} if (endLine && !count)
-				{
-					array[pos] = line;
-					pos++;
+					*p++;
+					if (*p == '\n') break;
 				}
 			}
-			line++;
+			if (*p == '\n') line++;
 		}
-		std::cout << std::endl;
 		return array;
 	}
 
@@ -627,34 +611,34 @@ namespace FT
 		else if (FST::execute(fst18) == -1) return LEX_NUMBER; // number
 		else if (FST::execute(fst19) == -1) return LEX_MAIN; // main
 		else if (FST::execute(fst20) == -1) return LEX_PRINT_STR; // main
-		else if (FST::execute(fst21) == -1) return 'w'; // repeat cycle
-		else if (FST::execute(fst22) == -1) return 'c'; // convert int to string
-		else if (FST::execute(fst23) == -1) return '$'; // pow function
-		else if (FST::execute(fst24) == -1) return 'q'; // root function
+		else if (FST::execute(fst21) == -1) return LEX_CYCLE; // repeat cycle
+		else if (FST::execute(fst22) == -1) return LEX_CONVERT; // convert int to string
+		else if (FST::execute(fst23) == -1) return LEX_POW; // pow function
+		else if (FST::execute(fst24) == -1) return LEX_ROOT; // root function
 		else if (FST::execute(fst25) == -1)
 		{
 			ltElement->priority = 3;
-			return '%';
+			return LEX_PERCENT;
 		}
 		else if (FST::execute(fst26) == -1)
 		{
 			ltElement->priority = 3;
-			return '&';
+			return LEX_AND;
 		}
 		else if (FST::execute(fst27) == -1)
 		{
 			ltElement->priority = 3;
-			return '|';
+			return LEX_OR;
 		}
 		else if (FST::execute(fst28) == -1)
 		{
 			ltElement->priority = 3;
-			return '~';
+			return LEX_INVERT;
 		}
-		else if (FST::execute(fst29) == -1) return '<'; // less
-		else if (FST::execute(fst30) == -1) return '>'; // over
-		else if (FST::execute(fst31) == -1) return 'e'; // equal
-		else if (FST::execute(fst32) == -1) return ':'; // if condition
+		else if (FST::execute(fst29) == -1) return LEX_LESS; // less
+		else if (FST::execute(fst30) == -1) return LEX_OVER; // over
+		else if (FST::execute(fst31) == -1) return LEX_EQUAL; // equal
+		else if (FST::execute(fst32) == -1) return LEX_CONDITION; // if condition
 		else return LEX_ID;
 	}
 }
