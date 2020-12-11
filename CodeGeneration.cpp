@@ -302,6 +302,7 @@ namespace CG
 				{
 					char* fname = new char();
 					itElement = IT::GetEntry(it, element->idxTI);
+					IT::IDDATATYPE t = itElement->iddatatype;
 					for (int i = 0; i < strlen(itElement->visibility.functionName); i++)
 						fname[i] = itElement->visibility.functionName[i];
 					fname[strlen(itElement->visibility.functionName)] = 0x00;
@@ -313,8 +314,16 @@ namespace CG
 						else if (itElement->iddatatype == IT::STR) CODE_PUSH_OFFSET
 					}
 
-					codeAsm << "\n\tcall\t" << fname;
-					codeAsm << "\n\tpush\teax";
+					if (t == IT::STR)
+					{
+						codeAsm << "\n\tcall\t" << fname;
+						codeAsm << "\n\tpush\teax";
+					}
+					else if (t == IT::INT)
+					{
+						codeAsm << "\n\tcall\t" << fname;
+						codeAsm << "\n\tpop\teax";
+					}
 					break;
 				}
 			case(LEX_PLUS):
