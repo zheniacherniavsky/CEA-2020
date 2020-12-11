@@ -314,7 +314,7 @@ namespace CG
 					}
 
 					codeAsm << "\n\tcall\t" << fname;
-					codeAsm << "\n\tpush\teax";
+					codeAsm << "\n\tpop\teax";
 					break;
 				}
 			case(LEX_PLUS):
