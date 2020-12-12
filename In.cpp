@@ -70,21 +70,28 @@ namespace In {
 			{
 				continue; // служебный комментарий 
 			}
+			info.fullLines++;
 			bool _literal = false;
 			for (int i = 0, spaceControl = 0; i <= line.length(); i++)
 			{
+				info.fullsize++;
 				// проверка на литерал
 				if (line[i] == '\"' || line[i] == '\'')
 					_literal ? _literal = false : _literal = true;
 				if (line[i] == ' ' && _literal)
 				{
 					code += '_';
+					info.size++;
 					continue;
 				}
 				
 				if (!_literal)
 				{
-					if (checkSeparators(code, line[i])) continue; // добавление пробелов для разделения между лексемами
+					if (checkSeparators(code, line[i])) // добавление пробелов для разделения между лексемами
+					{
+						info.size += 2; // 2 пробела
+						continue; 
+					}
 				}
 				
 				// Проверка символа на допустимость

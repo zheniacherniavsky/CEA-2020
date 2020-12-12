@@ -16,7 +16,7 @@ namespace Error {
 		ERROR_ENTRY_NODEF10(10),ERROR_ENTRY_NODEF10(20),ERROR_ENTRY_NODEF10(30),
 		ERROR_ENTRY_NODEF10(40),ERROR_ENTRY_NODEF10(50),ERROR_ENTRY_NODEF10(60),
 		ERROR_ENTRY_NODEF10(70),ERROR_ENTRY_NODEF10(80),ERROR_ENTRY_NODEF10(90),
-		ERROR_ENTRY(100, (char*)"Возможно использовать только 3 параметра [-in: , -out: , -log:]"),
+		ERROR_ENTRY(100, (char*)"Возможно использовать только 6 параметров [-in: , -out: , -log:, -lex, -id, -tree]"),
 		ERROR_ENTRY(101, (char*)"Параметр -in: должен быть задан"),
 		ERROR_ENTRY(102, (char*)"Синтаксическая ошибка для параметра [-in:]"),
 		ERROR_ENTRY(103, (char*)"Синтаксическая ошибка для параметра [-out:]"),

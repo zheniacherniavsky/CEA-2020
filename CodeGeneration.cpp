@@ -23,6 +23,7 @@ namespace CG
 		codeAsm << "EXTRN _NOT : PROC\n";
 		codeAsm << "EXTRN tostr : PROC\n";
 		codeAsm << "EXTRN strequal : PROC\n";
+		codeAsm << "EXTRN _pause : PROC\n";
 
 		codeAsm << "\n.STACK 4096\n"; // stack
 
@@ -260,6 +261,7 @@ namespace CG
 				{
 					element = element->next; // r -> i
 					itElement = IT::GetEntry(it, element->idxTI);
+					codeAsm << "\n\tcall _pause";
 					if (itElement->iddatatype == IT::INT) CODE_PUSH // push i
 					else if (itElement->iddatatype == IT::STR) CODE_PUSH_OFFSET // push i
 				}

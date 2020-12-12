@@ -58,8 +58,8 @@ int main(int argc, char* argv[])
 		IT::IdTable idTable = IT::Create(TBL_LENGTH); // создаю таблицу идентификаторов размеров 2048
 
 		In::_IN_ in = In::getin(lexTable, idTable, parms.in, parms.out);	// получение in структуры
-		makeOutWithLT(lexTable, idTable, true, true, log);
-		makeOutWithIT(idTable, log);
+		if(parms.lex) makeOutWithLT(lexTable, idTable, true, true, log);
+		if(parms.id) makeOutWithIT(idTable, log);
 
 		*log.stream << "\n\n\tСинтаксический анализатор\n";
 		MFST_TRACE_START;								// оладка
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 		if (mfst.start(log)) // синтаксическийй анализ
 		{
 			mfst.savededucation();
-			mfst.printrules(log);
+			if(parms.tree) mfst.printrules(log);
 
 			PN::PolishNotation(lexTable, idTable, true); // last arg is debug
 			*log.stream << "\n\tПольская запись:\n";
@@ -97,6 +97,7 @@ int main(int argc, char* argv[])
 			Log::WriteError(log, e);
 			Log::Close(log);
 		}
+		system("pause");
 		return -1;
 	}
 }
