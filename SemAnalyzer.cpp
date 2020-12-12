@@ -157,6 +157,7 @@ namespace SemAnalyzer
 					f.declare = true;
 					break;
 				case LEX_IS:
+					f.declare = false;
 					f.expression = true;
 					break; 
 				case LEX_SEMICOLON:

@@ -251,9 +251,9 @@ namespace CG
 				{
 					element = element->next; // r -> i
 					itElement = IT::GetEntry(it, element->idxTI);
-					if (itElement->iddatatype == IT::INT) codeAsm << "\n\tpush " << itElement->visibility.functionName << '_' << itElement->id;
-					else if (itElement->iddatatype == IT::STR && itElement->idtype == IT::P) codeAsm << "\n\tmov eax, [" << itElement->visibility.functionName << '_' << itElement->id << "]\n\tpush\teax";
-					else if (itElement->iddatatype == IT::STR) codeAsm << "\n\tmov eax, offset " << itElement->visibility.functionName << '_' << itElement->id << "\n\tpush\teax";
+					if (itElement->iddatatype == IT::INT) codeAsm << "\n\tmov eax, " << itElement->visibility.functionName << '_' << itElement->id;
+					else if (itElement->iddatatype == IT::STR && itElement->idtype == IT::P) codeAsm << "\n\tmov eax, [" << itElement->visibility.functionName << '_' << itElement->id;
+					else if (itElement->iddatatype == IT::STR) codeAsm << "\n\tmov eax, offset " << itElement->visibility.functionName << '_' << itElement->id;
 					codeAsm << "\n\tret";
 				}
 				else if (f.enterPoint)
@@ -314,16 +314,8 @@ namespace CG
 						else if (itElement->iddatatype == IT::STR) CODE_PUSH_OFFSET
 					}
 
-					if (t == IT::STR)
-					{
-						codeAsm << "\n\tcall\t" << fname;
-						codeAsm << "\n\tpush\teax";
-					}
-					else if (t == IT::INT)
-					{
-						codeAsm << "\n\tcall\t" << fname;
-						codeAsm << "\n\tpop\teax";
-					}
+					codeAsm << "\n\tcall\t" << fname;
+					codeAsm << "\n\tpush\teax";
 					break;
 				}
 			case(LEX_PLUS):

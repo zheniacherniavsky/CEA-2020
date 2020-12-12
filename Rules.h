@@ -42,8 +42,8 @@ namespace GRB
 			Rule::Chain(3, TS('('), NS('E'), TS(')')),
 			Rule::Chain(3, TS('i'), TS('('), TS(')')),
 			Rule::Chain(4, TS('i'), TS('('), NS('W'), TS(')')),
-			Rule::Chain(4, TS('c'), TS('('), TS('i'), TS(')')),// sab
-			Rule::Chain(5, TS('c'), TS('('), TS('i'), TS(')'), NS('N')), // sab
+			Rule::Chain(4, TS('c'), TS('('), NS('Q'), TS(')')),// sab
+			Rule::Chain(5, TS('c'), TS('('), NS('Q'), TS(')'), NS('N')), // sab
 			Rule::Chain(2, TS('i'), NS('M')),
 			Rule::Chain(2, TS('l'), NS('M')),
 			Rule::Chain(4, TS('('), NS('E'), TS(')'), NS('M')),
