@@ -173,12 +173,14 @@ namespace SemAnalyzer
 						errors[errorCount++] = Error::geterrorin(705, lexem->sn, 0);
 						errorMessage = "ОШИБКА В ПАРАМЕТРАХ ВЫЗЫВАЕМОЙ ФУНКЦИИ. НЕ СОВПАДАЮТ ТИПЫ";
 					}
+					break;
 				case LEX_PRINT_STR:
 					if (IT::GetEntry(it, lexem->next->idxTI)->iddatatype != IT::STR)
 					{
 						errors[errorCount++] = Error::geterrorin(705, lexem->sn, 0);
 						errorMessage = "ОШИБКА В ПАРАМЕТРАХ ВЫЗЫВАЕМОЙ ФУНКЦИИ. НЕ СОВПАДАЮТ ТИПЫ";
 					}
+					break;
 				case LEX_FUNCTION:
 					f.function = true; // function body
 					break;
