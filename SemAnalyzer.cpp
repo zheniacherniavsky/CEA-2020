@@ -167,6 +167,18 @@ namespace SemAnalyzer
 					functionType = IT::INT;
 					f.main = true;
 					break;
+				case LEX_PRINT_INT:
+					if (IT::GetEntry(it, lexem->next->idxTI)->iddatatype != IT::INT)
+					{
+						errors[errorCount++] = Error::geterrorin(705, lexem->sn, 0);
+						errorMessage = "ОШИБКА В ПАРАМЕТРАХ ВЫЗЫВАЕМОЙ ФУНКЦИИ. НЕ СОВПАДАЮТ ТИПЫ";
+					}
+				case LEX_PRINT_STR:
+					if (IT::GetEntry(it, lexem->next->idxTI)->iddatatype != IT::STR)
+					{
+						errors[errorCount++] = Error::geterrorin(705, lexem->sn, 0);
+						errorMessage = "ОШИБКА В ПАРАМЕТРАХ ВЫЗЫВАЕМОЙ ФУНКЦИИ. НЕ СОВПАДАЮТ ТИПЫ";
+					}
 				case LEX_FUNCTION:
 					f.function = true; // function body
 					break;
