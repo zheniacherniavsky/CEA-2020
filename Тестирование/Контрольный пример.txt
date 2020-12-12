@@ -1,0 +1,35 @@
+integer function sum(int a, int b)
+{
+	declare int c = a + b;
+	return c;
+};
+
+string function menu(string a)
+{
+	declare string r = "- + - + - + - " + a + " - + - + - + -";
+	return r;
+};
+
+main
+{
+	declare string s1 = menu("Закупочки");
+	sout s1;
+	
+	declare int i1 = 2;
+	declare int i2 = 1 + sum(3,i1) + 1;
+	declare string s2 = itos(i2);
+	declare string s3 = "Помидоры: " + s2;
+	sout s3;
+
+	declare int i3 = pow(2,2);
+	declare string s4 = itos(i3);
+	declare string s5 = "Яблоки: " + s4;
+	sout s5;
+
+	declare int i4 = root(11,3);
+	declare string s6 = itos(i4);
+	declare string s7 = "Рыба: " + s6;
+	sout s7;
+
+	return 0;
+};
