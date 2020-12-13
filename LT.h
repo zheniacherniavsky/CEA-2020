@@ -12,25 +12,25 @@
 #define LEX_ID				'i'			// лексема для идентификатора
 #define LEX_LITERAL			'l'			// лексема для литерала
 #define LEX_NUMBER			'n'			// для числа
-#define LEX_FUNCTION		'f'			// лексема для функции
+#define LEX_FUNCTION			'f'			// лексема для функции
 #define LEX_DECLARE			'd'			// лексема для declare
 #define LEX_RETURN			'r'			// лексема для return
-#define LEX_PRINT_INT		'p'			// лексема для print
-#define LEX_PRINT_STR		's'			// лексема для print
+#define LEX_PRINT_INT			'p'			// лексема для print
+#define LEX_PRINT_STR			's'			// лексема для print
 #define LEX_MAIN			'm'			// main
-#define LEX_SEMICOLON		';'			// лексема для ;
+#define LEX_SEMICOLON			';'			// лексема для ;
 #define LEX_COMMA			','			// лексема для ,
-#define LEX_LEFTBRACE		'{'			// лексема для {
-#define LEX_BRACELET		'}'			// лексема для }
-#define LEX_LEFTHESIS		'('			// лексема для (
-#define LEX_RIGHTHESIS		')'			// лексема для )
+#define LEX_LEFTBRACE			'{'			// лексема для {
+#define LEX_BRACELET			'}'			// лексема для }
+#define LEX_LEFTHESIS			'('			// лексема для (
+#define LEX_RIGHTHESIS			')'			// лексема для )
 #define LEX_PLUS			'+'			// лексема для +
 #define LEX_MINUS			'-'			// лексема для - 
 #define LEX_STAR			'*'			// лексема для *
-#define LEX_DIRSLASH		'/'			// лексема для /
+#define LEX_DIRSLASH			'/'			// лексема для /
 #define LEX_IS				'='			// лексема для =
 #define LEX_CYCLE			'w'			// лексема для repeat()
-#define LEX_CONDITION		':'			// лексема для if()
+#define LEX_CONDITION			':'			// лексема для if()
 #define LEX_CONVERT			'c'			// лексема для itos()
 #define LEX_POW				'$'			// лексема для pow()
 #define LEX_ROOT			'q'			// лексема для root()
