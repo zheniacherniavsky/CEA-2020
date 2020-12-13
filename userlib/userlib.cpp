@@ -7,10 +7,44 @@
 // TODO: Это пример библиотечной функции.
 extern "C"
 {
+	void _pause()
+	{
+		system("pause");
+		return;
+	}
+
 	void outint(int a)
 	{
-		std::cout << a << std::endl;
+		setlocale(LC_ALL, "rus");
+		std::cout << a << " [ Десятичная система счисления ]" << std::endl;
 		return;
+	}
+
+	int _AND(int a, int b)
+	{
+		return b & a; // b % a тк берем из стека первым a, но это короче b, так шо местами меняем оп оп 
+	}
+
+	int _OR(int a, int b)
+	{
+		return b | a;
+	}
+
+	int _NOT(int a)
+	{
+		return ~a;
+	}
+
+	int powN(int num, int degree)
+	{
+		int r = pow(num, degree);
+		return r;
+	}
+
+	int rootN(int num, int degree)
+	{
+		int r = pow(num, 1.0/degree);
+		return r;
 	}
 
 	char* copystr(char* str1, char* str2)
@@ -22,10 +56,12 @@ extern "C"
 			ExitProcess(0);
 		}
 		else
+		{
 			return strcpy(str1, str2);
+		}
 	}
 
-	char* ConvertToChar(int number) {
+	char* tostr(int number) {
 
 		char* buffer = (char*)calloc(5, sizeof(char));
 		int pos = 100; // max num value is 255
@@ -49,13 +85,10 @@ extern "C"
 		return buffer;
 	}
 
-	int intpow(int a, int b)
-	{
-		return pow(a, b);
-	}
-
 	void outstr(char* str)
 	{
+		SetConsoleOutputCP(1251);
+		SetConsoleCP(1251);
 		if (!str)
 		{
 			std::cout << "ERROR: Null string in strcon function!!!" << std::endl;
@@ -78,7 +111,20 @@ extern "C"
 		}
 		strcpy(buf, str2);
 		strcat(buf, str1);
-
+		
 		return  buf;
+	}
+
+	int strequal(char* str1, char* str2)
+	{
+		if (!str1 || !str2)
+		{
+			std::cout << "ERROR: Null string in strcon function!!!" << std::endl;
+			system("pause");
+			ExitProcess(0);
+		}
+
+		if (strcmp(str1, str2) == 0) return 1;
+		else return 0;
 	}
 }
