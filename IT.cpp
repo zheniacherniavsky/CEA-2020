@@ -117,7 +117,7 @@ namespace IT
 				if (equal(element->visibility.functionName, fnkName)) // параметры и переменные
 					return element->idxTI;
 				else if (element->idtype == IT::F) // вызов функции
-					return element->idxTI;		
+					return element->idxTI;
 			}	
 			element = element->next;
 		}

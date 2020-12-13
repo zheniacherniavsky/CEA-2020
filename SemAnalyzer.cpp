@@ -48,11 +48,13 @@ namespace SemAnalyzer
 					{
 						errors[errorCount++] = Error::geterrorin(700, lexem->sn, 0);
 						errorMessage = "ЭТА ПЕРЕМЕННА УЖЕ БЫЛА ОБЪЯВЛЕНА";
+						break;
 					}
 					else if (!element->declared && !f.declare && element->idtype == IT::V)
 					{
 						errors[errorCount++] = Error::geterrorin(701, lexem->sn, 0);
 						errorMessage = "ВЫЗОВ НЕОБЪЯВЛЕННОЙ ПЕРЕМЕННОЙ";
+						break;
 					}
 					else if (!element->declared && f.declare && element->idtype == IT::V)
 						element->declared = true;
@@ -66,11 +68,13 @@ namespace SemAnalyzer
 							{
 								errors[errorCount++] = Error::geterrorin(702, lexem->sn, 0);
 								errorMessage = "ВОЗРАЩАЕМОЕ ЗНАЧЕНИЕ НЕ СОВПАДАЕТ С ТИПОМ ФУНКЦИИ";
+								break;
 							}
 							else
 							{
 								errors[errorCount++] = Error::geterrorin(703, lexem->sn, 0);
 								errorMessage = "ВОЗРАЩАЕМОЕ ЗНАЧЕНИЕ НЕ СОВПАДАЕТ С ТИПОМ ФУНКЦИИ (ТИП ФУНКЦИИ MAIN -> INT)";
+								break;
 							}
 						}
 					}
